@@ -1,0 +1,881 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="SVD,特征值,特征向量,矩阵对角化," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="任何一个线性变换都可以用一个矩阵$A$来表示。线性变换解耦是通过对角化实现的。本文将简单介绍线性变换的含义尤其是几何含义，同时简要介绍下特征值对角化与奇异值对角化的方法，并分析了特征值与奇异值的异同。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="小论线性变换">
+<meta property="og:url" content="http://younggy.com/2015/11/26/小论线性变换/index.html">
+<meta property="og:site_name" content="YoungGy">
+<meta property="og:description" content="任何一个线性变换都可以用一个矩阵$A$来表示。线性变换解耦是通过对角化实现的。本文将简单介绍线性变换的含义尤其是几何含义，同时简要介绍下特征值对角化与奇异值对角化的方法，并分析了特征值与奇异值的异同。">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/kernel.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0360.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0361.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0363.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0362.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0364.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0365.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0366.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0367.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0368.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0369.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0368.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0370.png">
+<meta property="og:updated_time" content="2015-11-26T09:46:43.643Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="小论线性变换">
+<meta name="twitter:description" content="任何一个线性变换都可以用一个矩阵$A$来表示。线性变换解耦是通过对角化实现的。本文将简单介绍线性变换的含义尤其是几何含义，同时简要介绍下特征值对角化与奇异值对角化的方法，并分析了特征值与奇异值的异同。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post',
+    motion: false
+  };
+</script>
+
+  <title> 小论线性变换 | YoungGy </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?your-analytics-id";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">YoungGy</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">心有猛虎 细嗅蔷薇</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tools">
+          <a href="/tools" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            工具
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'owv-2W-dWzRWk1KttzWi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                小论线性变换
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-11-26T17:38:02+08:00" content="2015-11-26">
+              2015-11-26
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/矩阵/" itemprop="url" rel="index">
+                    <span itemprop="name">矩阵</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/11/26/小论线性变换/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/26/小论线性变换/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/kernel.png" alt="这里写图片描述"></p>
+<p>任何一个线性变换都可以用一个矩阵$A$来表示。<br>线性变换解耦是通过对角化实现的。本文将简单介绍线性变换的含义尤其是几何含义，同时简要介绍下特征值对角化与奇异值对角化的方法，并分析了特征值与奇异值的异同。</p>
+<a id="more"></a>
+<p>#EIG分解</p>
+<p>特征值分解的适应情况是：</p>
+<ol>
+<li>矩阵是方阵</li>
+<li>矩阵有足够的特征向量</li>
+<li>如果矩阵有不相同的特征值 ，那么肯定有足够的特征向量</li>
+</ol>
+<p>对角矩阵本质上是每个轴上的不耦合地伸缩。<br>$$A1 = \begin{bmatrix}<br>1 &amp; 0 \\<br>0 &amp; 2<br>\end{bmatrix},A2 =\begin{bmatrix}<br>1 &amp; 2 \\<br>0 &amp; 1<br>\end{bmatrix}$$</p>
+<table><tr><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0360.png" width="400" alt="图片名称" border="0"></td><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0361.png" width="400" alt="图片名称" border="0"></td><br></tr></table>
+
+
+<p>如果矩阵的特征向量充满了整个空间，并且都不为0，那么可以进行$S\Lambda S^{-1} $对角化分解。<br>矩阵对角化的本质就是换一组或者两组基底，使得在各组基底下的坐标不耦合，像对角矩阵那样伸缩</p>
+<p>$$A = \begin{bmatrix}<br>1 &amp; 2 \\<br>0 &amp; 2<br>\end{bmatrix},D=\begin{bmatrix}<br>1 &amp; 0 \\<br>0 &amp; 2<br>\end{bmatrix}$$</p>
+<table><tr><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0363.png" width="400" alt="图片名称" border="0"></td><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0362.png" width="400" alt="图片名称" border="0"></td><br></tr></table>
+
+<p>对称矩阵，一定可以$S\Lambda S^{-1} $对角化，特征值是实数，特征向量标准正交</p>
+<p>$$A = \begin{bmatrix}<br>1 &amp; 2 \\<br>2 &amp; 2<br>\end{bmatrix},D=\begin{bmatrix}<br>-0.5616 &amp; 0 \\<br>0 &amp; 3.5616<br>\end{bmatrix}$$</p>
+<table><tr><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0364.png" width="400" alt="图片名称" border="0"></td><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0365.png" width="400" alt="图片名称" border="0"></td><br></tr></table>
+
+<p>特征值如果出现0（行列式等于0，不满秩），但是仍然有足够的特征向量，那么同样可以$S\Lambda S^{-1} $对角化。<br>但是这个时候因为特征值出现0，所以肯定存在某一个维度信息的丢失，表现在图里面就是一个平面图形经过$A$映射后只剩下一条线，无论我们选取的基是标准及还是特征向量基。</p>
+<p><strong>注意</strong>：特征向量是否足够与特征值有没有等于0的数没有必然联系。<br>$$A = \begin{bmatrix}<br>1 &amp; 0 \\<br>0 &amp; 0<br>\end{bmatrix},D=\begin{bmatrix}<br>0 &amp; 0 \\<br>0 &amp; 1<br>\end{bmatrix}$$</p>
+<table><tr><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0366.png" width="400" alt="图片名称" border="0"></td><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0367.png" width="400" alt="图片名称" border="0"></td><br></tr></table>
+
+
+<p>不能对角化，就意味着不能进行$S\Lambda S^{-1} $分解，分解的话会提示错误。</p>
+<blockquote>
+<p>警告: 矩阵接近奇异值，或者缩放错误。结果可能不准确。RCOND =  5.551115e-17。 </p>
+</blockquote>
+<p>$$A = \begin{bmatrix}<br>1 &amp; 2 \\<br>0 &amp; 1<br>\end{bmatrix},D=\begin{bmatrix}<br>1 &amp; 0 \\<br>0 &amp; 1<br>\end{bmatrix}$$</p>
+<table><tr><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0368.png" width="400" alt="图片名称" border="0"></td><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0369.png" width="400" alt="图片名称" border="0"></td><br></tr></table>
+
+<p>#SVD分解<br>如何将不能对角化的矩阵对角化，不存在奇异值为0的情况，矩阵是方阵</p>
+<p>$$A = \begin{bmatrix}<br>1 &amp; 2 \\<br>0 &amp; 1<br>\end{bmatrix},S=\begin{bmatrix}<br>2.4142 &amp; 0 \\<br>0 &amp; 0.4142<br>\end{bmatrix}$$</p>
+<table><tr><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0368.png" width="400" alt="图片名称" border="0"></td><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0370.png" width="400" alt="图片名称" border="0"></td><br></tr></table>
+
+<p>#特征值与奇异值</p>
+<p>如果一个矩阵的秩为$r$，表明这个矩阵表示的空间是$r$维的，不等于0的特征值或者奇异值的个数是$r$，特征值或者奇异值的绝对值表示对应维度的方差，方差越大表明在这个维度上信息量越大，这个维度也就越重要。</p>
+<p>#参考代码</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">% 画图辅助函数</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[]</span> = <span class="title">px</span><span class="params">(X,p1,p2)</span></span></span><br><span class="line">plot(X(<span class="number">1</span>,:),X(<span class="number">2</span>,:),p1)</span><br><span class="line">hold on</span><br><span class="line">plot(X(<span class="number">1</span>,:),X(<span class="number">2</span>,:),p2)</span><br><span class="line">hold off</span><br><span class="line">axis equal</span><br><span class="line"><span class="comment">%axis([0 2 0 2])</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">% 主函数</span></span><br><span class="line"></span><br><span class="line"><span class="comment">%% 耦合与解耦</span></span><br><span class="line">X = <span class="matrix">[<span class="number">0</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span>    </span><br><span class="line"><span class="number">0</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">0</span>]</span>;</span><br><span class="line"><span class="comment">% 对角矩阵</span></span><br><span class="line">A2 = <span class="matrix">[<span class="number">1</span> <span class="number">0</span></span><br><span class="line">    <span class="number">0</span> <span class="number">2</span>]</span>;</span><br><span class="line">X2 = A2*X;</span><br><span class="line">px(X,<span class="string">'ro'</span>,<span class="string">'r-'</span>)</span><br><span class="line">hold on</span><br><span class="line">px(X2,<span class="string">'b*'</span>,<span class="string">'b:'</span>)</span><br><span class="line">hold off;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">% 矩阵耦合的情况</span></span><br><span class="line">A2 = <span class="matrix">[<span class="number">1</span> <span class="number">2</span></span><br><span class="line">    <span class="number">0</span> <span class="number">1</span>]</span>;</span><br><span class="line">X2 = A2*X;</span><br><span class="line">px(X,<span class="string">'ro'</span>,<span class="string">'r-'</span>)</span><br><span class="line">hold on</span><br><span class="line">px(X2,<span class="string">'b*'</span>,<span class="string">'b:'</span>)</span><br><span class="line">hold off;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">%% 解耦，矩阵可以对角化，有足够的特征向量，按照SDS^&#123;-1&#125;分解</span></span><br><span class="line"></span><br><span class="line">A2 = <span class="matrix">[<span class="number">1</span> <span class="number">2</span></span><br><span class="line">    <span class="number">0</span> <span class="number">2</span>]</span>;</span><br><span class="line"><span class="comment">% %D =</span></span><br><span class="line"><span class="comment">% </span></span><br><span class="line"><span class="comment">%      1     0</span></span><br><span class="line"><span class="comment">%      0     2</span></span><br><span class="line">X2 = A2*X;</span><br><span class="line">px(X,<span class="string">'ro'</span>,<span class="string">'r-'</span>)</span><br><span class="line">hold on</span><br><span class="line">px(X2,<span class="string">'b*'</span>,<span class="string">'b:'</span>)</span><br><span class="line">hold off;</span><br><span class="line"></span><br><span class="line"><span class="comment">% 换坐标系，从单位坐标系换到以特征向量为基底的坐标系</span></span><br><span class="line"><span class="matrix">[V,D]</span> = eig(A2)</span><br><span class="line">V*D*inv(V)</span><br><span class="line"></span><br><span class="line">Xnew = inv(V)*X;  <span class="comment">%Xnew是原正方形数据X在新的基下面的坐标</span></span><br><span class="line"></span><br><span class="line">Xnew2 = inv(V)*A2*V*Xnew <span class="comment">%Xnew2是经过线性变换A2后在新的基底下的坐标</span></span><br><span class="line"></span><br><span class="line"><span class="comment">% 选择特征向量方向为新的坐标，在新的坐标系下横坐标不变，纵坐标是原来的2倍。</span></span><br><span class="line">px(Xnew,<span class="string">'ro'</span>,<span class="string">'r-'</span>)</span><br><span class="line">hold on</span><br><span class="line">px(Xnew2,<span class="string">'b*'</span>,<span class="string">'b:'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">gtext(<span class="string">'A = [1 2 ; 0 1]'</span>)</span><br><span class="line"><span class="comment">%% 对称矩阵，一定可以对角化，特征值是实数，特征向量标准正交</span></span><br><span class="line"><span class="comment">% 对称矩阵就像对角矩阵那样</span></span><br><span class="line"><span class="comment">% 更深刻地去理解特征值与特征向量</span></span><br><span class="line"><span class="comment">% 特征值本质上是找到了一组完整的不缺失的特征向量后，可以进行解耦地伸缩变换，每个基上伸缩变换的系数</span></span><br><span class="line"><span class="comment">% 如果和压缩联系在一起的话，如果特征向量的长度都一样，那么特征值的绝对值越大表明在这个方向</span></span><br><span class="line"><span class="comment">% 的伸缩越大，理解成方差越大，因此可以利用这种分解去找到最大的方差，寻找如何包含更多的信息。</span></span><br><span class="line"><span class="comment">% D =</span></span><br><span class="line"><span class="comment">% </span></span><br><span class="line"><span class="comment">%    -0.5616         0</span></span><br><span class="line"><span class="comment">%          0    3.5616</span></span><br><span class="line">A2 = <span class="matrix">[<span class="number">1</span> <span class="number">2</span></span><br><span class="line">    <span class="number">2</span> <span class="number">2</span>]</span>;</span><br><span class="line">X2 = A2*X;</span><br><span class="line">px(X,<span class="string">'ro'</span>,<span class="string">'r-'</span>)</span><br><span class="line">hold on</span><br><span class="line">px(X2,<span class="string">'b*'</span>,<span class="string">'b:'</span>)</span><br><span class="line">hold off;</span><br><span class="line"></span><br><span class="line"><span class="comment">% 换坐标系，从单位坐标系换到以特征向量为基底的坐标系</span></span><br><span class="line"><span class="matrix">[V,D]</span> = eig(A2)</span><br><span class="line">V*D*inv(V)</span><br><span class="line"></span><br><span class="line">Xnew = inv(V)*X;  <span class="comment">%Xnew是原正方形数据X在新的基下面的坐标</span></span><br><span class="line"></span><br><span class="line">Xnew2 = inv(V)*A2*V*Xnew <span class="comment">%Xnew2是经过线性变换A2后在新的基底下的坐标</span></span><br><span class="line"></span><br><span class="line"><span class="comment">% 选择特征向量方向为新的坐标，在新的坐标系下横坐标不变，纵坐标是原来的2倍。</span></span><br><span class="line">px(Xnew,<span class="string">'ro'</span>,<span class="string">'r-'</span>)</span><br><span class="line">hold on</span><br><span class="line">px(Xnew2,<span class="string">'b*'</span>,<span class="string">'b:'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">% 判断是不是符合</span></span><br><span class="line">mean((D(<span class="number">1</span>,<span class="number">1</span>)*Xnew(<span class="number">1</span>,:) - Xnew2(<span class="number">1</span>,:) ) &lt; <span class="number">1e-5</span>)</span><br><span class="line">mean((D(<span class="number">2</span>,<span class="number">2</span>)*Xnew(<span class="number">2</span>,:) - Xnew2(<span class="number">2</span>,:) ) &lt; <span class="number">1e-5</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">%% 特征值如果出现0（行列式等于0，不满秩）是什么含义呢</span></span><br><span class="line"><span class="comment">% 在某个基上的分量丢失，原来的系数不为0可能是因为和其他基耦合</span></span><br><span class="line"><span class="comment">% 对角化后D上存在着为0的元素，有几个0说明有几个维度丢失。</span></span><br><span class="line">A2 = <span class="matrix">[<span class="number">1</span> <span class="number">0</span></span><br><span class="line">    <span class="number">0</span> <span class="number">0</span>]</span>;</span><br><span class="line">X2 = A2*X;</span><br><span class="line">px(X,<span class="string">'ro'</span>,<span class="string">'r-'</span>)</span><br><span class="line">hold on</span><br><span class="line">px(X2,<span class="string">'b*'</span>,<span class="string">'b:'</span>)</span><br><span class="line">hold off;</span><br><span class="line"></span><br><span class="line"><span class="comment">% 换坐标系，从单位坐标系换到以特征向量为基底的坐标系</span></span><br><span class="line"><span class="matrix">[V,D]</span> = eig(A2)</span><br><span class="line">V*D*inv(V)</span><br><span class="line"></span><br><span class="line">Xnew = inv(V)*X;  <span class="comment">%Xnew是原正方形数据X在新的基下面的坐标</span></span><br><span class="line"></span><br><span class="line">Xnew2 = inv(V)*A2*V*Xnew <span class="comment">%Xnew2是经过线性变换A2后在新的基底下的坐标</span></span><br><span class="line"></span><br><span class="line"><span class="comment">% 选择特征向量方向为新的坐标，在新的坐标系下横坐标不变，纵坐标是原来的2倍。</span></span><br><span class="line">px(Xnew,<span class="string">'ro'</span>,<span class="string">'r-'</span>)</span><br><span class="line">hold on</span><br><span class="line">px(Xnew2,<span class="string">'b*'</span>,<span class="string">'b:'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">%% 不能对角化意味着什么</span></span><br><span class="line"><span class="comment">% 找不到上面那些好的性质，特征向量之间线性相关充满不了整个空间</span></span><br><span class="line"><span class="comment">% 但是只是在变换前后同一个基的条件下找不到</span></span><br><span class="line">A2 = <span class="matrix">[<span class="number">1</span> <span class="number">2</span></span><br><span class="line">    <span class="number">0</span> <span class="number">1</span>]</span>;</span><br><span class="line">X2 = A2*X;</span><br><span class="line">px(X,<span class="string">'ro'</span>,<span class="string">'r-'</span>)</span><br><span class="line">hold on</span><br><span class="line">px(X2,<span class="string">'b*'</span>,<span class="string">'b:'</span>)</span><br><span class="line">hold off;</span><br><span class="line"></span><br><span class="line"><span class="comment">% 换坐标系，从单位坐标系换到以特征向量为基底的坐标系</span></span><br><span class="line"><span class="matrix">[V,D]</span> = eig(A2)</span><br><span class="line">V*D*inv(V)</span><br><span class="line"></span><br><span class="line">Xnew = inv(V)*X;  <span class="comment">%Xnew是原正方形数据X在新的基下面的坐标</span></span><br><span class="line"></span><br><span class="line">Xnew2 = inv(V)*A2*V*Xnew <span class="comment">%Xnew2是经过线性变换A2后在新的基底下的坐标</span></span><br><span class="line"></span><br><span class="line"><span class="comment">% 选择特征向量方向为新的坐标，在新的坐标系下横坐标不变，纵坐标是原来的2倍。</span></span><br><span class="line">px(Xnew,<span class="string">'ro'</span>,<span class="string">'r-'</span>)</span><br><span class="line">hold on</span><br><span class="line">px(Xnew2,<span class="string">'b*'</span>,<span class="string">'b:'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">% 判断是不是符合</span></span><br><span class="line">mean((D(<span class="number">1</span>,<span class="number">1</span>)*Xnew(<span class="number">1</span>,:) - Xnew2(<span class="number">1</span>,:) ) &lt; <span class="number">1e-5</span>)</span><br><span class="line">mean((D(<span class="number">2</span>,<span class="number">2</span>)*Xnew(<span class="number">2</span>,:) - Xnew2(<span class="number">2</span>,:) ) &lt; <span class="number">1e-5</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">%% 如何将不能对角化的矩阵对角化，不存在奇异值为0的情况，矩阵是方阵</span></span><br><span class="line"><span class="comment">% SVD，构建起两个不同的坐标基</span></span><br><span class="line"><span class="comment">% 与特征值相对的，这里引入的是奇异值</span></span><br><span class="line"><span class="comment">% S =</span></span><br><span class="line"><span class="comment">% </span></span><br><span class="line"><span class="comment">%     2.4142         0</span></span><br><span class="line"><span class="comment">%          0    0.4142</span></span><br><span class="line">A2 = <span class="matrix">[<span class="number">1</span> <span class="number">2</span></span><br><span class="line">    <span class="number">0</span> <span class="number">1</span>]</span>;</span><br><span class="line"><span class="matrix">[V,D]</span> = eig(A2)</span><br><span class="line">V</span><br><span class="line"></span><br><span class="line"><span class="matrix">[U,S,V]</span> = svd(A2);</span><br><span class="line">Xnew = inv(V)*X;  <span class="comment">%Xnew是原正方形数据X在新的基下面的坐标</span></span><br><span class="line"></span><br><span class="line">Xnew2 = inv(U)*A2*V*Xnew; <span class="comment">%Xnew2是经过线性变换A2后在新的基底下的坐标</span></span><br><span class="line"></span><br><span class="line"><span class="comment">% 选择特征向量方向为新的坐标，在新的坐标系下横坐标不变，纵坐标是原来的2倍。</span></span><br><span class="line">px(Xnew,<span class="string">'ro'</span>,<span class="string">'r-'</span>)</span><br><span class="line">hold on</span><br><span class="line">px(Xnew2,<span class="string">'b*'</span>,<span class="string">'b:'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">% 判断是不是符合</span></span><br><span class="line">mean((S(<span class="number">1</span>,<span class="number">1</span>)*Xnew(<span class="number">1</span>,:) - Xnew2(<span class="number">1</span>,:) ) &lt; <span class="number">1e-5</span>)</span><br><span class="line">mean((S(<span class="number">2</span>,<span class="number">2</span>)*Xnew(<span class="number">2</span>,:) - Xnew2(<span class="number">2</span>,:) ) &lt; <span class="number">1e-5</span>)</span><br></pre></td></tr></table></figure></span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/SVD/" rel="tag">#SVD</a>
+          
+            <a href="/tags/特征值/" rel="tag">#特征值</a>
+          
+            <a href="/tags/特征向量/" rel="tag">#特征向量</a>
+          
+            <a href="/tags/矩阵对角化/" rel="tag">#矩阵对角化</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/11/26/SVD分解及其应用/" rel="next" title="SVD分解及其应用">
+                <i class="fa fa-chevron-left"></i> SVD分解及其应用
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2015/11/26/小论线性变换/"
+           data-title="小论线性变换" data-url="http://younggy.com/2015/11/26/小论线性变换/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/uploads/touxiang.jpg" alt="Guangyao Yang" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Guangyao Yang</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Guangyao Yang</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">8</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">8</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">17</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/young_gy" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> CSDN
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YoungGer" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-twitter-url" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i> Twitter
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-weibo-url" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-douban-url" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> DouBan
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/ger-young" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> ZhiHu
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <p class="post-toc-empty">此文章未包含目录</p>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guangyao Yang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"younggy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+
+  
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/MathJax.js"></script>
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/config/TeX-AMS-MML_HTMLorMML.js"></script>
+  
+
+
+  
+  
+
+</body>
+</html>
