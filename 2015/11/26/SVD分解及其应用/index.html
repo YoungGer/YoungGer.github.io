@@ -1,0 +1,941 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="SVD,图像压缩,数据去噪,数据降维,矩阵对角化," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="SVD可谓线性代数的登峰造极者。其本质就是找到将任何一个矩阵对角化分解的两组标准正交的基底，同时对应的奇异值反映了对应基底变换的性质，为0表示对应的维度缺少信息，越大表明对应的维度容纳的信息方差越大。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SVD分解及其应用">
+<meta property="og:url" content="http://younggy.com/2015/11/26/SVD分解及其应用/index.html">
+<meta property="og:site_name" content="YoungGy">
+<meta property="og:description" content="SVD可谓线性代数的登峰造极者。其本质就是找到将任何一个矩阵对角化分解的两组标准正交的基底，同时对应的奇异值反映了对应基底变换的性质，为0表示对应的维度缺少信息，越大表明对应的维度容纳的信息方差越大。">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0357.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/IMG_20151125_224329.jpg">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202015-11-25%20%E4%B8%8B%E5%8D%8810.53.01.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202015-11-25%20%E4%B8%8B%E5%8D%8810.53.31.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202015-11-25%20%E4%B8%8B%E5%8D%8811.26.28.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202015-11-25%20%E4%B8%8B%E5%8D%8811.17.15.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202015-11-25%20%E4%B8%8B%E5%8D%8811.32.01.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202015-11-25%20%E4%B8%8B%E5%8D%8811.35.10.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202015-11-25%20%E4%B8%8B%E5%8D%8811.39.56.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/svd.O.gif">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0354.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0353.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0356.png">
+<meta property="og:updated_time" content="2015-11-26T08:13:06.063Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SVD分解及其应用">
+<meta name="twitter:description" content="SVD可谓线性代数的登峰造极者。其本质就是找到将任何一个矩阵对角化分解的两组标准正交的基底，同时对应的奇异值反映了对应基底变换的性质，为0表示对应的维度缺少信息，越大表明对应的维度容纳的信息方差越大。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post',
+    motion: false
+  };
+</script>
+
+  <title> SVD分解及其应用 | YoungGy </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?your-analytics-id";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">YoungGy</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">心有猛虎 细嗅蔷薇</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tools">
+          <a href="/tools" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            工具
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'owv-2W-dWzRWk1KttzWi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                SVD分解及其应用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-11-26T15:49:39+08:00" content="2015-11-26">
+              2015-11-26
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/图像压缩/" itemprop="url" rel="index">
+                    <span itemprop="name">图像压缩</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/图像压缩/矩阵/" itemprop="url" rel="index">
+                    <span itemprop="name">矩阵</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/11/26/SVD分解及其应用/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/26/SVD分解及其应用/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0357.png" alt="这里写图片描述"></p>
+<p><code>SVD</code>可谓线性代数的登峰造极者。<br>其本质就是找到将任何一个矩阵对角化分解的两组标准正交的基底，同时对应的奇异值反映了对应基底变换的性质，为0表示对应的维度缺少信息，越大表明对应的维度容纳的信息方差越大。</p>
+<a id="more"></a>
+<h1 id="SVD起源">SVD起源</h1><p>认识一个问题总要追根究底，为什么要有<code>SVD</code>这个东西呢？<br>要了解这一点，必须知道矩阵<code>对角化</code>是个奇妙的东西，以及并不是所有的矩阵都可以对角化。同时引出了今天的重点——如何让每个矩阵都可以对角化？</p>
+<hr>
+<h2 id="对角化概述">对角化概述</h2><p>矩阵分析中，我们都想要好的矩阵，好的矩阵的一大特点就是可以对角化。  </p>
+<p>对角化的对象矩阵有两类：</p>
+<ol>
+<li>方矩阵的对角化</li>
+<li>长方形矩阵的对角化</li>
+</ol>
+<p>对角化的方法也有两类：</p>
+<ol>
+<li>输入和输出空间的基完全一样，对应的特征值特征向量分解$A = S\Lambda S^{-1}$。但是这种情况下$S$基中的向量不一定是正交的。当$A$是对称矩阵的话$S$中的基可以是标准正交的。同时基也不是一定存在的，只有有足够的特征向量，比如$n \times n$的矩阵对角化的充要条件是有$n$个不相关的特征向量。</li>
+<li>输入空间和输出空间的基不一样，这就对应了$SVD$，也就是$AV=US$，$V,U$分别是输入和输出空间的基，这种情况下的对角化总是存在的。</li>
+</ol>
+<p>所以，综合对角化对象矩阵的形状以及对角化的方法，有以下结论：</p>
+<ol>
+<li>如果矩阵是$n$阶方阵，可以尝试同一组基下面的对角化，也就是特征值特征向量分解。这种情况下对角化存在当且仅当存在$n$个线性无关的特征向量。如果不存在的话说明不能找到同一组基使矩阵对角化。同时如果矩阵是对称矩阵的话，那么特征值肯定存在，肯定存在标准正交的特征向量。</li>
+<li>其他矩阵可以采用不同的两组基底实现$SVD$对角化。</li>
+<li>对于$n$阶方阵来说，$eig$分解与$svd$分解相等当且仅当矩阵是半正定矩阵，也就是方阵在同一组标准正交基上对角化并且特定维度上的方向不变。</li>
+<li>特征值和奇异值分别表示对角化解耦后对应的基底的长度，从线性变换的角度上是对不同的基的延伸程度，从方差的角度上来说是方差的大小信息的多少。</li>
+<li>特征值或奇异值如果等于0，说明矩阵存在某一个维度上的信息缺失。因此可以得到如果矩阵$A_{mn}$的秩为$r$，那么它肯定有$r$个不等于0的特征值和奇异值。</li>
+</ol>
+<p>对角化的优点是（以特征值分解举例）：</p>
+<ol>
+<li>可以进行对角化分解，$A= S \Lambda S^{-1}$</li>
+<li>矩阵的$k$次方$A^k =S \Lambda^k S^{-1} $</li>
+<li>从对角化的矩阵中可以知道矩阵是不是缺失了某些维度的信息（特征值或者奇异值等于0），如果存在0的话那么矩阵不可逆（因为损失信息回不到以前了）。</li>
+<li>如果基底是标准正交基，那么从特征值或者奇异值的绝对值上可以找到哪个维度上的方差最大，利用这个思路可以实现数据压缩。</li>
+</ol>
+<p>那么，具体如何将一个矩阵分解成对角矩阵和标准正交矩阵的乘积？</p>
+<h1 id="SVD">SVD</h1><h2 id="公式描述">公式描述</h2><p>$$\begin{split}<br>A_{mn} &amp;= U_{mr}S_{rr}{V_{nr}}^T \<br>A_{mn} &amp;= U_{mm}S_{mn}{V_{nn}}^T  \<br>A_{mn} &amp;=  \mathrm{u}_1 \sigma_1 {\mathrm{v}_1}^T+\mathrm{u}_1 \sigma_2 {\mathrm{v}_2}^T+\cdots +\mathrm{u}_r \sigma_1 {\mathrm{v}_r}^T<br>\end{split}$$</p>
+<p>上面的分解计算了奇异值$\sigma$不为0的情况，中间的分解考虑了奇异值$\sigma$为0的情况，最后的分解拆成了$r$个列向量与行向量的乘积。</p>
+<p>其中，<br>$$\begin{split}<br>U &amp;= eigenVector(AA^T)\<br>V &amp;= eigenVector(A^TA) \<br>eigenValue(U)_i &amp;= eigenValue(V)_i = ( diag(S_r)_i )^2 \quad i \le r<br>\end{split}$$</p>
+<h2 id="几何描述">几何描述</h2><div align="center"><br>    <img src="http://7xlwwh.com1.z0.glb.clouddn.com/IMG_20151125_224329.jpg" width="400" alt="图片名称" align="center"><br></div>
+
+
+<p>SVD的几何意义是对于特定的矩阵$A_{mn}$，寻找行空间$R^n$中的一组标准正交基，通过线性变换$A$得到列空间$R^m$中的一组标准正交基。$\sigma_i$也可以理解成变换到$AV$空间后的模$Av_i = \sigma_i u_i$。</p>
+<p>同时，如果矩阵的秩为$r$，那么行空间、零空间、列空间、左零空间的示意与转换如上图所示。</p>
+<p>采用<code>matlab</code>中的<code>eigshow</code>函数，可以得到类似的解释：</p>
+<table><tr><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202015-11-25%20%E4%B8%8B%E5%8D%8810.53.01.png" width="400" alt="图片名称" border="0"></td><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202015-11-25%20%E4%B8%8B%E5%8D%8810.53.31.png" width="400" alt="图片名称" border="0"></td><br></tr></table>
+
+
+
+<p>通过选择一组合适的正交基$V$，使得$AV=US$也是正交的。然后分别以这两组正交且单位化的$V,U$为基，$S$中包含了他们的比例系数，构建了对角化的矩阵$S$，实现了对角化解耦的线性变换。</p>
+<h1 id="SVD应用">SVD应用</h1><h2 id="图像压缩">图像压缩</h2><p>我们的目标就是这位美女——蒋勤勤，将对这幅图片实现压缩。</p>
+<div align="center"><br>    <img src="http://7xlwwh.com1.z0.glb.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202015-11-25%20%E4%B8%8B%E5%8D%8811.26.28.png" width="400" alt="图片名称" align="center"><br></div>
+
+<p>首先，先来看看原来的RGB图片以及RGB分量的灰度图片：</p>
+<div align="center"><br>    <img src="http://7xlwwh.com1.z0.glb.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202015-11-25%20%E4%B8%8B%E5%8D%8811.17.15.png" width="400" alt="图片名称" align="center"><br></div>
+
+
+<p>SVD之后，先来看看SVD的奇异值大小的分布情况和累计分布比率：</p>
+<table><tr><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202015-11-25%20%E4%B8%8B%E5%8D%8811.32.01.png" width="400" alt="图片名称" border="0"></td><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202015-11-25%20%E4%B8%8B%E5%8D%8811.35.10.png" width="400" alt="图片名称" border="0"></td><br></tr></table>
+
+
+<p>接着，看一看选择不同数量的奇异值的结果。</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202015-11-25%20%E4%B8%8B%E5%8D%8811.39.56.png" alt="这里写图片描述"></p>
+<p>最后，看一看图像的压缩比，原图像是$686 \times 482$，选择最大的100个奇异值已经能够得到相当好的结果了。这时候奇异值的累积比例为$89.6\%$，压缩比是<br>$$\frac{686 \times 482}{ (686+482) \times 100} = 2.83$$</p>
+<p>具体代码如下：<br><figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">% 读入图像RGB数据，并从Uint8转换成double类型方便之后的处理。</span></span><br><span class="line">p = imread(<span class="string">'/Users/yangguangyao/Desktop/test/p.jpg'</span>);</span><br><span class="line">pr = p(:,:,<span class="number">1</span>);</span><br><span class="line">pg = p(:,:,<span class="number">2</span>);</span><br><span class="line">pb = p(:,:,<span class="number">3</span>);</span><br><span class="line">pr = double(pr);</span><br><span class="line">pg = double(pg);</span><br><span class="line">pb = double(pb);</span><br><span class="line"></span><br><span class="line"><span class="comment">% 可视化图像</span></span><br><span class="line">figure()</span><br><span class="line">subplot(<span class="number">2</span>,<span class="number">2</span>,<span class="number">1</span>);</span><br><span class="line">imshow(p)</span><br><span class="line">title(<span class="string">'原来的RGB图像'</span>)</span><br><span class="line">subplot(<span class="number">2</span>,<span class="number">2</span>,<span class="number">2</span>);</span><br><span class="line">imshow(mat2gray(pr))</span><br><span class="line">title(<span class="string">'R分量的灰度图像'</span>)</span><br><span class="line">subplot(<span class="number">2</span>,<span class="number">2</span>,<span class="number">3</span>);</span><br><span class="line">imshow(mat2gray(pg))</span><br><span class="line">title(<span class="string">'G分量的灰度图像'</span>)</span><br><span class="line">subplot(<span class="number">2</span>,<span class="number">2</span>,<span class="number">4</span>);</span><br><span class="line">imshow(mat2gray(pb))</span><br><span class="line">title(<span class="string">'B分量的灰度图像'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">% SVD分解</span></span><br><span class="line"><span class="matrix">[Ur,Sr,Vr]</span> = svd(pr);</span><br><span class="line"><span class="matrix">[Ug,Sg,Vg]</span> = svd(pg);</span><br><span class="line"><span class="matrix">[Ub,Sb,Vb]</span> = svd(pb);</span><br><span class="line"></span><br><span class="line"><span class="comment">% 分析SVD，计划选取1 3 5 10 30 50 100 150</span></span><br><span class="line">svdD = <span class="built_in">diag</span>(Sr);</span><br><span class="line">cumsumD = cumsum(svdD);</span><br><span class="line">plot(svdD,<span class="string">'LineWidth'</span>,<span class="number">2</span>)</span><br><span class="line">plot(cumsumD,<span class="string">'LineWidth'</span>,<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">% 分解后按照singular value从大到小选择</span></span><br><span class="line">fr = @(n) Ur(:,<span class="number">1</span>:n)*Sr(<span class="number">1</span>:n,<span class="number">1</span>:n)*Vr(:,<span class="number">1</span>:n)<span class="operator">'</span>;</span><br><span class="line">fg = @(n) Ug(:,<span class="number">1</span>:n)*Sg(<span class="number">1</span>:n,<span class="number">1</span>:n)*Vg(:,<span class="number">1</span>:n)<span class="operator">'</span>;</span><br><span class="line">fb = @(n) Ub(:,<span class="number">1</span>:n)*Sb(<span class="number">1</span>:n,<span class="number">1</span>:n)*Vb(:,<span class="number">1</span>:n)<span class="operator">'</span>;</span><br><span class="line"></span><br><span class="line">param = <span class="matrix">[<span class="number">1</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">10</span>,<span class="number">30</span>,<span class="number">50</span>,<span class="number">100</span>,<span class="number">150</span>]</span>;</span><br><span class="line">figure()</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span>:<span class="number">8</span></span><br><span class="line">    subplot(<span class="number">2</span>,<span class="number">4</span>,<span class="built_in">i</span>);</span><br><span class="line">    n = param(<span class="built_in">i</span>);</span><br><span class="line">    pnew(:,:,<span class="number">1</span>) = fr(n);</span><br><span class="line">    pnew(:,:,<span class="number">2</span>) = fg(n);</span><br><span class="line">    pnew(:,:,<span class="number">3</span>) = fb(n);</span><br><span class="line">    pnew = uint8(pnew);</span><br><span class="line">    imshow(pnew)</span><br><span class="line">    title(strcat(num2str(param(<span class="built_in">i</span>)),<span class="string">'个奇异值'</span>))</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="图像压缩2">图像压缩2</h2><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/svd.O.gif" alt="这里写图片描述"></p>
+<p>上图是一个$15 \times 25$的图像，其本质上是$15 \times 25$的矩阵，白色的元素代表相应位置上是1，黑色代表相应位置上是0。其一共有三种模式：</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0354.png" alt="这里写图片描述"></p>
+<p>这个矩阵的特征值有3，对应了三种的模式，选择最大的三个奇异值进行SVD后的结果是：</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0353.png" alt="这里写图片描述"></p>
+<p>代码如下：</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">% 构建目标图像矩阵X</span></span><br><span class="line">x1 = <span class="built_in">ones</span>(<span class="number">25</span>,<span class="number">1</span>);</span><br><span class="line">x2 = <span class="matrix">[ones(<span class="number">5</span>,<span class="number">1</span>);zeros(<span class="number">15</span>,<span class="number">1</span>);ones(<span class="number">5</span>,<span class="number">1</span>);]</span>;</span><br><span class="line">x3 = <span class="matrix">[ones(<span class="number">5</span>,<span class="number">1</span>);zeros(<span class="number">3</span>,<span class="number">1</span>);ones(<span class="number">9</span>,<span class="number">1</span>);zeros(<span class="number">3</span>,<span class="number">1</span>);ones(<span class="number">5</span>,<span class="number">1</span>);]</span>;</span><br><span class="line">X = <span class="matrix">[repmat(x1,<span class="number">1</span>,<span class="number">2</span>),repmat(x2,<span class="number">1</span>,<span class="number">3</span>),repmat(x3,<span class="number">1</span>,<span class="number">5</span>),repmat(x2,<span class="number">1</span>,<span class="number">3</span>),repmat(x1,<span class="number">1</span>,<span class="number">2</span>)]</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">% 查看矩阵的秩</span></span><br><span class="line">r = rank(X);</span><br><span class="line"></span><br><span class="line"><span class="comment">% 进行SVD</span></span><br><span class="line"><span class="matrix">[U,S,V]</span> = svd(X);</span><br><span class="line">Xnew = U(:,<span class="number">1</span>:r)*S(<span class="number">1</span>:r,<span class="number">1</span>:r)*V(:,<span class="number">1</span>:r)<span class="operator">'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">% 分析画图</span></span><br><span class="line">figure()</span><br><span class="line">subplot(<span class="number">1</span>,<span class="number">2</span>,<span class="number">1</span>)</span><br><span class="line">imshow(X)</span><br><span class="line">title(<span class="string">'原始的图像'</span>)</span><br><span class="line">subplot(<span class="number">1</span>,<span class="number">2</span>,<span class="number">2</span>)</span><br><span class="line">imshow(Xnew)</span><br><span class="line">title(<span class="string">'选择秩数量3的奇异值分解'</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="数据去噪">数据去噪</h2><p>SVD总能找到标准化正交基后方差最大的维度，因此可以用它进行降维去噪等等。</p>
+<p>下面分别用<code>SVD</code>和<code>linear regression</code>去拟合直线，结果如下，看来效果还不错哦。<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0356.png" alt="这里写图片描述"></p>
+<p>代码如下：</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">% 模拟线性数据，加上一定的高斯噪声</span></span><br><span class="line">X = <span class="number">1</span>:<span class="number">10</span>;</span><br><span class="line">Xb = <span class="built_in">ones</span>(<span class="number">1</span>,<span class="number">10</span>);</span><br><span class="line">Y = <span class="number">2</span>*X + random(<span class="string">'Normal'</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">% 进行SVD分解并选择原输入空间的一个奇异值比较大的基，实现了数据降维</span></span><br><span class="line">M = <span class="matrix">[X;Y]</span>;</span><br><span class="line"><span class="matrix">[U,S,V]</span> = svd(M);</span><br><span class="line"></span><br><span class="line">U1 = U(:,<span class="number">1</span>);</span><br><span class="line">u1 = U1(<span class="number">1</span>);</span><br><span class="line">u2 = U1(<span class="number">2</span>);</span><br><span class="line">k = (u2/u1);</span><br><span class="line"></span><br><span class="line"><span class="comment">% 进行线性回归</span></span><br><span class="line">w = pinv(<span class="matrix">[X;Xb]</span>)<span class="operator">'</span>*Y<span class="operator">'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">% 分别是SVD和线性回归拟合的数据</span></span><br><span class="line">Y1 = k*X;</span><br><span class="line">Y2 = w(<span class="number">1</span>)*X+w(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">% 画图并比较</span></span><br><span class="line">figure()</span><br><span class="line"><span class="comment">% 注释蛮方便的函数ezplot('y-2*x-1')</span></span><br><span class="line"><span class="comment">% refline(u2/u1,0) </span></span><br><span class="line">hold on</span><br><span class="line">plot(X,Y,<span class="string">'ko'</span>,<span class="string">'LineWidth'</span>,<span class="number">2</span>)</span><br><span class="line">plot(X,Y1,<span class="string">'r-'</span>,<span class="string">'LineWidth'</span>,<span class="number">1</span>)</span><br><span class="line">plot(X,Y2,<span class="string">'b-'</span>,<span class="string">'LineWidth'</span>,<span class="number">1</span>)</span><br><span class="line">legend(<span class="string">'数据点'</span>,<span class="string">'SVD拟合'</span>,<span class="string">'线性回归拟合'</span>)</span><br></pre></td></tr></table></figure>
+<p>##LSA</p>
+<p>LSA（<code>Latent Semantic Analysis</code>也叫作<code>Latent Semantic Indexing</code>）分析文档发现潜在的概念意义。</p>
+<h2 id="推荐系统">推荐系统</h2><h1 id="注意">注意</h1><ol>
+<li>$USV^T$分解和$S\Lambda S^{-1}$分解等价当且仅当矩阵是半正定（对称矩阵，有大于等于0的特征值）。</li>
+<li>介绍下几种矩阵分解</li>
+</ol>
+<ul>
+<li>$A=USV^T$，$U,V$都是标准正交的，S是对角化的上面按照由大到小的顺序存放着奇异值。</li>
+<li>$A=QHR$，$Q$是标准正交的，$R$对角线上是1，$H$是对角化的上面存放着高度$h_i$。</li>
+<li>$A=LDU$，$L,U$的对角线上是1，主元存放在$D$中。</li>
+</ul>
+<p>A的行列式的绝对值等于奇异值的乘积，等于主元乘积的绝对值，等于高度$h_i$乘积的绝对值，等于特征值的乘积。</p>
+<h1 id="参考资料">参考资料</h1><ol>
+<li><a href="http://www.ams.org/samplings/feature-column/fcarc-svd" target="_blank" rel="external">关于SVD很棒的包含几何解释的资料</a></li>
+<li><a href="http://www.puffinwarellc.com/index.php/news-and-articles/articles/33-latent-semantic-analysis-tutorial.html" target="_blank" rel="external">关于LSA的很棒的文章</a></li>
+</ol>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/SVD/" rel="tag">#SVD</a>
+          
+            <a href="/tags/图像压缩/" rel="tag">#图像压缩</a>
+          
+            <a href="/tags/数据去噪/" rel="tag">#数据去噪</a>
+          
+            <a href="/tags/数据降维/" rel="tag">#数据降维</a>
+          
+            <a href="/tags/矩阵对角化/" rel="tag">#矩阵对角化</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/11/25/ROC曲线与癌症分类/" rel="next" title="ROC曲线与癌症分类">
+                <i class="fa fa-chevron-left"></i> ROC曲线与癌症分类
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2015/11/26/SVD分解及其应用/"
+           data-title="SVD分解及其应用" data-url="http://younggy.com/2015/11/26/SVD分解及其应用/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/uploads/touxiang.jpg" alt="Guangyao Yang" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Guangyao Yang</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Guangyao Yang</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">15</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/young_gy" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> CSDN
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YoungGer" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-twitter-url" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i> Twitter
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-weibo-url" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-douban-url" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> DouBan
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/ger-young" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> ZhiHu
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SVD起源"><span class="nav-number">1.</span> <span class="nav-text">SVD起源</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#对角化概述"><span class="nav-number">1.1.</span> <span class="nav-text">对角化概述</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SVD"><span class="nav-number">2.</span> <span class="nav-text">SVD</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#公式描述"><span class="nav-number">2.1.</span> <span class="nav-text">公式描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#几何描述"><span class="nav-number">2.2.</span> <span class="nav-text">几何描述</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SVD应用"><span class="nav-number">3.</span> <span class="nav-text">SVD应用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#图像压缩"><span class="nav-number">3.1.</span> <span class="nav-text">图像压缩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图像压缩2"><span class="nav-number">3.2.</span> <span class="nav-text">图像压缩2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据去噪"><span class="nav-number">3.3.</span> <span class="nav-text">数据去噪</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#推荐系统"><span class="nav-number">3.4.</span> <span class="nav-text">推荐系统</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#注意"><span class="nav-number">4.</span> <span class="nav-text">注意</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guangyao Yang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"younggy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+
+  
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/MathJax.js"></script>
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/config/TeX-AMS-MML_HTMLorMML.js"></script>
+  
+
+
+  
+  
+
+</body>
+</html>
