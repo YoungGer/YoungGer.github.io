@@ -35,7 +35,7 @@
 <link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="ROC,confusion matrix," />
+  <meta name="keywords" content="bayes,entropy," />
 
 
 
@@ -51,19 +51,17 @@
 
 
 
-<meta name="description" content="ROC曲线在二分类问题中应用很广，最早可以追溯到二战中用雷达识别海鸥和敌机。本文将阐述ROC曲线、confusion matrix，如何评价二分类问题，最后以癌症分类的例子，讲一讲有时候现实和常识可能不太一样的地方。">
+<meta name="description" content="熵一般用来表征混乱程度，本文将简要介绍熵entropy以及其与贝叶斯的关系。最后以Monty Hall等例子结束。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ROC曲线与癌症分类">
-<meta property="og:url" content="http://younggy.com/2015/11/25/ROC曲线与癌症分类/index.html">
+<meta property="og:title" content="浅谈熵与贝叶斯">
+<meta property="og:url" content="http://younggy.com/2015/11/30/浅谈熵与贝叶斯/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="ROC曲线在二分类问题中应用很广，最早可以追溯到二战中用雷达识别海鸥和敌机。本文将阐述ROC曲线、confusion matrix，如何评价二分类问题，最后以癌症分类的例子，讲一讲有时候现实和常识可能不太一样的地方。">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/ROC_curve_MedCalc_Snap17.gif">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/confusionmatrix.png">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/ROC_curve_MedCalc_Snap17.gif">
-<meta property="og:updated_time" content="2015-11-25T01:54:06.447Z">
+<meta property="og:description" content="熵一般用来表征混乱程度，本文将简要介绍熵entropy以及其与贝叶斯的关系。最后以Monty Hall等例子结束。">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/text.jpg">
+<meta property="og:updated_time" content="2015-11-30T12:54:35.324Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ROC曲线与癌症分类">
-<meta name="twitter:description" content="ROC曲线在二分类问题中应用很广，最早可以追溯到二战中用雷达识别海鸥和敌机。本文将阐述ROC曲线、confusion matrix，如何评价二分类问题，最后以癌症分类的例子，讲一讲有时候现实和常识可能不太一样的地方。">
+<meta name="twitter:title" content="浅谈熵与贝叶斯">
+<meta name="twitter:description" content="熵一般用来表征混乱程度，本文将简要介绍熵entropy以及其与贝叶斯的关系。最后以Monty Hall等例子结束。">
 
 
 
@@ -75,7 +73,7 @@
   };
 </script>
 
-  <title> ROC曲线与癌症分类 | YoungGy </title>
+  <title> 浅谈熵与贝叶斯 | YoungGy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -256,7 +254,7 @@
             
             
               
-                ROC曲线与癌症分类
+                浅谈熵与贝叶斯
               
             
           </h1>
@@ -265,8 +263,8 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2015-11-25T09:47:46+08:00" content="2015-11-25">
-              2015-11-25
+            <time itemprop="dateCreated" datetime="2015-11-30T20:46:39+08:00" content="2015-11-30">
+              2015-11-30
             </time>
           </span>
 
@@ -275,20 +273,8 @@
               &nbsp; | &nbsp; 分类于
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/机器学习/" itemprop="url" rel="index">
-                    <span itemprop="name">机器学习</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/机器学习/分类/" itemprop="url" rel="index">
-                    <span itemprop="name">分类</span>
+                  <a href="/categories/统计/" itemprop="url" rel="index">
+                    <span itemprop="name">统计</span>
                   </a>
                 </span>
 
@@ -303,8 +289,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2015/11/25/ROC曲线与癌症分类/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/25/ROC曲线与癌症分类/" itemprop="commentsCount"></span>
+                <a href="/2015/11/30/浅谈熵与贝叶斯/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/30/浅谈熵与贝叶斯/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -323,60 +309,67 @@
       
 
       
-        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/ROC_curve_MedCalc_Snap17.gif" alt="这里写图片描述"></p>
-<p><code>ROC</code>曲线在二分类问题中应用很广，最早可以追溯到二战中用雷达识别海鸥和敌机。<br>本文将阐述<code>ROC</code>曲线、<code>confusion matrix</code>，如何评价二分类问题，最后以癌症分类的例子，讲一讲有时候现实和常识可能不太一样的地方。</p>
+        <span itemprop="articleBody"><div align="center"><br>    <img src="http://7xlwwh.com1.z0.glb.clouddn.com/text.jpg" width="600" alt="图片名称" align="center"><br></div>
+
+
+<p><code>熵</code>一般用来表征混乱程度，本文将简要介绍熵<code>entropy</code>以及其与贝叶斯的关系。最后以<code>Monty Hall</code>等例子结束。</p>
 <a id="more"></a>
-<h1 id="ROC曲线">ROC曲线</h1><p>ROC(receiver operating characteristic curve)曲线的对象是二分类问题，选择不同的阈值会有不同的分类结果。<br>ROC将不同阈值下的<code>TP rate</code>和<code>FP rate</code>表示在一张图表上，便于直观地看到不同阈值的作用以及分类器本身的作用情况。</p>
-<p><code>Confusion Matrix</code>如下：</p>
-<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/confusionmatrix.png" alt="这里写图片描述"></p>
-<p><code>ROC curve</code>如下，不同的阈值对应着图上不同的点：</p>
-<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/ROC_curve_MedCalc_Snap17.gif" alt="这里写图片描述"></p>
-<hr>
-<p>其中，</p>
-<p>$$\begin{split}<br>\mathrm{Sensitivity} = \mathrm{TPrate}  = \frac{TP}{TP+FN} \<br>\mathrm{Specificity} = \mathrm{FPrate}  = \frac{FP}{FP+TN}<br>\end{split}$$<br>一般认为越靠近左上角分类结果越好（TP rate高，FP rate低）。这表示对于Positive的样本有很大的概率识别出来（TP rate高），同时对Negative的样本有较小的误判几率（FP rate低）。</p>
-<h1 id="二分类问题的评价标准">二分类问题的评价标准</h1><p>最典型的评价标准是<code>AUC</code>，也就是<code>ROC</code>曲线下的面积（<code>baseline model的AUC是0.5</code>）。<br>同时，根据不同分类的严重性不同，也可以定义自己的<code>cost function</code>。</p>
-<h1 id="癌症分类">癌症分类</h1><p>下面举一个癌症分类的例子，你会发现有时候现实和常识往往不一样哦。</p>
+<h1 id="熵概述">熵概述</h1><p>熵<code>entropy</code>，用来描述概率分布的混乱程度，描述包含的信息量。<br>一般认为，越混乱的系统包含的信息量越大，反之确定的概率为1的系统不包含任何信息量。</p>
+<p>以猜数字举例，猜1到100的一个数字，采用二分法的话需要<code>log\_2(100)</code>次，从这个角度理解，<code>熵</code>是所有信息进行二进制编码需要的位数。</p>
+<p>更一般的，对于一个概率分布$X \sim P(x_i = p_i)$，其熵为：</p>
+<p>$$H =- \sum_{i}^N p_i log(p_i)$$</p>
+<p>熵有以下特点：</p>
+<ol>
+<li>$P=1$的系统熵最小，为$0$。</li>
+<li>均匀分布的系统熵最大，为$H = log_2(n )$，反之系统越偏斜熵越小。</li>
+<li>对于自然界中的一个系统，熵只会增加不会减少，并且过程不可逆。</li>
+</ol>
+<p>关于熵的公式有以下几个：</p>
+<p>$$\begin{split}<br>H(X |Y) &amp;= \sum_i^{N} p(y_i)*H(X|y=y_i) \\<br>H(X,Y) &amp;= H(X) + H(Y) - I(X,Y) \\<br>I(X,Y) &amp;= H(X) - H(X|Y)<br>\end{split}$$</p>
+<p>其中，$H(X,Y) $可以理解成$X,Y$的联合概率分布的熵，I(X,Y) 可以理解成增加$Y$的<code>information gain</code>以及<code>mutual entropy</code>。</p>
+<h1 id="贝叶斯概述">贝叶斯概述</h1><p>$$P(X|Y)=  \frac{P(Y|X)P(X)}{P(Y)}$$</p>
+<h1 id="熵与贝叶斯">熵与贝叶斯</h1><p>熵和贝叶斯都有一个大前提——知道概率分布。但是两者侧重不一样：</p>
+<ul>
+<li>贝叶斯侧重于计算出新的概率分布，根据新的知识提取信息。</li>
+<li>熵侧重于<code>keep score</code>，量化提取信息的程度。</li>
+</ul>
+<h1 id="例子">例子</h1><h2 id="Monty_Hall">Monty Hall</h2><blockquote>
+<p>三门问题（Monty Hall problem）亦称为蒙提霍尔问题、蒙特霍问题或蒙提霍尔悖论，大致出自美国的电视游戏节目Let’s Make a Deal。问题名字来自该节目的主持人蒙提·霍尔（Monty Hall）。参赛者会看见三扇关闭了的门，其中一扇的后面有一辆汽车，选中后面有车的那扇门可赢得该汽车，另外两扇门后面则各藏有一只山羊。当参赛者选定了一扇门，但未去开启它的时候，节目主持人开启剩下两扇门的其中一扇，露出其中一只山羊。主持人其后会问参赛者要不要换另一扇仍然关上的门。问题是：换另一扇门会否增加参赛者赢得汽车的机会率？如果严格按照上述的条件，即主持人清楚地知道，哪扇门后是羊，那么答案是会。换门的话，赢得汽车的机率是2/3。</p>
+</blockquote>
+<p>这道题的关键是，主持人的操作，改变了原来的概率分布！</p>
+<p>从概率的观点来看，坚持观点获胜的概率是$0.33$，改变观点获胜的概率是$0.67$。</p>
+<p>从熵的观点来看，主持人提供信息之前的熵是$H(X)= log_2(3) = 1.58$，主持人提供信息之后的熵是$H(X|Y) = 0.33log_2(3)  + 0.67log_2(1.5) = 0.92$，所以主持人的<code>information gain</code>是$I(X,Y) = 1.58-0.92=0.66$，占原来的熵比例是$0.66/1.58=41.8\%$，也就是说，主持人将结果的不确定性减少了$41.8\%$。</p>
+<h2 id="另一个的Monty_Hall">另一个的Monty Hall</h2><p>现在将原问题稍作修改，有5个门，主持人打开没有奖的两个门。</p>
+<p>从概率的观点来看，不改变观点获胜的概率是$1/5$，改变观点获胜的概率是$2/5$，失败的概率是$2/5$。</p>
+<p>从熵的角度上看，原来的熵是$2.32$，主持人操作后熵是$1.52$，熵减了$0.8$，减少了$34.5\%$。</p>
+<h2 id="投掷硬币">投掷硬币</h2><blockquote>
+<p>小明喜欢和大家玩投掷硬币的游戏，$30\%$的时间他用均匀的硬币，$70\%$的时间他用不均匀的硬币。均匀硬币正反的概率都是$0.5$，不均与的硬币正反的概率分别是$0.4,0.6$。</p>
+</blockquote>
+<p>现在投掷的第一枚是正面，那么会造成：</p>
 <table>
 <thead>
 <tr>
-<th style="text-align:center">Tables</th>
-<th style="text-align:center">Positive</th>
-<th style="text-align:center">Negative</th>
-<th style="text-align:center">All Row</th>
+<th>Null</th>
+<th>Fair</th>
+<th>Un-Fair</th>
+<th>Entropy</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">$+$</td>
-<td style="text-align:center">0.0095</td>
-<td style="text-align:center">0.0005</td>
-<td style="text-align:center">0.01</td>
+<td>实验前</td>
+<td>0.3</td>
+<td>0.7</td>
+<td>0.8813</td>
 </tr>
 <tr>
-<td style="text-align:center">$-$</td>
-<td style="text-align:center">0.198</td>
-<td style="text-align:center">0.792</td>
-<td style="text-align:center">0.99</td>
-</tr>
-<tr>
-<td style="text-align:center">All Column</td>
-<td style="text-align:center">0.2075</td>
-<td style="text-align:center">0.7925</td>
-<td style="text-align:center">1.00</td>
+<td>实验后</td>
+<td>0.35</td>
+<td>0.65</td>
+<td>0.9341</td>
 </tr>
 </tbody>
 </table>
-<p>对上面的<code>confusion matrix</code>简单阐述下：</p>
-<ul>
-<li>人群中患癌症的概率是$P(+)=0.01$，不患癌症的概率是$P(-)=0.99$</li>
-<li>患癌症的人被检测出来患癌症的概率是$\frac{P(P|+)}{P(+)}=95\%$。</li>
-</ul>
-<p>那么，问题是如果有一个人被检测出来患癌症，那么他真的患癌症的概率是多少呢？</p>
-<p>想一想，在心里面给一个答案^_^。</p>
-<p>真实的答案是$4.6\%$。  </p>
-<p>$$P(P|+) = \frac{P(P+)}{P(P)}=\frac{0.0095}{0.2075}=4.6\%$$</p>
-<p>有没有觉得跟自己想象的差别很大，$95\%$的<code>TP rate</code>虽然很高，但是也得关注下$20\%$的<code>FP rate</code>，并且人群中不患癌症的占了$99\%$。</p>
-<p>或者换个角度，假如把所有病人都判定为患癌症，那么<code>TP rate</code>是1感觉还不错哦，但是这时候的<code>FP rate</code>是1，也就是把所有不患癌症的都判断患癌症，这不是很好啊。这个时候即使判断你为癌症那么可信度也不高。<br>$$P(P|+) = \frac{P(P+)}{P(P)}=1\%$$</p>
 </span>
       
     </div>
@@ -385,9 +378,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/ROC/" rel="tag">#ROC</a>
+            <a href="/tags/bayes/" rel="tag">#bayes</a>
           
-            <a href="/tags/confusion-matrix/" rel="tag">#confusion matrix</a>
+            <a href="/tags/entropy/" rel="tag">#entropy</a>
           
         </div>
       
@@ -396,17 +389,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/11/24/矩阵求导与实例/" rel="next" title="矩阵求导与实例">
-                <i class="fa fa-chevron-left"></i> 矩阵求导与实例
+              <a href="/2015/11/30/LSA概述与实例/" rel="next" title="LSA概述与实例">
+                <i class="fa fa-chevron-left"></i> LSA概述与实例
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2015/11/26/SVD分解及其应用/" rel="prev" title="SVD分解及其应用">
-                SVD分解及其应用 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -456,8 +445,8 @@
         
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2015/11/25/ROC曲线与癌症分类/"
-           data-title="ROC曲线与癌症分类" data-url="http://younggy.com/2015/11/25/ROC曲线与癌症分类/">
+      <div class="ds-thread" data-thread-key="2015/11/30/浅谈熵与贝叶斯/"
+           data-title="浅谈熵与贝叶斯" data-url="http://younggy.com/2015/11/30/浅谈熵与贝叶斯/">
       </div>
     
   </div>
@@ -603,7 +592,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ROC曲线"><span class="nav-number">1.</span> <span class="nav-text">ROC曲线</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二分类问题的评价标准"><span class="nav-number">2.</span> <span class="nav-text">二分类问题的评价标准</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#癌症分类"><span class="nav-number">3.</span> <span class="nav-text">癌症分类</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#熵概述"><span class="nav-number">1.</span> <span class="nav-text">熵概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#贝叶斯概述"><span class="nav-number">2.</span> <span class="nav-text">贝叶斯概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#熵与贝叶斯"><span class="nav-number">3.</span> <span class="nav-text">熵与贝叶斯</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#例子"><span class="nav-number">4.</span> <span class="nav-text">例子</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Monty_Hall"><span class="nav-number">4.1.</span> <span class="nav-text">Monty Hall</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#另一个的Monty_Hall"><span class="nav-number">4.2.</span> <span class="nav-text">另一个的Monty Hall</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#投掷硬币"><span class="nav-number">4.3.</span> <span class="nav-text">投掷硬币</span></a></li></ol></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
