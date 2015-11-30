@@ -1,0 +1,922 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="NLP,SVD," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="本文将介绍SVD的一个很重要的应用LSA潜在语义分析。即如何将文档和对应的关键词投影到相同的空间，以便我们可以根据检索的关键词找到对应的相关度高的文档。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LSA概述与实例">
+<meta property="og:url" content="http://younggy.com/2015/11/30/LSA概述与实例/index.html">
+<meta property="og:site_name" content="YoungGy">
+<meta property="og:description" content="本文将介绍SVD的一个很重要的应用LSA潜在语义分析。即如何将文档和对应的关键词投影到相同的空间，以便我们可以根据检索的关键词找到对应的相关度高的文档。">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/latent-semantic-indexing.jpg">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/11.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0358.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/raster.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/xygraph2.png">
+<meta property="og:updated_time" content="2015-11-30T06:41:00.250Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LSA概述与实例">
+<meta name="twitter:description" content="本文将介绍SVD的一个很重要的应用LSA潜在语义分析。即如何将文档和对应的关键词投影到相同的空间，以便我们可以根据检索的关键词找到对应的相关度高的文档。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post',
+    motion: false
+  };
+</script>
+
+  <title> LSA概述与实例 | YoungGy </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?your-analytics-id";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">YoungGy</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">心有猛虎 细嗅蔷薇</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tools">
+          <a href="/tools" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            工具
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'owv-2W-dWzRWk1KttzWi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                LSA概述与实例
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-11-30T14:33:37+08:00" content="2015-11-30">
+              2015-11-30
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/机器学习/矩阵/" itemprop="url" rel="index">
+                    <span itemprop="name">矩阵</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/11/30/LSA概述与实例/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/30/LSA概述与实例/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/latent-semantic-indexing.jpg" alt="这里写图片描述"></p>
+<p>本文将介绍<code>SVD</code>的一个很重要的应用<code>LSA</code>潜在语义分析。即如何将文档和对应的关键词投影到相同的空间，以便我们可以根据检索的关键词找到对应的相关度高的文档。</p>
+<a id="more"></a>
+<h1 id="LSA概述">LSA概述</h1><p><code>Latent Semantic Analysis</code>简单来说，就是将<code>word</code>和<code>document</code>透射到<code>concept space</code>，然后在<code>concept space</code>中聚类，以实现语义级别的检索等功能。</p>
+<p>LSA的核心，有以下几点：</p>
+<ol>
+<li><code>parse</code>阶段，将文档表示为<code>bags of words</code>，同时忽略掉<code>stop words</code>以及标点符号。例如实例中的<code>parse(self, doc)</code>函数，输出一个字典对象，<code>key</code>是<code>word</code>，<code>value</code>是出现的文档序号的<code>list</code>（同一篇文档可能出现同一个词多次，因此<code>list</code>中的值不唯一）。</li>
+<li><code>build</code>阶段，构建<code>count Matrix</code>，行是<code>word</code>，列是<code>document</code>，对应的值是对应的<code>word</code>在<code>document</code>中出现的频数。</li>
+<li><code>SVD</code>，基于<code>SVD</code>上发现比较大的奇异值，并且投射到<code>concept space</code>。</li>
+<li><code>picture</code>，实现二维空间的可视化，发现聚类模式</li>
+</ol>
+<p>LSA的使用，基于以下假设：</p>
+<ol>
+<li>文档被表示为<code>bags of words</code>，也就是只考虑一篇文章中的词的频率而不考虑其顺序。</li>
+<li>相同概念的词（表示相同或者近似内容）的词总会被聚类在一起</li>
+<li>不考虑多义词，每个单词只确定其唯一含义</li>
+</ol>
+<h1 id="LSA注意">LSA注意</h1><ol>
+<li>得到<code>Count Matrix</code>后，最好进行<code>TF-IDF</code>，来决定对应词在对应文档的重要性权值。</li>
+<li>下面的实例中省略了第一个维度，因为第一个维度表征一个平均参数，具体来说就是这个文档平均有多少个词，或者这个词平均在多少个文档出现，意义不大因此省略。但是更加通用的做法是先对<code>Count Matrix</code>进行列的<code>normalize</code>，这样的话就不用省略第一个维度，缺点是这样会让<code>sparse matrix</code>变得<code>dense</code>。</li>
+</ol>
+<h1 id="LSA优缺点">LSA优缺点</h1><h2 id="优点">优点</h2><ol>
+<li>将词和文档都聚类到同样的概念空间，因此可以在概念空间上实现聚类，并且可以实现词和文档的相互查询（比如根据词在概念空间上检索相应的文档）。</li>
+<li>概念空间的维度相比原矩阵小得多，并且这些维度中包含的信息多噪音少。</li>
+<li><code>LSA</code>是一种<code>global algorithm</code>，容易让我们发现难以观察到的模式信息等。</li>
+</ol>
+<h2 id="缺点">缺点</h2><ol>
+<li>假设<code>Gaussian distribution</code>和<code>Frobenius norm</code>，不一定适合所有的问题。比如，文章中的单词遵从<code>Poisson distribution</code>而不是<code>Gaussian distribution</code>。</li>
+<li>不能处理多义词的问题，假设每个单词只有一个意思。</li>
+<li>严重依赖<code>svd</code>，计算量相对较大。</li>
+</ol>
+<h1 id="LSA实例">LSA实例</h1><p>选用的9个文档标题分别是：</p>
+<ol>
+<li>The Neatest Little Guide to Stock Market Investing</li>
+<li>Investing For Dummies, 4th Edition</li>
+<li>The Little Book of Common Sense Investing: The Only Way to Guarantee Your Fair Share of Stock Market Returns</li>
+<li>The Little Book of Value Investing</li>
+<li>Value Investing: From Graham to Buffett and Beyond</li>
+<li>Rich Dad’s Guide to Investing: What the Rich Invest in, That the Poor and the Middle Class Do Not!</li>
+<li>Investing in Real Estate, 5th Edition</li>
+<li>Stock Investing For Dummies</li>
+<li>Rich Dad’s Advisors: The ABC’s of Real Estate Investing: The Secrets of Finding Hidden Profits Most Investors Miss</li>
+</ol>
+<p><code>Count Matrix</code>为<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/11.png" alt="这里写图片描述"></p>
+<p><code>SVD</code>分解后，根据矩阵$S$对角线上奇异值的平方进行重要性排序，结果如下所示：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Xshot-0358.png" alt="这里写图片描述"></p>
+<p>根据<code>Book Title Matrix</code>的聚类方法结果如下，使用维度2，3进行简单的聚类：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/raster.png" alt="这里写图片描述"></p>
+<table>
+<thead>
+<tr>
+<th>Dim2</th>
+<th style="text-align:center">Dim3</th>
+<th style="text-align:right">Titles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>red</td>
+<td style="text-align:center">red</td>
+<td style="text-align:right">7,9</td>
+</tr>
+<tr>
+<td>red</td>
+<td style="text-align:center">blue</td>
+<td style="text-align:right">6</td>
+</tr>
+<tr>
+<td>blue</td>
+<td style="text-align:center">red</td>
+<td style="text-align:right">2,4,5,8</td>
+</tr>
+<tr>
+<td>blue</td>
+<td style="text-align:center">blue</td>
+<td style="text-align:right">1,3</td>
+</tr>
+</tbody>
+</table>
+<p>根据<code>Book Title Matrix</code>和<code>word matrix</code>的聚类方法结果如下，同样使用维度2，3进行简单的聚类：</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/xygraph2.png" alt="这里写图片描述"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><span class="line">%pylab inline</span><br><span class="line"><span class="keyword">from</span> numpy <span class="keyword">import</span> zeros</span><br><span class="line"><span class="keyword">from</span> scipy.linalg <span class="keyword">import</span> svd</span><br><span class="line"><span class="comment">#following needed for TFIDF</span></span><br><span class="line"><span class="keyword">from</span> math <span class="keyword">import</span> log</span><br><span class="line"><span class="keyword">from</span> numpy <span class="keyword">import</span> asarray, sum</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt </span><br><span class="line"></span><br><span class="line">titles = [<span class="string">"The Neatest Little Guide to Stock Market Investing"</span>,</span><br><span class="line">          <span class="string">"Investing For Dummies, 4th Edition"</span>,</span><br><span class="line">          <span class="string">"The Little Book of Common Sense Investing: The Only Way to Guarantee Your Fair Share of Stock Market Returns"</span>,</span><br><span class="line">          <span class="string">"The Little Book of Value Investing"</span>,</span><br><span class="line">          <span class="string">"Value Investing: From Graham to Buffett and Beyond"</span>,</span><br><span class="line">          <span class="string">"Rich Dad's Guide to Investing: What the Rich Invest in, That the Poor and the Middle Class Do Not!"</span>,</span><br><span class="line">          <span class="string">"Investing in Real Estate, 5th Edition"</span>,</span><br><span class="line">          <span class="string">"Stock Investing For Dummies"</span>,</span><br><span class="line">          <span class="string">"Rich Dad's Advisors: The ABC's of Real Estate Investing: The Secrets of Finding Hidden Profits Most Investors Miss"</span></span><br><span class="line">          ]</span><br><span class="line">stopwords = [<span class="string">'and'</span>,<span class="string">'edition'</span>,<span class="string">'for'</span>,<span class="string">'in'</span>,<span class="string">'little'</span>,<span class="string">'of'</span>,<span class="string">'the'</span>,<span class="string">'to'</span>]</span><br><span class="line">ignorechars = <span class="string">''',:'!'''</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LSA</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, stopwords, ignorechars)</span>:</span></span><br><span class="line">        self.stopwords = stopwords</span><br><span class="line">        self.ignorechars = ignorechars</span><br><span class="line">        self.wdict = &#123;&#125;</span><br><span class="line">        self.dcount = <span class="number">0</span>        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, doc)</span>:</span></span><br><span class="line">        words = doc.split();</span><br><span class="line">        <span class="keyword">for</span> w <span class="keyword">in</span> words:</span><br><span class="line">            w = w.lower().translate(<span class="keyword">None</span>, self.ignorechars)</span><br><span class="line">            <span class="keyword">if</span> w <span class="keyword">in</span> self.stopwords:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            <span class="keyword">elif</span> w <span class="keyword">in</span> self.wdict:</span><br><span class="line">                self.wdict[w].append(self.dcount)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment">#考虑wdict['book']会不会出现[0,0]如果book在0中出现两次</span></span><br><span class="line">                self.wdict[w] = [self.dcount]</span><br><span class="line">        self.dcount += <span class="number">1</span>      </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">build</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.keys = [k <span class="keyword">for</span> k <span class="keyword">in</span> self.wdict.keys() <span class="keyword">if</span> len(self.wdict[k]) &gt; <span class="number">1</span>]</span><br><span class="line">        self.keys.sort()</span><br><span class="line">        self.A = zeros([len(self.keys), self.dcount])</span><br><span class="line">        <span class="keyword">for</span> i, k <span class="keyword">in</span> enumerate(self.keys):</span><br><span class="line">            <span class="keyword">for</span> d <span class="keyword">in</span> self.wdict[k]:</span><br><span class="line">                self.A[i,d] += <span class="number">1</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">calc</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.U, self.S, self.Vt = svd(self.A)</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">picture0</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">'''</span><br><span class="line">        根据奇异值的平方画出奇异值的重要性的bar图</span><br><span class="line">        '''</span></span><br><span class="line">        plt.bar(left=range(len(self.S)) ,height=(self.S**<span class="number">2</span>)/sum(self.S**<span class="number">2</span>),align=<span class="string">"center"</span>)</span><br><span class="line">        plt.xticks(range(len(self.S)))</span><br><span class="line">        plt.title(<span class="string">"The Importance of Each Singular Value"</span>)</span><br><span class="line">        plt.xlabel(<span class="string">u"Singular Values"</span>)</span><br><span class="line">        plt.ylabel(<span class="string">u"Importance"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">picture1</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">'''</span><br><span class="line">        画出瓦片图</span><br><span class="line">        '''</span></span><br><span class="line">        plt.set_cmap(<span class="string">'bwr'</span>) </span><br><span class="line">        plt.pcolor(-<span class="number">1</span>*self.Vt[<span class="number">0</span>:<span class="number">3</span>,:])</span><br><span class="line">        plt.colorbar()</span><br><span class="line">        plt.yticks(np.arange(<span class="number">3</span>)+<span class="number">0.5</span>,[<span class="string">'Dim1'</span>,<span class="string">'Dim2'</span>,<span class="string">'Dim3'</span>,])</span><br><span class="line">        plt.xticks(np.arange(<span class="number">9</span>)+<span class="number">0.5</span>,[i[<span class="number">0</span>]+i[<span class="number">1</span>] <span class="keyword">for</span> i <span class="keyword">in</span> zip([<span class="string">'T'</span>]*<span class="number">9</span> ,map(str,range(<span class="number">1</span>,<span class="number">10</span>)))])</span><br><span class="line">        plt.gca().invert_yaxis()</span><br><span class="line">        plt.gca().set_aspect(<span class="string">'equal'</span>)</span><br><span class="line">        plt.xlabel(<span class="string">"Book Titles"</span>)</span><br><span class="line">        plt.ylabel(<span class="string">"Dimensions"</span>)</span><br><span class="line">        plt.title(<span class="string">"Top 3 Dimensions of Each Book Title"</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">picture2</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">'''</span><br><span class="line">        画出散点图加上点的注释，投影到概念空间</span><br><span class="line">        '''</span></span><br><span class="line">        TitleX = -<span class="number">1</span>*self.Vt[<span class="number">1</span>,:]</span><br><span class="line">        TitleY = -<span class="number">1</span>*self.Vt[<span class="number">2</span>,:]</span><br><span class="line">        WordX = -<span class="number">1</span>*self.U[:,<span class="number">1</span>]</span><br><span class="line">        WordY = -<span class="number">1</span>*self.U[:,<span class="number">2</span>]</span><br><span class="line">        </span><br><span class="line">        <span class="comment">#画Word图的形状和注释</span></span><br><span class="line">        Words = self.keys</span><br><span class="line">        plt.plot(WordX,WordY,<span class="string">'rs'</span>)</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(len(Words)):</span><br><span class="line">            plt.annotate(Words[i],xy=(WordX[i],WordY[i]),xytext=(<span class="number">2</span>, <span class="number">6</span>),textcoords=<span class="string">'offset points'</span>,color=<span class="string">'red'</span>)</span><br><span class="line">        <span class="comment">#画Title图的形状和注释</span></span><br><span class="line">        Titles = [i[<span class="number">0</span>]+i[<span class="number">1</span>] <span class="keyword">for</span> i <span class="keyword">in</span> zip([<span class="string">'T'</span>]*<span class="number">9</span> ,map(str,range(<span class="number">1</span>,<span class="number">10</span>)))]</span><br><span class="line">        plt.plot(TitleX,TitleY,<span class="string">'bo'</span>)</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(len(TitleX)):</span><br><span class="line">            plt.annotate(Titles[i],xy=(TitleX[i],TitleY[i]),xytext=(<span class="number">2</span>, <span class="number">2</span>),textcoords=<span class="string">'offset points'</span>,color=<span class="string">'blue'</span>)</span><br><span class="line">        plt.title(<span class="string">'XY plots of Words and Titles'</span>)</span><br><span class="line">        plt.xlabel(<span class="string">'Dimension 2'</span>)</span><br><span class="line">        plt.ylabel(<span class="string">'Dimension 1'</span>)</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">TFIDF</span><span class="params">(self)</span>:</span></span><br><span class="line">        WordsPerDoc = sum(self.A, axis=<span class="number">0</span>)        </span><br><span class="line">        DocsPerWord = sum(asarray(self.A &gt; <span class="number">0</span>, <span class="string">'i'</span>), axis=<span class="number">1</span>)</span><br><span class="line">        rows, cols = self.A.shape</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(rows):</span><br><span class="line">            <span class="keyword">for</span> j <span class="keyword">in</span> range(cols):</span><br><span class="line">                self.A[i,j] = (self.A[i,j] / WordsPerDoc[j]) * log(float(cols) / DocsPerWord[i])</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">printA</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">'Here is the count matrix'</span></span><br><span class="line">        <span class="keyword">print</span> self.A</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">printSVD</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">'Here are the singular values'</span></span><br><span class="line">        <span class="keyword">print</span> self.S</span><br><span class="line">        <span class="keyword">print</span> <span class="string">'Here are the first 3 columns of the U matrix'</span></span><br><span class="line">        <span class="keyword">print</span> -<span class="number">1</span>*self.U[:, <span class="number">0</span>:<span class="number">3</span>]</span><br><span class="line">        <span class="keyword">print</span> <span class="string">'Here are the first 3 rows of the Vt matrix'</span></span><br><span class="line">        <span class="keyword">print</span> -<span class="number">1</span>*self.Vt[<span class="number">0</span>:<span class="number">3</span>, :]</span><br></pre></td></tr></table></figure>
+<h1 id="参考">参考</h1><ol>
+<li><a href="http://www.puffinwarellc.com/index.php/news-and-articles/articles/33-latent-semantic-analysis-tutorial.html" target="_blank" rel="external">非常棒的资料，参考了其中大多数内容</a></li>
+</ol>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/NLP/" rel="tag">#NLP</a>
+          
+            <a href="/tags/SVD/" rel="tag">#SVD</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/11/26/小论线性变换/" rel="next" title="小论线性变换">
+                <i class="fa fa-chevron-left"></i> 小论线性变换
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2015/11/30/LSA概述与实例/"
+           data-title="LSA概述与实例" data-url="http://younggy.com/2015/11/30/LSA概述与实例/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/uploads/touxiang.jpg" alt="Guangyao Yang" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Guangyao Yang</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Guangyao Yang</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">8</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">18</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/young_gy" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> CSDN
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YoungGer" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-twitter-url" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i> Twitter
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-weibo-url" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-douban-url" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> DouBan
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/ger-young" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> ZhiHu
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#LSA概述"><span class="nav-number">1.</span> <span class="nav-text">LSA概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LSA注意"><span class="nav-number">2.</span> <span class="nav-text">LSA注意</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LSA优缺点"><span class="nav-number">3.</span> <span class="nav-text">LSA优缺点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#优点"><span class="nav-number">3.1.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缺点"><span class="nav-number">3.2.</span> <span class="nav-text">缺点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LSA实例"><span class="nav-number">4.</span> <span class="nav-text">LSA实例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guangyao Yang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"younggy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+
+  
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/MathJax.js"></script>
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/config/TeX-AMS-MML_HTMLorMML.js"></script>
+  
+
+
+  
+  
+
+</body>
+</html>
