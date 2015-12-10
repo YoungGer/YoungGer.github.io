@@ -1,0 +1,875 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="RK4,微分方程,方向场,欧拉法,积分曲线," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="微分方程在现实世界中应用很广泛，本文将简要介绍微分方程中的方向场、积分曲线等概念，以及解析解法、数值解法，尤其是欧拉法等，并且利用程序代码具体生动地阐述。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="微分方程与欧拉法">
+<meta property="og:url" content="http://younggy.com/2015/12/10/微分方程与欧拉法/index.html">
+<meta property="og:site_name" content="YoungGy">
+<meta property="og:description" content="微分方程在现实世界中应用很广泛，本文将简要介绍微分方程中的方向场、积分曲线等概念，以及解析解法、数值解法，尤其是欧拉法等，并且利用程序代码具体生动地阐述。">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/sXshot-0369.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/sXshot-0367.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/sfigure_1-2.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/sfigure_1-3.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/sfigure_1-5.png">
+<meta property="og:updated_time" content="2015-12-10T12:45:07.843Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="微分方程与欧拉法">
+<meta name="twitter:description" content="微分方程在现实世界中应用很广泛，本文将简要介绍微分方程中的方向场、积分曲线等概念，以及解析解法、数值解法，尤其是欧拉法等，并且利用程序代码具体生动地阐述。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post',
+    motion: false
+  };
+</script>
+
+  <title> 微分方程与欧拉法 | YoungGy </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?your-analytics-id";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">YoungGy</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">心有猛虎 细嗅蔷薇</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tools">
+          <a href="/tools" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            工具
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'owv-2W-dWzRWk1KttzWi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                微分方程与欧拉法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-12-10T20:30:16+08:00" content="2015-12-10">
+              2015-12-10
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/微分方程/" itemprop="url" rel="index">
+                    <span itemprop="name">微分方程</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/12/10/微分方程与欧拉法/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/10/微分方程与欧拉法/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><div align="center"><br>    <img src="http://7xlwwh.com1.z0.glb.clouddn.com/sXshot-0369.png" width="350" alt="图片名称" align="center"><br></div>
+
+
+<p>微分方程在现实世界中应用很广泛，本文将简要介绍微分方程中的<code>方向场</code>、<code>积分曲线</code>等概念，以及<code>解析解法</code>、<code>数值解法</code>，尤其是<code>欧拉法等</code>，并且利用程序代码具体生动地阐述。<br><a id="more"></a></p>
+<h1 id="微分方程概述">微分方程概述</h1><p>微分方程在各个领域应用颇多。</p>
+<p>形如$y’ = f(x,y)$的微分方程表示了系统的变化信息，如果在加上初始条件$(x_0,y_0)$，那么就可以求出系统整体随时间变化的信息。<br>可以说，<strong>正是微分方程将物理世界模型化</strong>。</p>
+<h1 id="方向场与积分曲线">方向场与积分曲线</h1><p>方向场（<code>direction field</code>）与积分曲线（<code>integral curve</code>）的关系，可以用下面的式子简要表示：</p>
+<p>$$\left \{ \begin{split}y’=f(x,y)   &amp;\iff Direction Field \\<br>y(x) &amp;\iff Integral Curve<br>\end{split}\right.$$</p>
+<p>其中，当$f(x,y), f’(x,y)$在邻域内连续时，积分曲线不会相交也不会相切，解存在且唯一(exist and unique)。</p>
+<p>下面，举函数$y’ = -x/y$的方向场与积分曲线：</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">%下面的函数dirfield需要用到参考资料中的函数</span></span><br><span class="line"></span><br><span class="line"><span class="comment">%定义函数y'</span></span><br><span class="line">f = @(x,y) -x/y</span><br><span class="line"></span><br><span class="line"><span class="comment">%方向场的一些简单可视化</span></span><br><span class="line">ezplot(f,<span class="matrix">[-<span class="number">2</span>,<span class="number">2</span>,-<span class="number">2</span>,<span class="number">2</span>]</span>)</span><br><span class="line">ezsurf(f,<span class="matrix">[-<span class="number">2</span>,<span class="number">2</span>,-<span class="number">2</span>,<span class="number">2</span>]</span>)</span><br><span class="line">ezcontour(f,<span class="matrix">[-<span class="number">2</span>,<span class="number">2</span>,-<span class="number">2</span>,<span class="number">2</span>]</span>); colorbar</span><br><span class="line"></span><br><span class="line"><span class="comment">%画出方向场与积分曲线</span></span><br><span class="line">dirfield(f,-<span class="number">2</span>:<span class="number">0.2</span>:<span class="number">2</span>,-<span class="number">2</span>:<span class="number">0.2</span>:<span class="number">2</span>)</span><br><span class="line">hold on </span><br><span class="line"><span class="keyword">for</span> y0=-<span class="number">0.2</span>:<span class="number">0.5</span>:<span class="number">2</span> </span><br><span class="line">  <span class="matrix">[ts,ys]</span> = ode45(f,<span class="matrix">[-<span class="number">2</span>,<span class="number">2</span>]</span>,y0); plot(ts,ys) </span><br><span class="line"><span class="keyword">end</span> </span><br><span class="line">title(<span class="string">'dy/dx=-x/y的方向场与积分曲线'</span>)</span><br><span class="line">hold off</span><br></pre></td></tr></table></figure>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/sXshot-0367.png" alt="这里写图片描述"></p>
+<h1 id="微分方程的解析解法">微分方程的解析解法</h1><p>微分方程的解析解法通常是将$x,y$分别移到等式的一边。</p>
+<p>下面以$y’ = 2y+1$为例，移项后$\frac{dy}{2y+1}=dx$，所以有$\frac{1}{2} ln(|2y+1|) + c_1=  x+c_2$，进而有$|2y+1| = Ce^{2x}$，最后解得：</p>
+<p>$$y = Ce^{2x}-\frac{1}{2}$$</p>
+<p>其实，$e^x$就是根据微分方程$y’=y$在$(0,1)$的初始条件下确定的。</p>
+<p>使用matlab的解析解法为：</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">dsolve(<span class="string">'Dy=2*y+1'</span>,<span class="string">'x'</span>)</span><br><span class="line"><span class="comment">%输出为： (C2*exp(2*x))/2 - 1/2</span></span><br><span class="line"></span><br><span class="line"><span class="comment">%求解e^x</span></span><br><span class="line">dsolve(<span class="string">'Dy=y'</span>,<span class="string">'y(0)=1'</span>,<span class="string">'x'</span>)</span><br><span class="line"><span class="comment">%输出为： exp(x)</span></span><br></pre></td></tr></table></figure>
+<h1 id="微分方程的数值解法">微分方程的数值解法</h1><h2 id="欧拉法">欧拉法</h2><p>欧拉法的核心是，设定步长为$h$，然后已知$y’和(x_0,y_0)$，根据下面方法迭代：</p>
+<p>$$\left \{ \begin{split} x_{n+1} &amp;= x_n +h\\<br>y_{n+1} &amp;= y_n +h*Slope \\<br>Slope &amp;= y’_n<br>\end{split}\right.$$</p>
+<p>ODE数值解法的matlab程序为：</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="matrix">[xs,ys]</span> = ode45(f,<span class="matrix">[-<span class="number">2</span>,<span class="number">2</span>]</span>,y0)</span><br></pre></td></tr></table></figure>
+<h2 id="欧拉法的缺点">欧拉法的缺点</h2><table><tr><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/sfigure_1-2.png" width="400" alt="图片名称" border="0"></td><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/sfigure_1-3.png" width="400" alt="图片名称" border="0"></td><br></tr></table>
+
+<p>由上图可见，欧拉法存在一定的误差，并且误差会累计。当步长越小误差也就越小拟合效果越好。</p>
+<p>这种情况下，误差和步长的关系是:</p>
+<p>$$e  \sim c*h$$</p>
+<p>如果函数时而<code>convex</code>时而<code>concave</code>，这时候误差的变化便难以预测。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#---------------------------------------------------------</span></span><br><span class="line"><span class="comment">##凸函数</span></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np </span><br><span class="line"><span class="keyword">import</span> scipy <span class="keyword">as</span> sp</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line"><span class="comment">#定义产生下一个点的函数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">nextPoint</span><span class="params">(x,y,h)</span>:</span></span><br><span class="line">    xn = x + h</span><br><span class="line">    slope = <span class="number">2</span>*x</span><br><span class="line">    yn = y + h*slope</span><br><span class="line">    <span class="keyword">return</span> (xn,yn)</span><br><span class="line"><span class="comment">#定义产生点的生成器</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pointGenerator</span><span class="params">(x,y,h)</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        <span class="keyword">yield</span> nextPoint(x,y,h)</span><br><span class="line">        (x,y) = nextPoint(x,y,h)</span><br><span class="line"><span class="comment">#根据输入的起始终止点以及步长，输出可以用于画图的参数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getXY</span><span class="params">(x,y,h)</span>:</span></span><br><span class="line">    x1,y1=[],[]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> pointGenerator(x,y,h):</span><br><span class="line">        xi = i[<span class="number">0</span>]</span><br><span class="line">        yi = i[<span class="number">1</span>]</span><br><span class="line">        <span class="keyword">if</span> xi&gt;<span class="number">2.5</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            x1.append(xi)</span><br><span class="line">            y1.append(yi)</span><br><span class="line">    x1.insert(<span class="number">0</span>,-<span class="number">2</span>)</span><br><span class="line">    y1.insert(<span class="number">0</span>,<span class="number">4</span>)</span><br><span class="line">    <span class="keyword">return</span> (x1,y1)</span><br><span class="line"></span><br><span class="line"><span class="comment">#---------------------------------------------------------</span></span><br><span class="line"><span class="comment">#凹函数</span></span><br><span class="line"><span class="comment">#大部分和上面相同，只是将`nextPoint`函数重新定义</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">nextPoint</span><span class="params">(x,y,h)</span>:</span></span><br><span class="line">    xn = x + h</span><br><span class="line">    slope = -<span class="number">2</span>*x</span><br><span class="line">    yn = y + h*slope</span><br><span class="line">    <span class="keyword">return</span> (xn,yn)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pointGenerator</span><span class="params">(x,y,h)</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        <span class="keyword">yield</span> nextPoint(x,y,h)</span><br><span class="line">        (x,y) = nextPoint(x,y,h)</span><br><span class="line">        </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getXY</span><span class="params">(x,y,h)</span>:</span></span><br><span class="line">    x1,y1=[],[]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> pointGenerator(x,y,h):</span><br><span class="line">        xi = i[<span class="number">0</span>]</span><br><span class="line">        yi = i[<span class="number">1</span>]</span><br><span class="line">        <span class="keyword">if</span> xi&gt;<span class="number">2.5</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            x1.append(xi)</span><br><span class="line">            y1.append(yi)</span><br><span class="line">    x1.insert(<span class="number">0</span>,-<span class="number">2</span>)</span><br><span class="line">    y1.insert(<span class="number">0</span>,-<span class="number">4</span>)</span><br><span class="line">    <span class="keyword">return</span> (x1,y1)</span><br><span class="line"></span><br><span class="line">x = np.arange(-<span class="number">2</span>,<span class="number">2.1</span>,<span class="number">0.1</span>)</span><br><span class="line">y = -x**<span class="number">2</span></span><br><span class="line">x1,y1 = getXY(-<span class="number">2</span>,-<span class="number">4</span>,<span class="number">0.1</span>)</span><br><span class="line">x2,y2 = getXY(-<span class="number">2</span>,-<span class="number">4</span>,<span class="number">0.4</span>)</span><br><span class="line">x3,y3 = getXY(-<span class="number">2</span>,-<span class="number">4</span>,<span class="number">0.6</span>)</span><br><span class="line"></span><br><span class="line">plt.plot(x,y,<span class="string">'b--'</span>, linewidth=<span class="number">1</span>,label=<span class="string">'raw line'</span>)</span><br><span class="line">plt.plot(x1,y1,<span class="string">'r'</span>,label=<span class="string">'h=0.1'</span>)</span><br><span class="line">plt.plot(x2,y2,<span class="string">'g'</span>,label=<span class="string">'h=0.4'</span>)</span><br><span class="line">plt.plot(x3,y3,<span class="string">'c'</span>,label=<span class="string">'h=0.6'</span>)</span><br><span class="line">plt.autoscale()</span><br><span class="line">plt.xlim(-<span class="number">2.5</span>,<span class="number">2.5</span>)</span><br><span class="line">plt.legend(loc=<span class="string">'best'</span>)</span><br><span class="line">plt.title(<span class="string">'concave function with different h'</span>)</span><br><span class="line">plt.xlabel(<span class="string">'X'</span>)</span><br><span class="line">plt.ylabel(<span class="string">'Y'</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure></p>
+<h2 id="改进欧拉法之步长">改进欧拉法之步长</h2><p>步长的改进参考上文，步长越小误差越小。</p>
+<h2 id="改进欧拉法之斜率">改进欧拉法之斜率</h2><p>核心是：计算斜率不只考虑当前的点，也考虑之后的点的斜率。</p>
+<p>该方法一般被称作<code>runge-kutta</code>法，上文只用到一个斜率的被称为<code>RK1</code>，下面将要阐述的是<code>RK2</code>，同时在绝大多数数值计算工具中，<code>RK4</code>的使用最为广泛。</p>
+<p>$$\left \{ \begin{split} x_{n+1} &amp;= x_n +h \\<br>y_{n+1} &amp;= y_n +h*Slope \\<br>Slope &amp;= (y’_n + y’_{n+1})/2<br>\end{split}\right.$$</p>
+<div align="center"><br>    <img src="http://7xlwwh.com1.z0.glb.clouddn.com/sfigure_1-5.png" width="600" alt="图片名称" align="center"><br></div>
+
+<p>由上图可看，RK2的效果已经比RK1好太多的。改进后误差和步长的关系是:</p>
+<p>$$e  \sim c*h^2$$</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np </span><br><span class="line"><span class="keyword">import</span> scipy <span class="keyword">as</span> sp</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line"><span class="comment">#RK1</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">nextPoint</span><span class="params">(x,y,h)</span>:</span></span><br><span class="line">    xn = x + h</span><br><span class="line">    slope = <span class="number">2</span>*x</span><br><span class="line">    yn = y + h*slope</span><br><span class="line">    <span class="keyword">return</span> (xn,yn)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pointGenerator</span><span class="params">(x,y,h)</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        <span class="keyword">yield</span> nextPoint(x,y,h)</span><br><span class="line">        (x,y) = nextPoint(x,y,h)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getXY</span><span class="params">(x,y,h)</span>:</span></span><br><span class="line">    x1,y1=[],[]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> pointGenerator(x,y,h):</span><br><span class="line">        xi = i[<span class="number">0</span>]</span><br><span class="line">        yi = i[<span class="number">1</span>]</span><br><span class="line">        <span class="keyword">if</span> xi&gt;<span class="number">2.5</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            x1.append(xi)</span><br><span class="line">            y1.append(yi)</span><br><span class="line">    x1.insert(<span class="number">0</span>,-<span class="number">2</span>)</span><br><span class="line">    y1.insert(<span class="number">0</span>,<span class="number">4</span>)</span><br><span class="line">    <span class="keyword">return</span> (x1,y1)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#RK2</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">nextPoint2</span><span class="params">(x,y,h)</span>:</span></span><br><span class="line">    xn = x + h</span><br><span class="line">    slope = (<span class="number">2</span>*x + <span class="number">2</span>*xn)/<span class="number">2</span></span><br><span class="line">    yn = y + h*slope   </span><br><span class="line">    <span class="keyword">return</span> (xn,yn)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pointGenerator2</span><span class="params">(x,y,h)</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        <span class="keyword">yield</span> nextPoint2(x,y,h)</span><br><span class="line">        (x,y) = nextPoint2(x,y,h)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getXY2</span><span class="params">(x,y,h)</span>:</span></span><br><span class="line">    x1,y1=[],[]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> pointGenerator2(x,y,h):</span><br><span class="line">        xi = i[<span class="number">0</span>]</span><br><span class="line">        yi = i[<span class="number">1</span>]</span><br><span class="line">        <span class="keyword">if</span> xi&gt;<span class="number">2.5</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            x1.append(xi)</span><br><span class="line">            y1.append(yi)</span><br><span class="line">    x1.insert(<span class="number">0</span>,-<span class="number">2</span>)</span><br><span class="line">    y1.insert(<span class="number">0</span>,<span class="number">4</span>)</span><br><span class="line">    <span class="keyword">return</span> (x1,y1)</span><br><span class="line"></span><br><span class="line"><span class="comment">#DATA</span></span><br><span class="line">x = np.arange(-<span class="number">2</span>,<span class="number">2.1</span>,<span class="number">0.1</span>)</span><br><span class="line">y = x**<span class="number">2</span></span><br><span class="line">x1,y1 = getXY(-<span class="number">2</span>,<span class="number">4</span>,<span class="number">1</span>)</span><br><span class="line">x2,y2 = getXY2(-<span class="number">2</span>,<span class="number">4</span>,<span class="number">1</span>)</span><br><span class="line">x3,y3 = getXY(-<span class="number">2</span>,<span class="number">4</span>,<span class="number">0.5</span>)</span><br><span class="line">x4,y4 = getXY2(-<span class="number">2</span>,<span class="number">4</span>,<span class="number">0.5</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#PLOT</span></span><br><span class="line">plt.plot(x,y,<span class="string">'k'</span>, linewidth=<span class="number">1</span>,label=<span class="string">'raw line'</span>)</span><br><span class="line">plt.plot(x4,y4,<span class="string">'r--'</span>,label=<span class="string">'h=0.5 RK2'</span>)</span><br><span class="line">plt.plot(x2,y2,<span class="string">'b--'</span>,label=<span class="string">'h=1 RK2'</span>)</span><br><span class="line">plt.plot(x3,y3,<span class="string">'c--'</span>,label=<span class="string">'h=0.5 RK1'</span>)</span><br><span class="line">plt.plot(x1,y1,<span class="string">'g--'</span>,label=<span class="string">'h=1 RK1'</span>)</span><br><span class="line"></span><br><span class="line">plt.autoscale()</span><br><span class="line">plt.xlim(-<span class="number">2.5</span>,<span class="number">2.5</span>)</span><br><span class="line">plt.legend(loc=<span class="string">'best'</span>)</span><br><span class="line">plt.title(<span class="string">'convex function with different h and RKn'</span>)</span><br><span class="line">plt.xlabel(<span class="string">'X'</span>)</span><br><span class="line">plt.ylabel(<span class="string">'Y'</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<p>#参考资料</p>
+<ol>
+<li><a href="http://ocw.mit.edu/courses/mathematics/18-03-differential-equations-spring-2010/index.htm" target="_blank" rel="external">MIT 18.03</a></li>
+<li><a href="http://terpconnect.umd.edu/~petersd/246/matlabode.html" target="_blank" rel="external">Using MATLAB for first order ODE</a></li>
+</ol>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/RK4/" rel="tag">#RK4</a>
+          
+            <a href="/tags/微分方程/" rel="tag">#微分方程</a>
+          
+            <a href="/tags/方向场/" rel="tag">#方向场</a>
+          
+            <a href="/tags/欧拉法/" rel="tag">#欧拉法</a>
+          
+            <a href="/tags/积分曲线/" rel="tag">#积分曲线</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/11/30/浅谈熵与贝叶斯/" rel="next" title="浅谈熵与贝叶斯">
+                <i class="fa fa-chevron-left"></i> 浅谈熵与贝叶斯
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2015/12/10/微分方程与欧拉法/"
+           data-title="微分方程与欧拉法" data-url="http://younggy.com/2015/12/10/微分方程与欧拉法/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/uploads/touxiang.jpg" alt="Guangyao Yang" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Guangyao Yang</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Guangyao Yang</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">10</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">25</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/young_gy" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> CSDN
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YoungGer" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-twitter-url" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i> Twitter
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-weibo-url" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-douban-url" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> DouBan
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/ger-young" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> ZhiHu
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#微分方程概述"><span class="nav-number">1.</span> <span class="nav-text">微分方程概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#方向场与积分曲线"><span class="nav-number">2.</span> <span class="nav-text">方向场与积分曲线</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#微分方程的解析解法"><span class="nav-number">3.</span> <span class="nav-text">微分方程的解析解法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#微分方程的数值解法"><span class="nav-number">4.</span> <span class="nav-text">微分方程的数值解法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#欧拉法"><span class="nav-number">4.1.</span> <span class="nav-text">欧拉法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#欧拉法的缺点"><span class="nav-number">4.2.</span> <span class="nav-text">欧拉法的缺点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#改进欧拉法之步长"><span class="nav-number">4.3.</span> <span class="nav-text">改进欧拉法之步长</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#改进欧拉法之斜率"><span class="nav-number">4.4.</span> <span class="nav-text">改进欧拉法之斜率</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guangyao Yang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"younggy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+
+  
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/MathJax.js"></script>
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/config/TeX-AMS-MML_HTMLorMML.js"></script>
+  
+
+
+  
+  
+
+</body>
+</html>
