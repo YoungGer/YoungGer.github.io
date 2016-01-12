@@ -1,0 +1,909 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="JPEG,图像识别," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="本文将介绍SVD的一个很重要的应用LSA潜在语义分析。即如何将文档和对应的关键词投影到相同的空间，以便我们可以根据检索的关键词找到对应的相关度高的文档。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JPEG算法及其实现">
+<meta property="og:url" content="http://younggy.com/2016/01/12/JPEG算法及其实现/index.html">
+<meta property="og:site_name" content="YoungGy">
+<meta property="og:description" content="本文将介绍SVD的一个很重要的应用LSA潜在语义分析。即如何将文档和对应的关键词投影到相同的空间，以便我们可以根据检索的关键词找到对应的相关度高的文档。">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/latent-semantic-indexing.jpg">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/yuanyuan.jpg">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/s.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/yuanyuanRGB.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/YCBCR.gif">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/yuanyuanYCBCR.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/DCT-8x8.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/dct2.jpg">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/dct2m.jpg">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/jpeg_qy.gif">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/jpeg_qc.gif">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/huffman1.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/huffman2.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/JPEG_LS.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/MPEG.png">
+<meta property="og:updated_time" content="2016-01-12T07:01:12.720Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JPEG算法及其实现">
+<meta name="twitter:description" content="本文将介绍SVD的一个很重要的应用LSA潜在语义分析。即如何将文档和对应的关键词投影到相同的空间，以便我们可以根据检索的关键词找到对应的相关度高的文档。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post',
+    motion: false
+  };
+</script>
+
+  <title> JPEG算法及其实现 | YoungGy </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?your-analytics-id";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">YoungGy</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">心有猛虎 细嗅蔷薇</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tools">
+          <a href="/tools" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            工具
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'owv-2W-dWzRWk1KttzWi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                JPEG算法及其实现
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-01-12T14:59:16+08:00" content="2016-01-12">
+              2016-01-12
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/图像识别/" itemprop="url" rel="index">
+                    <span itemprop="name">图像识别</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/01/12/JPEG算法及其实现/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/12/JPEG算法及其实现/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/latent-semantic-indexing.jpg" alt="这里写图片描述"></p>
+<p>本文将介绍<code>SVD</code>的一个很重要的应用<code>LSA</code>潜在语义分析。即如何将文档和对应的关键词投影到相同的空间，以便我们可以根据检索的关键词找到对应的相关度高的文档。</p>
+<a id="more"></a>
+<h1 id="JPEG概述">JPEG概述</h1><p>图像压缩很重要。有这么几种压缩算法：</p>
+<ul>
+<li>JPEG（非常基本的算法，以DCT和quantization为基础，在25比1的压缩比情况下非图像专家很难发现区别）</li>
+<li>JPEG-LS（无损压缩算法，以预测技术为基础，视频的压缩也参照了预测技术）</li>
+<li>JPEG-2000（最新的标准，采用wavelet算法）</li>
+</ul>
+<h1 id="JPEG步骤">JPEG步骤</h1><h2 id="概述">概述</h2><ol>
+<li>图像分割。分割成8*8的小块</li>
+<li>颜色空间转换。从RGB到Y,Cb,Cr。</li>
+<li>DCT(Discrete cosine transform)</li>
+<li>Quantization(数据量化，压缩很大一部分是在这里的)</li>
+<li>Huffman coding(对数据进行编码，进一步压缩)</li>
+</ol>
+<p>下面，将以我们可爱的高圆圆的照片，来看一下压缩算法。<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/yuanyuan.jpg" alt="这里写图片描述"></p>
+<h2 id="图像分割">图像分割</h2><p>首先，将图像分成8*8的小块，分成这么大是有原因的：</p>
+<ol>
+<li>太大的话进行矩阵操作复杂度上升</li>
+<li>太小的话包含的信息太少，在DCT中不能实现很好地压缩</li>
+</ol>
+<p>下面，以高圆圆图片左上角为例，取8*8的元素</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/s.png" alt="这里写图片描述"></p>
+<p>看，就是这么一小块啦！</p>
+<h2 id="颜色空间转换">颜色空间转换</h2><p>首先，简单介绍下颜色空间，其就是表达颜色的数学模型。比如最普通的RGB，高圆圆图片的RGB分解如下：</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/yuanyuanRGB.png" alt="这里写图片描述"></p>
+<p>不同的颜色空间有不同的应用场景，RGB颜色空间适合像显示器这样的自发光图案。然而在JPEG压缩算法中，通常转换成YCbCr空间，这里Y表示亮度，Cb和Cr分别表示绿色和红色的色差值。</p>
+<blockquote>
+<p>“色差”这个概念起源于电视行业，最早的电视都是黑白的，那时候传输电视信号只需要传输亮度信号，也就是Y信号即可，彩色电视出现之后，人们在Y信号之外增加了两条色差信号以传输颜色信息，这么做的目的是为了兼容黑白电视机，因为黑白电视只需要处理信号中的Y信号即可。<br>对于人眼来说，图像中明暗的变化更容易被感知到，这是由于人眼的构造引起的。视网膜上有两种感光细胞，能够感知亮度变化的视杆细胞，以及能够感知颜色的视锥细胞，由于视杆细胞在数量上远大于视锥细胞，所以我们更容易感知到明暗细节。比如说下面这张图<br>——摘自参考文献</p>
+</blockquote>
+<p>其转换公式为：</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/YCBCR.gif" alt="这里写图片描述"></p>
+<p>转换后的图像是：</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/yuanyuanYCBCR.png" alt="这里写图片描述"></p>
+<p>容易看到，RGB颜色空间中，每个颜色尺度上图像的信息都是差不多的。但是在YCbCr中，Y中包含的信息（也就是图形细节）更多，因此后面就可以根据信息的丰富程度做不同的数据压缩处理。比如对Y分量压缩地少，对另外两个分量压缩地多。</p>
+<h2 id="DCT">DCT</h2><p>前文中，我们已经得到了8<em>8的小方块，接着需要对小方块进行DCT变换，DCT变换的实质就是将原来的8</em>8小块投影到新的空间（也就是下面的图片）。</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/DCT-8x8.png" alt="这里写图片描述"></p>
+<p>经过DCT变换后，杂乱的数据变得工整了（这里可以类别矩阵的EIG、SVD分解等）。举个极端的例子，如果每个元素都一样，那么只有左上角（也就是位置（1，1））的方格有值，其他都是零。</p>
+<p>DCT变换的公式是：<br>元素公式：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/dct2.jpg" alt="这里写图片描述"><br>矩阵公式：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/dct2m.jpg" alt="这里写图片描述"></p>
+<p>下面还是以前文中的8*8小方块为例（只看Y分量）：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">s_y =</span><br><span class="line"></span><br><span class="line">  <span class="number">118</span>  <span class="number">118</span>  <span class="number">120</span>  <span class="number">122</span>  <span class="number">122</span>  <span class="number">121</span>  <span class="number">125</span>  <span class="number">128</span></span><br><span class="line">  <span class="number">117</span>  <span class="number">118</span>  <span class="number">120</span>  <span class="number">122</span>  <span class="number">123</span>  <span class="number">123</span>  <span class="number">128</span>  <span class="number">132</span></span><br><span class="line">  <span class="number">121</span>  <span class="number">121</span>  <span class="number">121</span>  <span class="number">121</span>  <span class="number">121</span>  <span class="number">121</span>  <span class="number">125</span>  <span class="number">130</span></span><br><span class="line">  <span class="number">124</span>  <span class="number">123</span>  <span class="number">120</span>  <span class="number">118</span>  <span class="number">116</span>  <span class="number">117</span>  <span class="number">122</span>  <span class="number">126</span></span><br><span class="line">  <span class="number">124</span>  <span class="number">122</span>  <span class="number">118</span>  <span class="number">114</span>  <span class="number">113</span>  <span class="number">116</span>  <span class="number">123</span>  <span class="number">127</span></span><br><span class="line">  <span class="number">130</span>  <span class="number">127</span>  <span class="number">122</span>  <span class="number">117</span>  <span class="number">114</span>  <span class="number">117</span>  <span class="number">124</span>  <span class="number">128</span></span><br><span class="line">  <span class="number">138</span>  <span class="number">135</span>  <span class="number">129</span>  <span class="number">122</span>  <span class="number">117</span>  <span class="number">119</span>  <span class="number">123</span>  <span class="number">126</span></span><br><span class="line">  <span class="number">141</span>  <span class="number">138</span>  <span class="number">133</span>  <span class="number">125</span>  <span class="number">120</span>  <span class="number">121</span>  <span class="number">124</span>  <span class="number">126</span></span><br><span class="line"></span><br><span class="line">&gt;&gt; dct2(s_y)</span><br><span class="line"></span><br><span class="line">ans =</span><br><span class="line"></span><br><span class="line">  <span class="number">984.6250</span>    <span class="number">2.7093</span>   <span class="number">24.9920</span>   -<span class="number">8.0736</span>    <span class="number">1.1250</span>    <span class="number">0.8013</span>   -<span class="number">0.7458</span>    <span class="number">0.3843</span></span><br><span class="line">  -<span class="number">12.6773</span>  -<span class="number">25.9635</span>  -<span class="number">12.8348</span>   -<span class="number">0.9374</span>    <span class="number">3.6024</span>   -<span class="number">0.5894</span>   -<span class="number">0.7880</span>    <span class="number">0.6604</span></span><br><span class="line">   <span class="number">15.0671</span>    <span class="number">5.2086</span>   -<span class="number">4.9383</span>    <span class="number">0.0106</span>    <span class="number">0.0280</span>    <span class="number">0.3999</span>    <span class="number">0.5152</span>    <span class="number">0.2320</span></span><br><span class="line">   -<span class="number">8.2712</span>   -<span class="number">3.4118</span>    <span class="number">2.7730</span>    <span class="number">0.3084</span>   -<span class="number">0.1410</span>    <span class="number">0.7677</span>   -<span class="number">0.4452</span>    <span class="number">0.1033</span></span><br><span class="line">   -<span class="number">3.3750</span>    <span class="number">3.0430</span>   -<span class="number">0.1633</span>    <span class="number">0.4712</span>   -<span class="number">0.3750</span>    <span class="number">0.2268</span>   -<span class="number">0.0676</span>    <span class="number">0.1702</span></span><br><span class="line">    <span class="number">0.5963</span>    <span class="number">5.7983</span>   -<span class="number">0.2067</span>    <span class="number">0.0606</span>    <span class="number">0.2430</span>    <span class="number">0.0231</span>    <span class="number">0.0559</span>   -<span class="number">0.5708</span></span><br><span class="line">    <span class="number">0.1181</span>    <span class="number">0.0674</span>    <span class="number">0.0152</span>   -<span class="number">0.0561</span>    <span class="number">0.3943</span>    <span class="number">0.0299</span>    <span class="number">0.1883</span>    <span class="number">0.1514</span></span><br><span class="line">   -<span class="number">0.5753</span>   -<span class="number">0.0467</span>    <span class="number">0.0542</span>    <span class="number">0.2484</span>   -<span class="number">0.0791</span>   -<span class="number">0.3391</span>    <span class="number">0.2906</span>    <span class="number">0.1321</span></span><br><span class="line"></span><br><span class="line">&gt;&gt; idct2(dct2(s_y))</span><br><span class="line"></span><br><span class="line">ans =</span><br><span class="line"></span><br><span class="line">  <span class="number">118.0000</span>  <span class="number">118.0000</span>  <span class="number">120.0000</span>  <span class="number">122.0000</span>  <span class="number">122.0000</span>  <span class="number">121.0000</span>  <span class="number">125.0000</span>  <span class="number">128.0000</span></span><br><span class="line">  <span class="number">117.0000</span>  <span class="number">118.0000</span>  <span class="number">120.0000</span>  <span class="number">122.0000</span>  <span class="number">123.0000</span>  <span class="number">123.0000</span>  <span class="number">128.0000</span>  <span class="number">132.0000</span></span><br><span class="line">  <span class="number">121.0000</span>  <span class="number">121.0000</span>  <span class="number">121.0000</span>  <span class="number">121.0000</span>  <span class="number">121.0000</span>  <span class="number">121.0000</span>  <span class="number">125.0000</span>  <span class="number">130.0000</span></span><br><span class="line">  <span class="number">124.0000</span>  <span class="number">123.0000</span>  <span class="number">120.0000</span>  <span class="number">118.0000</span>  <span class="number">116.0000</span>  <span class="number">117.0000</span>  <span class="number">122.0000</span>  <span class="number">126.0000</span></span><br><span class="line">  <span class="number">124.0000</span>  <span class="number">122.0000</span>  <span class="number">118.0000</span>  <span class="number">114.0000</span>  <span class="number">113.0000</span>  <span class="number">116.0000</span>  <span class="number">123.0000</span>  <span class="number">127.0000</span></span><br><span class="line">  <span class="number">130.0000</span>  <span class="number">127.0000</span>  <span class="number">122.0000</span>  <span class="number">117.0000</span>  <span class="number">114.0000</span>  <span class="number">117.0000</span>  <span class="number">124.0000</span>  <span class="number">128.0000</span></span><br><span class="line">  <span class="number">138.0000</span>  <span class="number">135.0000</span>  <span class="number">129.0000</span>  <span class="number">122.0000</span>  <span class="number">117.0000</span>  <span class="number">119.0000</span>  <span class="number">123.0000</span>  <span class="number">126.0000</span></span><br><span class="line">  <span class="number">141.0000</span>  <span class="number">138.0000</span>  <span class="number">133.0000</span>  <span class="number">125.0000</span>  <span class="number">120.0000</span>  <span class="number">121.0000</span>  <span class="number">124.0000</span>  <span class="number">126.0000</span></span><br></pre></td></tr></table></figure>
+<p>可以看到，转换后能量集中于左上角的直流分量（因为这么小的图像一般不会出现大的数值上的跳跃）。</p>
+<h2 id="Quantization">Quantization</h2><p>前面的变换都是<strong>可逆</strong>的，也就是数据的信息并没有丢失。<br>数据的大部分压缩都是在量化这里，有时候保存图片的时候软件会提示你选择保存的精度，其实就是改变量化的程度，或者改变量化系数矩阵乘的倍数。</p>
+<p>标准亮度量化表和标准色差量化表见下图：</p>
+<table><tr><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/jpeg_qy.gif" width="400" alt="图片名称" border="0"></td><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/jpeg_qc.gif" width="400" alt="图片名称" border="0"></td><br></tr></table>
+
+<p>对于每个单独元素量化的规则是：</p>
+<p>$$\hat{T}(u,v) =\lfloor  \frac{T(u,v)}{Q} \rfloor *Q$$<br>这么量化的原因是：</p>
+<blockquote>
+<p>有损压缩就是把数据中重要的数据和不重要的数据分开，然后分别处理。DCT系数矩阵中的不同位置的值代表了图像数据中不同频率的分量，这两张表中的数据时人们根据人眼对不不同频率的敏感程度的差别所积累下的经验制定的，一般来说人眼对于低频的分量必高频分量更加敏感，所以两张量化系数矩阵左上角的数值明显小于右下角区域。在实际的压缩过程中，还可以根据需要在这些系数的基础上再乘以一个系数，以使更多或更少的数据变成0。</p>
+</blockquote>
+<p>将原来的8*8小块，根据QY进行量化后，得到的结果是</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">s_y_dct =</span><br><span class="line"></span><br><span class="line">  <span class="number">984.6250</span>    <span class="number">2.7093</span>   <span class="number">24.9920</span>   -<span class="number">8.0736</span>    <span class="number">1.1250</span>    <span class="number">0.8013</span>   -<span class="number">0.7458</span>    <span class="number">0.3843</span></span><br><span class="line">  -<span class="number">12.6773</span>  -<span class="number">25.9635</span>  -<span class="number">12.8348</span>   -<span class="number">0.9374</span>    <span class="number">3.6024</span>   -<span class="number">0.5894</span>   -<span class="number">0.7880</span>    <span class="number">0.6604</span></span><br><span class="line">   <span class="number">15.0671</span>    <span class="number">5.2086</span>   -<span class="number">4.9383</span>    <span class="number">0.0106</span>    <span class="number">0.0280</span>    <span class="number">0.3999</span>    <span class="number">0.5152</span>    <span class="number">0.2320</span></span><br><span class="line">   -<span class="number">8.2712</span>   -<span class="number">3.4118</span>    <span class="number">2.7730</span>    <span class="number">0.3084</span>   -<span class="number">0.1410</span>    <span class="number">0.7677</span>   -<span class="number">0.4452</span>    <span class="number">0.1033</span></span><br><span class="line">   -<span class="number">3.3750</span>    <span class="number">3.0430</span>   -<span class="number">0.1633</span>    <span class="number">0.4712</span>   -<span class="number">0.3750</span>    <span class="number">0.2268</span>   -<span class="number">0.0676</span>    <span class="number">0.1702</span></span><br><span class="line">    <span class="number">0.5963</span>    <span class="number">5.7983</span>   -<span class="number">0.2067</span>    <span class="number">0.0606</span>    <span class="number">0.2430</span>    <span class="number">0.0231</span>    <span class="number">0.0559</span>   -<span class="number">0.5708</span></span><br><span class="line">    <span class="number">0.1181</span>    <span class="number">0.0674</span>    <span class="number">0.0152</span>   -<span class="number">0.0561</span>    <span class="number">0.3943</span>    <span class="number">0.0299</span>    <span class="number">0.1883</span>    <span class="number">0.1514</span></span><br><span class="line">   -<span class="number">0.5753</span>   -<span class="number">0.0467</span>    <span class="number">0.0542</span>    <span class="number">0.2484</span>   -<span class="number">0.0791</span>   -<span class="number">0.3391</span>    <span class="number">0.2906</span>    <span class="number">0.1321</span></span><br><span class="line"></span><br><span class="line"> uint8(<span class="built_in">floor</span>(<span class="keyword">double</span>(s_y_dct)./QY).*QY)</span><br><span class="line"></span><br><span class="line">ans =</span><br><span class="line"></span><br><span class="line">  <span class="number">255</span>    <span class="number">0</span>   <span class="number">20</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span></span><br><span class="line">    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span></span><br><span class="line">   <span class="number">14</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span></span><br><span class="line">    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span></span><br><span class="line">    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span></span><br><span class="line">    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span></span><br><span class="line">    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span></span><br><span class="line">    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span>    <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>可以看到，大部分元素都变成了0。</p>
+<h2 id="Huffman_coding">Huffman coding</h2><p>哈弗曼几乎是所有压缩算法的基础，它的基本原理是根据元素的使用频率，调整元素的编码长度，以获得更高的压缩比。</p>
+<p>原理可以用下面两张图简单介绍：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/huffman1.png" alt="这里写图片描述"><br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/huffman2.png" alt="这里写图片描述"></p>
+<p>可以看到，出现概率越高的符号通过哈弗曼编码用的<em>bit</em>位越少，以便实现更好的数据压缩。</p>
+<p>通过Huffman coding，在不丢失信息的前提下，我们实现了数据压缩。</p>
+<h1 id="JPEG-LS">JPEG-LS</h1><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/JPEG_LS.png" alt="这里写图片描述"></p>
+<p>上面这张图片简单概述了无损压缩的步骤，无损压缩建立在以下的基础上：</p>
+<ol>
+<li>每个像素之间差别不大，最朴素的方法可以用前一个像素的值来预测后一个像素的值。</li>
+<li>假设图片有256个像素，分别是0——255。那么只需要记录下第一个值0以及增长率1（并且这种特殊情况下增长率都是1，所以可以极大地减少空间）。</li>
+<li>同样地，对于普通的一张图片，因为相邻的像素差别不大，所以对增长率进行编码的话效率更高些，这就是JPEG-LS的核心思想——预测增长率。</li>
+</ol>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/MPEG.png" alt="这里写图片描述"></p>
+<p>同样地，对于视频，背景一般不变，所以也可以用类似的思想（MPEG就是用的这种思想方法）实现对视频的压缩。</p>
+<h1 id="参考文献">参考文献</h1><ol>
+<li><a href="http://thecodeway.com/blog/?p=69" target="_blank" rel="external">JPEG算法解密（母校学长的文章，大赞啊）</a></li>
+<li><a href="https://wuyuans.com/2012/11/dct2/" target="_blank" rel="external">DCT变换（这里DCT讲的很明白）</a></li>
+</ol>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JPEG/" rel="tag">#JPEG</a>
+          
+            <a href="/tags/图像识别/" rel="tag">#图像识别</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/12/10/微分方程与欧拉法/" rel="next" title="微分方程与欧拉法">
+                <i class="fa fa-chevron-left"></i> 微分方程与欧拉法
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/01/12/JPEG算法及其实现/"
+           data-title="JPEG算法及其实现" data-url="http://younggy.com/2016/01/12/JPEG算法及其实现/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/uploads/touxiang.jpg" alt="Guangyao Yang" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Guangyao Yang</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Guangyao Yang</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">27</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/young_gy" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> CSDN
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YoungGer" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-twitter-url" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i> Twitter
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-weibo-url" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-douban-url" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> DouBan
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/ger-young" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> ZhiHu
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#JPEG概述"><span class="nav-number">1.</span> <span class="nav-text">JPEG概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JPEG步骤"><span class="nav-number">2.</span> <span class="nav-text">JPEG步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">2.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图像分割"><span class="nav-number">2.2.</span> <span class="nav-text">图像分割</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#颜色空间转换"><span class="nav-number">2.3.</span> <span class="nav-text">颜色空间转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DCT"><span class="nav-number">2.4.</span> <span class="nav-text">DCT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Quantization"><span class="nav-number">2.5.</span> <span class="nav-text">Quantization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Huffman_coding"><span class="nav-number">2.6.</span> <span class="nav-text">Huffman coding</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JPEG-LS"><span class="nav-number">3.</span> <span class="nav-text">JPEG-LS</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考文献"><span class="nav-number">4.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guangyao Yang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"younggy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+
+  
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/MathJax.js"></script>
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/config/TeX-AMS-MML_HTMLorMML.js"></script>
+  
+
+
+  
+  
+
+</body>
+</html>
