@@ -51,13 +51,13 @@
 
 
 
-<meta name="description" content="本文将介绍SVD的一个很重要的应用LSA潜在语义分析。即如何将文档和对应的关键词投影到相同的空间，以便我们可以根据检索的关键词找到对应的相关度高的文档。">
+<meta name="description" content="本文将简单介绍下JPEG算法的实现流程，包括图像分割、颜色空间转换、DCT、Quantization、Huffman coding等。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JPEG算法及其实现">
 <meta property="og:url" content="http://younggy.com/2016/01/12/JPEG算法及其实现/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="本文将介绍SVD的一个很重要的应用LSA潜在语义分析。即如何将文档和对应的关键词投影到相同的空间，以便我们可以根据检索的关键词找到对应的相关度高的文档。">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/latent-semantic-indexing.jpg">
+<meta property="og:description" content="本文将简单介绍下JPEG算法的实现流程，包括图像分割、颜色空间转换、DCT、Quantization、Huffman coding等。">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/JPEG.png">
 <meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/yuanyuan.jpg">
 <meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/s.png">
 <meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/yuanyuanRGB.png">
@@ -72,10 +72,10 @@
 <meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/huffman2.png">
 <meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/JPEG_LS.png">
 <meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/MPEG.png">
-<meta property="og:updated_time" content="2016-01-12T07:01:12.720Z">
+<meta property="og:updated_time" content="2016-01-12T07:11:18.136Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JPEG算法及其实现">
-<meta name="twitter:description" content="本文将介绍SVD的一个很重要的应用LSA潜在语义分析。即如何将文档和对应的关键词投影到相同的空间，以便我们可以根据检索的关键词找到对应的相关度高的文档。">
+<meta name="twitter:description" content="本文将简单介绍下JPEG算法的实现流程，包括图像分割、颜色空间转换、DCT、Quantization、Huffman coding等。">
 
 
 
@@ -323,8 +323,8 @@
       
 
       
-        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/latent-semantic-indexing.jpg" alt="这里写图片描述"></p>
-<p>本文将介绍<code>SVD</code>的一个很重要的应用<code>LSA</code>潜在语义分析。即如何将文档和对应的关键词投影到相同的空间，以便我们可以根据检索的关键词找到对应的相关度高的文档。</p>
+        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/JPEG.png" alt="这里写图片描述"></p>
+<p>本文将简单介绍下JPEG算法的实现流程，包括图像分割、颜色空间转换、DCT、Quantization、Huffman coding等。</p>
 <a id="more"></a>
 <h1 id="JPEG概述">JPEG概述</h1><p>图像压缩很重要。有这么几种压缩算法：</p>
 <ul>
