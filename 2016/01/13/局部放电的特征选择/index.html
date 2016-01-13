@@ -1,0 +1,902 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="L2-regularization,sequential feature selection,随机森林," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="局部放电是电力设备监测中的一种很重要的方法。本文将以局部放电为例，具体阐述feature selection。具体包括L1-regularization、sequential feature selection和random forest这三种特征选择的方法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="局部放电的特征选择">
+<meta property="og:url" content="http://younggy.com/2016/01/13/局部放电的特征选择/index.html">
+<meta property="og:site_name" content="YoungGy">
+<meta property="og:description" content="局部放电是电力设备监测中的一种很重要的方法。本文将以局部放电为例，具体阐述feature selection。具体包括L1-regularization、sequential feature selection和random forest这三种特征选择的方法。">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/220px-Partial_discharge.svg.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/l1.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/l2.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/l1pdpath.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/%E5%A5%A5%E5%A5%A5.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/rf.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/rfff.png">
+<meta property="og:updated_time" content="2016-01-13T12:32:59.435Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="局部放电的特征选择">
+<meta name="twitter:description" content="局部放电是电力设备监测中的一种很重要的方法。本文将以局部放电为例，具体阐述feature selection。具体包括L1-regularization、sequential feature selection和random forest这三种特征选择的方法。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post',
+    motion: false
+  };
+</script>
+
+  <title> 局部放电的特征选择 | YoungGy </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?your-analytics-id";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">YoungGy</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">心有猛虎 细嗅蔷薇</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tools">
+          <a href="/tools" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            工具
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'owv-2W-dWzRWk1KttzWi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                局部放电的特征选择
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-01-13T20:28:39+08:00" content="2016-01-13">
+              2016-01-13
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/机器学习/局部放电/" itemprop="url" rel="index">
+                    <span itemprop="name">局部放电</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/01/13/局部放电的特征选择/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/13/局部放电的特征选择/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/220px-Partial_discharge.svg.png" alt="这里写图片描述"></p>
+<p>局部放电是电力设备监测中的一种很重要的方法。本文将以局部放电为例，具体阐述<code>feature selection</code>。具体包括<code>L1-regularization</code>、<code>sequential feature selection</code>和<code>random forest</code>这三种特征选择的方法。</p>
+<a id="more"></a>
+<h1 id="局部放电">局部放电</h1><p>当外加电压在电气设备中产生的场强，足以使绝缘部分区域发生放电，但在放电区域内未形成固定放电通道的这种放电现象，称为局部放电。</p>
+<p>局部放电在电力设备的检测中应用很广泛，通过局部放电的情况，可以判断设备故障情况与老化状态。</p>
+<p>本文将选择部分局部放电数据，通过各种不同的特征选择方法，选择出来合适的局放特征信号。</p>
+<h1 id="特征选择概述">特征选择概述</h1><p>在机器学习中，有一句名言：</p>
+<blockquote>
+<p>rubbish in, rubbish out</p>
+</blockquote>
+<p>这句话强调的是，无论多么强大的模型，都需要好的数据，好的数据的一个重要的特征就是这个数据跟需要解决的问题关联性大。</p>
+<p>特征工程方面主要有两种方法：</p>
+<ol>
+<li>feature selection</li>
+<li>feature extraction</li>
+</ol>
+<p>本文将主要探讨<code>feature selection</code>，也就是从已有的特征中进一步挑选出特征，而不是构建新的特征，这么做的优点有以下几个：</p>
+<ol>
+<li>如果<code>feature</code>太多的话，模型的复杂度过大，可能会发生过拟合</li>
+<li>如果<code>feature</code>太多的话，数据变得稀疏，会有<code>curse of dimension</code></li>
+<li>如果<code>feature</code>太多的话，训练以及预测需要的计算量更大</li>
+</ol>
+<h1 id="数据预处理">数据预处理</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#放电数据主要包含如下几个特征：</span></span><br><span class="line">pd_location </span><br><span class="line">signal_width </span><br><span class="line">rise_time </span><br><span class="line">fall_time</span><br><span class="line">peak_voltage</span><br><span class="line">polarity</span><br><span class="line">mean_voltage </span><br><span class="line">rms </span><br><span class="line">sd </span><br><span class="line">skewness </span><br><span class="line">kurtosis</span><br><span class="line">crest </span><br><span class="line">form_factor </span><br><span class="line">MainFreq </span><br><span class="line">phase_angle </span><br><span class="line">T </span><br><span class="line">W </span><br><span class="line">pC</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#载入数据</span></span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line">d = pd.read_csv(<span class="string">"2C4KPdNoise.csv"</span>)</span><br><span class="line"><span class="comment">#观察数据</span></span><br><span class="line">d.head()</span><br><span class="line">d.groupby(<span class="string">"pd_class"</span>).agg(&#123;<span class="string">'T'</span>: len&#125;)</span><br><span class="line">d.isnull().any()</span><br><span class="line"><span class="comment">#训练集和测试集划分</span></span><br><span class="line"><span class="keyword">from</span> sklearn.cross_validation <span class="keyword">import</span> train_test_split</span><br><span class="line">n1 = d.shape[<span class="number">1</span>]-<span class="number">1</span></span><br><span class="line">X, y = d.iloc[:, <span class="number">0</span>:n1].values, d.iloc[:, n1].values</span><br><span class="line">X_train, X_test, y_train, y_test = \</span><br><span class="line">        train_test_split(X, y, test_size=<span class="number">0.3</span>, random_state=<span class="number">0</span>)</span><br><span class="line"><span class="keyword">print</span> (<span class="string">"X_train shape:"</span>,X_train.shape) </span><br><span class="line"><span class="keyword">print</span> (<span class="string">"X_test  shape:"</span>,X_test.shape) </span><br><span class="line"><span class="keyword">print</span> (<span class="string">"Y_train shape:"</span>,y_train.shape) </span><br><span class="line"><span class="keyword">print</span> (<span class="string">"Y_test  shape:"</span>,y_test.shape) </span><br><span class="line"></span><br><span class="line"><span class="comment">#数据归一化</span></span><br><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> StandardScaler</span><br><span class="line">stdsc = StandardScaler()</span><br><span class="line">X_train_std = stdsc.fit_transform(X_train)</span><br><span class="line">X_test_std = stdsc.transform(X_test)</span><br></pre></td></tr></table></figure>
+<h1 id="L1-regularization">L1-regularization</h1><table><tr><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/l1.png" width="400" alt="图片名称" border="0"></td><br><td><img src="http://7xlwwh.com1.z0.glb.clouddn.com/l2.png" width="400" alt="图片名称" border="0"></td><br></tr></table>
+
+<p><code>L1-regularization</code>的原理以及与<code>L2</code>的区别如上图，其使用了<code>coordinate descent</code>以及<code>subgradient</code>的原理，会使某一个<code>feature</code>迅速地变成0。</p>
+<p>通过不断地调整权重，获得以下特征信息：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">['W', 'pC']</span><br><span class="line">['T', 'W', 'pC']</span><br><span class="line">['pd_location', 'kurtosis', 'phase_angle', 'T', 'W', 'pC']</span><br><span class="line">['pd_location', 'skewness', 'kurtosis', 'phase_angle', 'T', 'W', 'pC']</span><br></pre></td></tr></table></figure>
+<p><code>l1 path</code>如下图：</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/l1pdpath.png" alt="这里写图片描述"><br>代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line">COLUMNS = d.columns[:-<span class="number">1</span>]</span><br><span class="line"><span class="comment">#第一次选权重</span></span><br><span class="line">weights, params = [], []</span><br><span class="line"><span class="keyword">for</span> c <span class="keyword">in</span> np.arange(-<span class="number">4</span>, <span class="number">6</span>):</span><br><span class="line">    lr = LogisticRegression(penalty=<span class="string">'l1'</span>, C=<span class="number">10</span>**c, random_state=<span class="number">0</span>)</span><br><span class="line">    lr.fit(X_train_std, y_train)</span><br><span class="line">    weights.append(lr.coef_[<span class="number">1</span>])</span><br><span class="line">    params.append(<span class="number">10</span>**c)</span><br><span class="line">weights = np.array(weights)</span><br><span class="line">pd.DataFrame(&#123;<span class="string">"c"</span>:np.arange(-<span class="number">4</span>, <span class="number">6</span>),<span class="string">"num"</span>:[sum(i!=<span class="number">0</span>) <span class="keyword">for</span> i <span class="keyword">in</span> weights]&#125;)</span><br><span class="line"><span class="comment">#第二次选权重</span></span><br><span class="line">weights, params = [], []</span><br><span class="line"><span class="keyword">for</span> c <span class="keyword">in</span> np.linspace(-<span class="number">2</span>, -<span class="number">1</span>,<span class="number">5</span>):</span><br><span class="line">    lr = LogisticRegression(penalty=<span class="string">'l1'</span>, C=<span class="number">10</span>**c, random_state=<span class="number">0</span>)</span><br><span class="line">    lr.fit(X_train_std, y_train)</span><br><span class="line">    weights.append(lr.coef_[<span class="number">1</span>])</span><br><span class="line">    params.append(<span class="number">10</span>**c)</span><br><span class="line">weights = np.array(weights)</span><br><span class="line">pd.DataFrame(&#123;<span class="string">"c"</span>:np.linspace(-<span class="number">2</span>, -<span class="number">1</span>,<span class="number">5</span>),<span class="string">"num"</span>:[sum(i!=<span class="number">0</span>) <span class="keyword">for</span> i <span class="keyword">in</span> weights]&#125;)</span><br><span class="line"><span class="comment">#第三次选权重</span></span><br><span class="line">weights, params = [], []</span><br><span class="line"><span class="keyword">for</span> c <span class="keyword">in</span> np.linspace(-<span class="number">1.25</span>, -<span class="number">1</span>,<span class="number">10</span>):</span><br><span class="line">    lr = LogisticRegression(penalty=<span class="string">'l1'</span>, C=<span class="number">10</span>**c, random_state=<span class="number">0</span>)</span><br><span class="line">    lr.fit(X_train_std, y_train)</span><br><span class="line">    weights.append(lr.coef_[<span class="number">1</span>])</span><br><span class="line">    params.append(<span class="number">10</span>**c)</span><br><span class="line">weights = np.array(weights)</span><br><span class="line">pd.DataFrame(&#123;<span class="string">"c"</span>:np.linspace(-<span class="number">1.25</span>, -<span class="number">1</span>,<span class="number">10</span>),<span class="string">"num"</span>:[sum(i!=<span class="number">0</span>) <span class="keyword">for</span> i <span class="keyword">in</span> weights]&#125;)</span><br><span class="line"><span class="comment">#查看结果</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range (len(weights)):</span><br><span class="line">    <span class="keyword">print</span> (COLUMNS[weights[i] !=<span class="number">0</span>])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#可视化</span></span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="comment">##颜色的选择用`iWantHue`</span></span><br><span class="line">colors = [<span class="string">"#6FC9CA"</span>,</span><br><span class="line"><span class="string">"#CD5430"</span>,</span><br><span class="line"><span class="string">"#CE4DC4"</span>,</span><br><span class="line"><span class="string">"#88D54D"</span>,</span><br><span class="line"><span class="string">"#3D455E"</span>,</span><br><span class="line"><span class="string">"#5A752D"</span>,</span><br><span class="line"><span class="string">"#CC436D"</span>,</span><br><span class="line"><span class="string">"#603422"</span>,</span><br><span class="line"><span class="string">"#D2B43F"</span>,</span><br><span class="line"><span class="string">"#CD88BC"</span>,</span><br><span class="line"><span class="string">"#C8C28D"</span>,</span><br><span class="line"><span class="string">"#71D195"</span>,</span><br><span class="line"><span class="string">"#6A89C8"</span>,</span><br><span class="line"><span class="string">"#C18170"</span>,</span><br><span class="line"><span class="string">"#7F68D1"</span>,</span><br><span class="line"><span class="string">"#4A6553"</span>,</span><br><span class="line"><span class="string">"#BABAC7"</span>,</span><br><span class="line"><span class="string">"#693263"</span>]</span><br><span class="line"><span class="comment">##计算权重</span></span><br><span class="line">weights, params = [], []</span><br><span class="line"><span class="keyword">for</span> c <span class="keyword">in</span> np.arange(-<span class="number">2</span>, <span class="number">10</span>):</span><br><span class="line">    lr = LogisticRegression(penalty=<span class="string">'l1'</span>, C=<span class="number">10</span>**c, random_state=<span class="number">0</span>)</span><br><span class="line">    lr.fit(X_train_std, y_train)</span><br><span class="line">    weights.append(lr.coef_[<span class="number">1</span>])</span><br><span class="line">    params.append(<span class="number">10</span>**c)</span><br><span class="line"></span><br><span class="line">weights = np.array(weights)</span><br><span class="line"><span class="comment">##开始画图</span></span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">%matplotlib inline</span><br><span class="line">fig = plt.figure()</span><br><span class="line">ax = plt.subplot(<span class="number">111</span>)</span><br><span class="line"><span class="keyword">for</span> column, color <span class="keyword">in</span> zip(range(weights.shape[<span class="number">1</span>]), colors):</span><br><span class="line">    plt.plot(params, weights[:, column],</span><br><span class="line">             label=pd.columns[column],</span><br><span class="line">             color=color)</span><br><span class="line">plt.axhline(<span class="number">0</span>, color=<span class="string">'black'</span>, linestyle=<span class="string">'--'</span>, linewidth=<span class="number">5</span>)</span><br><span class="line">plt.xlim([<span class="number">10</span>**(-<span class="number">5</span>), <span class="number">10</span>**<span class="number">5</span>])</span><br><span class="line">plt.ylabel(<span class="string">'weight coefficient'</span>)</span><br><span class="line">plt.xlabel(<span class="string">'C'</span>)</span><br><span class="line">plt.xscale(<span class="string">'log'</span>)</span><br><span class="line">plt.legend(loc=<span class="string">'upper left'</span>,markerscale=<span class="number">5</span>)</span><br><span class="line">ax.legend(loc=<span class="string">'upper center'</span>, </span><br><span class="line">          bbox_to_anchor=(<span class="number">1.38</span>, <span class="number">1.03</span>),</span><br><span class="line">          ncol=<span class="number">1</span>, fancybox=<span class="keyword">True</span>)</span><br><span class="line">plt.savefig(<span class="string">'l1_path.png'</span>, dpi=<span class="number">600</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<h1 id="sequential_feature_selection">sequential feature selection</h1><p>这是属于<code>贪婪算法</code>的一种方法，具体有：</p>
+<ul>
+<li>forward selection</li>
+<li>backward selection</li>
+<li>forward and backward selection</li>
+</ul>
+<p>可以结合不同的模型，也可以有不同的<code>评价指标</code>，常见的有以下几个</p>
+<ul>
+<li>validation集上的精度</li>
+<li>特征的p值</li>
+</ul>
+<p>下面是用<code>logistic regression</code>模型，通过测试集上的分类精度，选择出的特征信息：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">'pd_location'</span> <span class="string">'signal_width'</span> <span class="string">'peak_voltage'</span> <span class="string">'form_factor'</span> <span class="string">'pC'</span>]</span><br><span class="line">[<span class="string">'signal_width'</span> <span class="string">'peak_voltage'</span> <span class="string">'form_factor'</span> <span class="string">'pC'</span>]</span><br><span class="line">[<span class="string">'signal_width'</span> <span class="string">'peak_voltage'</span> <span class="string">'pC'</span>]</span><br><span class="line">[<span class="string">'peak_voltage'</span> <span class="string">'pC'</span>]</span><br><span class="line">[<span class="string">'peak_voltage'</span>]</span><br></pre></td></tr></table></figure>
+<p>训练的过程图如下：</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/%E5%A5%A5%E5%A5%A5.png" alt="这里写图片描述"></p>
+<p>代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#定义sequential feature selection函数</span></span><br><span class="line"><span class="keyword">from</span> sklearn.base <span class="keyword">import</span> clone</span><br><span class="line"><span class="keyword">from</span> itertools <span class="keyword">import</span> combinations</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> sklearn.cross_validation <span class="keyword">import</span> train_test_split</span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SBS</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, estimator, k_features, scoring=accuracy_score,</span><br><span class="line">                 test_size=<span class="number">0.25</span>, random_state=<span class="number">1</span>)</span>:</span></span><br><span class="line">        self.scoring = scoring</span><br><span class="line">        self.estimator = clone(estimator)</span><br><span class="line">        self.k_features = k_features</span><br><span class="line">        self.test_size = test_size</span><br><span class="line">        self.random_state = random_state</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">fit</span><span class="params">(self, X, y)</span>:</span></span><br><span class="line">        </span><br><span class="line">        X_train, X_test, y_train, y_test = \</span><br><span class="line">                train_test_split(X, y, test_size=self.test_size, </span><br><span class="line">                                 random_state=self.random_state)</span><br><span class="line"></span><br><span class="line">        dim = X_train.shape[<span class="number">1</span>]</span><br><span class="line">        self.indices_ = tuple(range(dim))</span><br><span class="line">        self.subsets_ = [self.indices_]</span><br><span class="line">        score = self._calc_score(X_train, y_train, </span><br><span class="line">                                 X_test, y_test, self.indices_)</span><br><span class="line">        self.scores_ = [score]</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> dim &gt; self.k_features:</span><br><span class="line">            scores = []</span><br><span class="line">            subsets = []</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> p <span class="keyword">in</span> combinations(self.indices_, r=dim-<span class="number">1</span>):</span><br><span class="line">                score = self._calc_score(X_train, y_train, </span><br><span class="line">                                         X_test, y_test, p)</span><br><span class="line">                scores.append(score)</span><br><span class="line">                subsets.append(p)</span><br><span class="line"></span><br><span class="line">            best = np.argmax(scores)</span><br><span class="line">            self.indices_ = subsets[best]</span><br><span class="line">            self.subsets_.append(self.indices_)</span><br><span class="line">            dim -= <span class="number">1</span></span><br><span class="line"></span><br><span class="line">            self.scores_.append(scores[best])</span><br><span class="line">        self.k_score_ = self.scores_[-<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> self</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">transform</span><span class="params">(self, X)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> X[:, self.indices_]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_calc_score</span><span class="params">(self, X_train, y_train, X_test, y_test, indices)</span>:</span></span><br><span class="line">        self.estimator.fit(X_train[:, indices], y_train)</span><br><span class="line">        y_pred = self.estimator.predict(X_test[:, indices])</span><br><span class="line">        score = self.scoring(y_test, y_pred)</span><br><span class="line">        <span class="keyword">return</span> score</span><br><span class="line"><span class="comment">#训练</span></span><br><span class="line">%matplotlib inline</span><br><span class="line"><span class="keyword">from</span> sklearn.neighbors <span class="keyword">import</span> KNeighborsClassifier</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line">lr = LogisticRegression()</span><br><span class="line"></span><br><span class="line"><span class="comment"># selecting features</span></span><br><span class="line">sbs = SBS(lr, k_features=<span class="number">1</span>)</span><br><span class="line">sbs.fit(X_train_std, y_train)</span><br><span class="line"></span><br><span class="line"><span class="comment"># plotting performance of feature subsets</span></span><br><span class="line">k_feat = [len(k) <span class="keyword">for</span> k <span class="keyword">in</span> sbs.subsets_]</span><br><span class="line"></span><br><span class="line">plt.plot(k_feat, sbs.scores_, marker=<span class="string">'o'</span>)</span><br><span class="line">plt.ylim([<span class="number">0</span>, <span class="number">1</span>])</span><br><span class="line">plt.ylabel(<span class="string">'Accuracy'</span>)</span><br><span class="line">plt.xlabel(<span class="string">'Number of features'</span>)</span><br><span class="line">plt.grid()</span><br><span class="line">plt.tight_layout()</span><br><span class="line"><span class="comment"># plt.savefig('./sbs.png', dpi=300)</span></span><br><span class="line">plt.show()</span><br><span class="line"><span class="comment">#看参数</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> sbs.subsets_:</span><br><span class="line">    <span class="keyword">print</span> (np.array(COLUMNS[[i]]))</span><br></pre></td></tr></table></figure>
+<h1 id="random_forest">random forest</h1><p>随机森林的特征选择是根据特征的<code>Importance</code>。其核心是用<code>OOB</code>的资料，通过特征的置换来计算重要程度，可参考下面两张PPT。</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/rf.png" alt="这里写图片描述"></p>
+<p>结果如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"> <span class="number">1</span>) pd_location                    <span class="number">0.135614</span></span><br><span class="line"> <span class="number">2</span>) signal_width                   <span class="number">0.105168</span></span><br><span class="line"> <span class="number">3</span>) rise_time                      <span class="number">0.104014</span></span><br><span class="line"> <span class="number">4</span>) fall_time                      <span class="number">0.100831</span></span><br><span class="line"> <span class="number">5</span>) peak_voltage                   <span class="number">0.084795</span></span><br><span class="line"> <span class="number">6</span>) polarity                       <span class="number">0.071462</span></span><br><span class="line"> <span class="number">7</span>) mean_voltage                   <span class="number">0.056699</span></span><br><span class="line"> <span class="number">8</span>) rms                            <span class="number">0.056144</span></span><br><span class="line"> <span class="number">9</span>) sd                             <span class="number">0.048083</span></span><br><span class="line"><span class="number">10</span>) skewness                       <span class="number">0.044781</span></span><br><span class="line"><span class="number">11</span>) kurtosis                       <span class="number">0.041479</span></span><br><span class="line"><span class="number">12</span>) crest                          <span class="number">0.036688</span></span><br><span class="line"><span class="number">13</span>) form_factor                    <span class="number">0.033465</span></span><br><span class="line"><span class="number">14</span>) MainFreq                       <span class="number">0.029730</span></span><br><span class="line"><span class="number">15</span>) phase_angle                    <span class="number">0.029136</span></span><br><span class="line"><span class="number">16</span>) T                              <span class="number">0.011835</span></span><br><span class="line"><span class="number">17</span>) W                              <span class="number">0.010076</span></span><br><span class="line"><span class="number">18</span>) pC                             <span class="number">0.000000</span></span><br></pre></td></tr></table></figure>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/rfff.png" alt="这里写图片描述"></p>
+<p>需要注意的是，如果有两个特征相关度很大，这种方法会造成其中一种重要性很高，另一种重要性很低。对于预测并不影响，但是会影响解释程度。</p>
+<p>代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.ensemble <span class="keyword">import</span> RandomForestClassifier</span><br><span class="line">feat_labels = d.columns[<span class="number">0</span>:-<span class="number">1</span>]</span><br><span class="line">forest = RandomForestClassifier(n_estimators=<span class="number">10000</span>,</span><br><span class="line">                                random_state=<span class="number">0</span>,</span><br><span class="line">                                n_jobs=-<span class="number">1</span>)</span><br><span class="line">forest.fit(X_train, y_train)</span><br><span class="line">importances = forest.feature_importances_</span><br><span class="line">indices = np.argsort(importances)[::-<span class="number">1</span>]</span><br><span class="line"><span class="keyword">for</span> f <span class="keyword">in</span> range(X_train.shape[<span class="number">1</span>]):</span><br><span class="line">    print(<span class="string">"%2d) %-*s %f"</span> % (f + <span class="number">1</span>, <span class="number">30</span>, </span><br><span class="line">                            feat_labels[f], </span><br><span class="line">                            importances[indices[f]]))</span><br><span class="line">plt.title(<span class="string">'Feature Importances'</span>)</span><br><span class="line">plt.bar(range(X_train.shape[<span class="number">1</span>]), </span><br><span class="line">        importances[indices],</span><br><span class="line">        color=<span class="string">'lightblue'</span>, </span><br><span class="line">        align=<span class="string">'center'</span>)</span><br><span class="line">plt.xticks(range(X_train.shape[<span class="number">1</span>]), </span><br><span class="line">           feat_labels, rotation=<span class="number">90</span>)</span><br><span class="line">plt.xlim([-<span class="number">1</span>, X_train.shape[<span class="number">1</span>]])</span><br><span class="line">plt.tight_layout()</span><br><span class="line"><span class="comment">#plt.savefig('./figures/random_forest.png', dpi=300)</span></span><br><span class="line">plt.show()</span><br><span class="line"></span><br><span class="line"><span class="comment">#指定的threshold进行选择</span></span><br><span class="line">X_selected = forest.transform(X_train, threshold=<span class="number">0.15</span>)</span><br><span class="line">X_selected.shape</span><br></pre></td></tr></table></figure>
+<h1 id="参考资料">参考资料</h1><ol>
+<li><a href="PythonMachineLeaning">PythonMachineLeaning</a></li>
+</ol>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/L2-regularization/" rel="tag">#L2-regularization</a>
+          
+            <a href="/tags/sequential-feature-selection/" rel="tag">#sequential feature selection</a>
+          
+            <a href="/tags/随机森林/" rel="tag">#随机森林</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/01/13/消费者理论概述/" rel="next" title="消费者理论概述">
+                <i class="fa fa-chevron-left"></i> 消费者理论概述
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/01/13/局部放电的特征选择/"
+           data-title="局部放电的特征选择" data-url="http://younggy.com/2016/01/13/局部放电的特征选择/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/uploads/touxiang.jpg" alt="Guangyao Yang" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Guangyao Yang</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Guangyao Yang</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">14</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">13</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">32</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/young_gy" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> CSDN
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YoungGer" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-twitter-url" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i> Twitter
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-weibo-url" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-douban-url" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> DouBan
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/ger-young" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> ZhiHu
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#局部放电"><span class="nav-number">1.</span> <span class="nav-text">局部放电</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#特征选择概述"><span class="nav-number">2.</span> <span class="nav-text">特征选择概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据预处理"><span class="nav-number">3.</span> <span class="nav-text">数据预处理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#L1-regularization"><span class="nav-number">4.</span> <span class="nav-text">L1-regularization</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#sequential_feature_selection"><span class="nav-number">5.</span> <span class="nav-text">sequential feature selection</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#random_forest"><span class="nav-number">6.</span> <span class="nav-text">random forest</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">7.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guangyao Yang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"younggy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+
+  
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/MathJax.js"></script>
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/config/TeX-AMS-MML_HTMLorMML.js"></script>
+  
+
+
+  
+  
+
+</body>
+</html>
