@@ -35,7 +35,7 @@
 <link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="consumer sheory,optimization," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -51,17 +51,27 @@
 
 
 
-<meta name="description" content="消费者理论是构建经济学大厦的基石。本文先从优化问题讲起，构建经济学基本的benefit-cost模型，然后从消费者的角度阐述consumer theory，具体包括consumer demand，consumer surplus，consumer mistake，recovering preferences from data。">
+<meta name="description" content="关于婚姻，有如下的话：
+
+Marriage can take “work”.The first year is the hardest.People learn to get along and love is a practice-you must express love through living it to make it grow stronger.
+婚姻需要一定的“努力”。婚姻的第一">
 <meta property="og:type" content="article">
-<meta property="og:title" content="消费者理论概述">
-<meta property="og:url" content="http://younggy.com/2016/01/13/消费者理论概述/index.html">
+<meta property="og:title" content="婚姻关系的简单建模分析">
+<meta property="og:url" content="http://younggy.com/2016/06/13/婚姻关系的简单建模分析/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="消费者理论是构建经济学大厦的基石。本文先从优化问题讲起，构建经济学基本的benefit-cost模型，然后从消费者的角度阐述consumer theory，具体包括consumer demand，consumer surplus，consumer mistake，recovering preferences from data。">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Consumer-surplus.png">
-<meta property="og:updated_time" content="2016-01-13T03:38:19.888Z">
+<meta property="og:description" content="关于婚姻，有如下的话：
+
+Marriage can take “work”.The first year is the hardest.People learn to get along and love is a practice-you must express love through living it to make it grow stronger.
+婚姻需要一定的“努力”。婚姻的第一">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/d63758035ca5925db0bdee47757cb7ec.jpg?imageView/2/w/400">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/l1.jpg">
+<meta property="og:updated_time" content="2016-06-13T02:45:12.182Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="消费者理论概述">
-<meta name="twitter:description" content="消费者理论是构建经济学大厦的基石。本文先从优化问题讲起，构建经济学基本的benefit-cost模型，然后从消费者的角度阐述consumer theory，具体包括consumer demand，consumer surplus，consumer mistake，recovering preferences from data。">
+<meta name="twitter:title" content="婚姻关系的简单建模分析">
+<meta name="twitter:description" content="关于婚姻，有如下的话：
+
+Marriage can take “work”.The first year is the hardest.People learn to get along and love is a practice-you must express love through living it to make it grow stronger.
+婚姻需要一定的“努力”。婚姻的第一">
 
 
 
@@ -73,7 +83,7 @@
   };
 </script>
 
-  <title> 消费者理论概述 | YoungGy </title>
+  <title> 婚姻关系的简单建模分析 | YoungGy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -254,7 +264,7 @@
             
             
               
-                消费者理论概述
+                婚姻关系的简单建模分析
               
             
           </h1>
@@ -263,34 +273,19 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2016-01-13T11:14:38+08:00" content="2016-01-13">
-              2016-01-13
+            <time itemprop="dateCreated" datetime="2016-06-13T10:26:26+08:00" content="2016-06-13">
+              2016-06-13
             </time>
           </span>
 
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/经济学/" itemprop="url" rel="index">
-                    <span itemprop="name">经济学</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
           
 
           
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/01/13/消费者理论概述/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/13/消费者理论概述/" itemprop="commentsCount"></span>
+                <a href="/2016/06/13/婚姻关系的简单建模分析/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/13/婚姻关系的简单建模分析/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -309,141 +304,226 @@
       
 
       
-        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Consumer-surplus.png" alt="这里写图片描述"></p>
-<p><code>消费者理论</code>是构建经济学大厦的基石。<br>本文先从优化问题讲起，构建经济学基本的<code>benefit-cost</code>模型，然后从消费者的角度阐述<code>consumer theory</code>，具体包括<code>consumer demand</code>，<code>consumer surplus</code>，<code>consumer mistake</code>，<code>recovering preferences from data</code>。</p>
-<a id="more"></a>
-<h1 id="优化问题">优化问题</h1><p>经济学中的很多问题都可以理解成优化问题。<br>针对不同的对象（消费者、公司、市场等），构造不同的目标函数，然后优化目标函数。</p>
-<p>典型的优化问题如下：</p>
-<ul>
-<li>消费者最大化<code>utility(x)</code>，通过决定买多少商品<code>x</code>，在给定的财富水平<code>W</code>和市场价格<code>p</code>（更广泛的市场情况$\theta$）下。</li>
-<li>公司最大化<code>profit</code>，通过决定卖多少商品<code>x</code>，在给定的科技限制还有市场价格<code>p</code>（更广泛的市场情况$\theta$）下。</li>
-</ul>
-<h2 id="基本模型">基本模型</h2><p>经济学中的优化问题有最基本的结构：</p>
-<p>$$\begin{split}<br>&amp;\max_x T(x) = B(x) - C(x) = benefit- cost \\<br>s.t. ~~ &amp;x \ge 0 \\<br>&amp;T(x) ~~ \text{is strictly concave}<br>\end{split}$$</p>
-<p>这个最基本结构的好处是：</p>
-<ol>
-<li>全局最优值存在（假设MB和MC交叉）</li>
-<li>全局最优值独立</li>
-<li>有很好的经济学解释</li>
-</ol>
-<p>关于为什么很多经济学问题中，$T(x)$都是严格<code>concave</code>的，解释如下：</p>
+        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/d63758035ca5925db0bdee47757cb7ec.jpg?imageView/2/w/400" alt="爱情图片"></p>
+<p>关于婚姻，有如下的话：</p>
 <blockquote>
-<p>In many economic problems we have $B’(x)&gt;0,B’’(x) \le 0, C’(x) &gt;0, C’’(x) \ge 0$<br> (with not both$B’’=0$ and $C’’=0$). Then $T’’(x)&lt;0$。</p>
+<p>Marriage can take “work”.<br>The first year is the hardest.<br>People learn to get along and love is a practice-you must express love through living it to make it grow stronger.</p>
+<p>婚姻需要一定的“努力”。<br>婚姻的第一年往往是最难的。<br>夫妻双方需要去努力相处，通过日常生活的点点滴滴表达彼此的爱意让爱情愈发强壮。</p>
 </blockquote>
-<p>基本模型的适用举两个例子：</p>
+<p>那么，这种婚姻关系，该如何去评估呢？<br>本文，以<code>消费者理论</code>为依据，通过构建夫妻双方的<code>utility</code>模型，较为准确地评估这一婚姻状况。</p>
+<a id="more"></a>
+<h1 id="模型建立">模型建立</h1><p>有一对恋人结成夫妻，男的叫A，女的叫B。分别对两者的<code>utility</code>建模，得到：</p>
+<p>$$\begin{split}<br>&amp;U_a = x_a+\alpha_0(y_a+y_b) \\<br>&amp;U_b = x_b+\beta_0(y_a+y_b)  \\<br>s.t. &amp;\alpha_0 \in (0,1) \\<br>&amp;\beta_0 \in (0,1) \\<br>&amp;\alpha_0+\beta_0 \ge 1 \\<br>&amp;x_a + y_a =1 \\<br>&amp;x_b + y_b = 1<br>\end{split}$$</p>
+<p>下面，对上述模型做简要的阐释。</p>
+<p>$U_a,U_b$分别是A和B的<code>utility</code>（效用）值，通俗的理解是，该值越大表示A或B越开心。该值的大小取决于4个自变量，分别是$x_a,x_b$（表示对自己的关心值），$y_a,y_b$（表示对另一半的关心值）。限制条件$x_a + y_a =1x_b + y_b = 1$表示人的精力是有限的，需要在自己和对方之间进行合理的分配。</p>
+<h1 id="特殊情况分析">特殊情况分析</h1><p>婚姻关系也可以理解成一种博弈关系。博弈的主题是如何让自己在婚姻关系中收获最大。</p>
+<h2 id="帕累托最优">帕累托最优</h2><p><code>Pareto Efficient</code>指的是：一方得利时，必然会损害另一方的利益的状态。</p>
+<p>上面的公式经过变化为：</p>
+<p>$$\begin{split}<br>U_a = (1-\alpha_0)x_a+(2-x_b)\alpha_0\\<br>U_b = (1-\beta_0)x_b+(2-x_a)\beta_0<br>\end{split}$$</p>
+<p>以$U_a$为例分析，提升A幸福度只有两种方法：增大$x_a$或者减少$x_b$，这两种方法都会损害B的利益（降低$U_b$）。分析$U_b$同理。</p>
+<p>也就是说：不论在任何情况下，一方利益的提升都是以牺牲另一方的利益为损失的。</p>
+<p>因此，任何情况下都是<code>帕累托最优</code>。</p>
+<h2 id="纳什均衡">纳什均衡</h2><p><code>纳什均衡</code>指的是参与人的这样一种策略组合，在该策略组合上，任何参与人单独改变策略都不会得到好处。换句话说，如果在一个策略组合上，当所有其他人都不改变策略时，没有人会改变自己的策略，则该策略组合就是一个纳什均衡。</p>
+<p>以$U_a$为例分析，最优的选择一定在边界上，边界情况如下表，可以看到无论B做什么选择，A的最佳选择都是$x_a=1$，也就是最自私的情况。</p>
+<table>
+<thead>
+<tr>
+<th>$X_a$</th>
+<th>0</th>
+<th>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$X_b$</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>0</td>
+<td>$2\alpha_0$</td>
+<td>$1+\alpha_0$</td>
+</tr>
+<tr>
+<td>1</td>
+<td>$\alpha_0$</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p>$U_b$同理，最后两者达到了纳什均衡。</p>
+<p>同时，对公式进行分析的话，A只能控制$x_a$而控制不了$x_b$，因此只有将$x_a$变得最大$x_a=1$才能实现自己的利益。</p>
+<p>因此，纳什均衡条件下的<code>allocation</code>是：$x_a =1, y_a =0, x_b =1, y_b=0$。</p>
+<h1 id="两种婚姻的对比分析">两种婚姻的对比分析</h1><p>这里分析两种婚姻：</p>
 <ol>
-<li>公司<ul>
-<li>x：卖的商品数量</li>
-<li>B：卖商品的收入</li>
-<li>C：生产产品的花费</li>
-<li>T：公司的净利润</li>
-</ul>
-</li>
-<li>消费者<ul>
-<li>x：消费商品的数量</li>
-<li>B：消费商品带来的好处</li>
-<li>C：消费产品付出的钱</li>
-<li>T：<code>net utility</code></li>
-</ul>
-</li>
+<li>夫妻双方完全为自己（$x=1,y=0$）。</li>
+<li>夫妻双方完全为对方（$x=0,y=1$）。</li>
 </ol>
-<p>模型的解：</p>
-<p>$T’(x)=0，易知B’(x)=C’(x)，也就是MB=MC$。</p>
-<h2 id="无约束优化">无约束优化</h2><p>无约束优化问题参考上面的基本模型。</p>
-<h2 id="约束优化">约束优化</h2><p>有约束的优化问题，需要考虑<code>corner solution</code>和<code>interior solution</code>。</p>
-<p>有约束的优化问题，一个比较常见的模式如下：</p>
-<p>$$\begin{split}<br>&amp;\max_x T(x,y) =U(x) + V(y) \\<br>s.t. ~~ &amp;x \ge 0 \\<br>~~ &amp;y \ge 0 \\<br>&amp;px+qy=W \\<br>&amp; U’,V’&gt;0; U’’,V’’&lt;0<br>\end{split}$$</p>
-<p>这个模式，通过一个简单的<code>trick</code>，就可以转换成之前的<code>benefit-cost</code>的问题，然后根据解的位置，也就是是否MB和MC交叉确定最优解：<br>$$\max_x T(x,y) =U(x) - (- V(\frac{W-px}{q}))$$</p>
-<h2 id="小结">小结</h2><ol>
-<li>对于一个优化问题，确定全局最优很难，但是对于经济学问题，通过构建<code>B-C</code>模型，使得求解全局最优很简单很直观，一般来说需要满足下面三点<ul>
-<li>优化函数可以写作<code>B-C</code>模式</li>
-<li>x大于0</li>
-<li>满足<code>concavity</code>和<code>cross condition</code></li>
-</ul>
-</li>
-<li>注意解的<code>corner solution</code>和<code>interior solution</code></li>
-</ol>
-<h1 id="消费者理论">消费者理论</h1><h2 id="consumer_demand">consumer demand</h2><h3 id="utility模型">utility模型</h3><p>首先，定义<code>utility function</code>：</p>
-<p>$$\begin{split}<br>&amp;\max_x U(x,m) = B(x) +m \\<br>s.t. ~~ &amp;x \ge 0 \\<br>&amp; B’&gt;0; B’’&lt;0<br>\end{split}$$</p>
-<p>对上面的模型解释如下：</p>
+<h2 id="完全为自己">完全为自己</h2><p>这种情况下，达到了纳什均衡。</p>
+<p>最后两者的效用函数为$U_a=1,U_b=1$。</p>
+<h2 id="完全为对方">完全为对方</h2><p>这种情况下，两者的效用函数为$U_a=2\alpha_0,U_b=2\beta0$。</p>
+<h2 id="囚徒困境">囚徒困境</h2><p>如果$\alpha_0&gt;\frac{1}{2},\beta_0&gt;\frac{1}{2}$，那么夫妻双方则陷入了囚徒困境，也就是说：每个人都只关心着自己的利益，最后却得到了较差的结果，反而为对方考虑的情况能使双方的效用函数值最大，也更开心一些。</p>
+<h1 id="婚姻的阶段性分析">婚姻的阶段性分析</h1><h2 id="模型延伸">模型延伸</h2><p>阶段性分析需要阐述三点内容：</p>
 <ol>
-<li>$x$代表感兴趣的货物，单位是<code>units</code>。</li>
-<li>$m$代表除了$x$的其他消费，单位是<code>money</code>。</li>
-<li>$U(x,m)$代表通过消费$x,m$，获得的<code>experienced utility</code>（满足、高兴等），单位是<code>money</code>。</li>
-<li>$B(x)$代表买$x$单位的$x$货物的意愿。</li>
-<li>$\max_x U(x,m)$表示通过选择购买多少$x$，最大化<code>experienced utility</code>。</li>
+<li>婚姻需要彼此的努力</li>
+<li>婚姻头几年往往最难</li>
+<li>婚姻越往后越简单越自然</li>
 </ol>
-<h3 id="utility优化问题">utility优化问题</h3><p>假设财富是$W$，$x$商品的当前价格是$p$，那么优化函数可以写作：</p>
-<p>$$\begin{split}<br>\max_x U(x,m) &amp;= B(x) +m \\<br>&amp;=B(x) +W-xp \\<br>&amp;\approx B(x) -xp<br>\end{split}$$</p>
-<p>这样一来，又变成了$B-C$的模式，直观来讲，当$MB&gt;MC$的时候，就应该不断购买$x$，直到$MB=MC$。</p>
-<h3 id="demand模型">demand模型</h3><p>通过求解上面的优化问题，可以得到$x^* (p)$，也就是消费者购买的数量随商品价格变动的函数。</p>
-<p>这里需要<strong>特别</strong>注意一点：  </p>
-<p>$x^* (p), p^* (x) , B’(x)(MB)$是一条曲线，只不过自变量和因变量不同。</p>
-<p>关于demand模型，有几点性质：</p>
-<ol>
-<li>$\frac{dx^*}{dp} \le 0$</li>
-<li>$\frac{dx^*}{dW} =0$</li>
-<li>上面两条性质的前提是消费者消费的$x$占总体消费的比重不高，以及<code>utility function</code>是<code>quasi-linear</code>。</li>
-</ol>
-<h2 id="consumer_surplus">consumer surplus</h2><p>前文的<code>utility</code>衡量了<code>experience utility</code>，为了衡量消费者的<code>well-being</code>，我们构建了<code>consumer surplus function</code>，简称$CS(p)$，或者更广泛的$CS(\theta)$。</p>
-<p>$$\begin{split}<br>\max_x U(x,m) &amp;= B(x) +m \\<br>&amp;=B(x) +W-xp \\<br>&amp;\approx B(x) -xp<br>\end{split}$$</p>
-<p>$$\begin{split}<br>CS(p) &amp;= U( x^* (p),W-px^* (p))  - U(0,W) \\<br>&amp;= \int_0^{x^* (p)} (B’(x)-p) dx<br>\end{split}$$</p>
-<h2 id="数据到模型">数据到模型</h2><p>现实生活中，我们并不知道消费者的<code>utility function</code>以及<code>consumer surplus function</code>，所以很重要的一点是，如何从数据推导出上面的模型。</p>
-<p>所幸的是，通过数据，我们可以知道：</p>
-<p>$$x^*(p)$$</p>
-<p>然后根据$p^*(x)$和$B’(x)$共曲线的性质，可以推导出：</p>
-<p>$$\begin{split}<br>CS(p) &amp;=\int_0^{x^*(p)} (B’(x)-p) dx \\<br>B(x) &amp;= B(0) + \int_0^x B’(x) dx \\<br>U(x) &amp;= B(x) + \text{constant}<br>\end{split}$$</p>
-<p>同时，需要注意一点：如果U不是<code>quasi-linear</code>的话，这种推倒也可以<code>generalize</code>得很好。</p>
-<h2 id="consumer_mistake">consumer mistake</h2><p>前面的模型都是建立在消费者是<code>rational</code>的情况下，也就是$U^{DU} = U^{EU}$，如果两者不相等（比如消费者受刺激<code>addiction</code>），那么消费者就会犯错误。</p>
-<ul>
-<li><strong>Experienced utility</strong>: describes well-being/hedonics，消费者的<code>demand function</code>是$x^*(\theta)$。</li>
-<li><strong>Decision utility</strong>: describes objective that is maximized at decision time，消费者的<code>demand function</code>是$x^{opt}(\theta)$。</li>
-</ul>
-<h2 id="例子">例子</h2><h3 id="例1">例1</h3><p>$$U(x,m) = A\sqrt{x} +m$$</p>
-<p>问：<br>当价格下降百分之50的时候，需求$x$改变了多少？</p>
-<p>答：  增大了$4$倍</p>
-<h3 id="例2">例2</h3><p>$$U(x,m) = 2A\sqrt{x} +m$$</p>
-<p>问：<br>$\theta(0)$情况下，自由买卖；$\theta(1)$情况下，需要交百分之百的税，也就是商品p，需要实际付2p；问通过引进税，消费者的幸福感($CS$)变化了多少？</p>
-<p>答：  $-A^2/(2*p)$</p>
-<h3 id="例3">例3</h3><p>研究<code>烟酒税</code>。</p>
-<p>$$\begin{split}<br>U^{EU}(x,m) = 2\sqrt{x} +m \\<br>U^{DU}(x,m) = 20\sqrt{x} +m<br>\end{split}$$</p>
-<p>问：<br>政府通过引入<code>sin tax</code>（$t$，也就是每花费1，需要额外付t），希望$x^*(t)=x^{opt}$，那么$t$应该设置成多少？</p>
-<p>答：  $9$</p>
-<h2 id="小结-1">小结</h2><ol>
-<li>通过$x^*(\theta)$衡量消费者的行为，产生这种行为的动机是$\max U^{DU}(x)$。</li>
-<li>通过$CS(\theta)$衡量消费者的<code>well-being</code>，$CS(\theta) = U^{EU}(x^*(\theta)) -U_{\text{no trade}}$。</li>
-<li>可以从消费者的行为$p^*(x)$将所有模型建立起来。</li>
-</ol>
+<p>因此，对模型做简单的延伸：$\alpha和\beta$表示双方的感情程度，越高表示对彼此的感情越深；刚结婚时$\alpha_0=\frac{1}{2},\beta_0=\frac{1}{2}$。以后每年变化一次，从$t$年到$t+1$年变化如下：</p>
+<p>$$\begin{split}<br>\alpha_{t+1} = \frac{\alpha_t}{2} + \frac{y_b}{2} \\<br>\beta_{t+1} = \frac{\beta_t}{2} + \frac{y_a}{2}<br>\end{split}$$</p>
+<p>也就是说，新一年的感情程度是前一年的感情程度与对方对感情付出值的简单平均值。</p>
+<p>下面，对婚姻进行阶段性的分析。</p>
+<h2 id="婚姻需要努力">婚姻需要努力</h2><p>首先先看第一年的分析表：</p>
+<p>对A来说，$U_a$的值如下：</p>
+<table>
+<thead>
+<tr>
+<th>$X_a$</th>
+<th>0</th>
+<th>1</th>
+<th>difference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$X_b$</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>1.5</td>
+<td>0.5</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0.5</td>
+<td>1</td>
+<td>0.5</td>
+</tr>
+</tbody>
+</table>
+<p>可以看到，无论B做什么，A如果只考虑自己的利益，那么最优选择都是$x_a=1$，也就是只关心自己，完全不对对方付出。</p>
+<p>而且因为两种决策的结果差值比较大（0.5,0.5），因此A在决定要完全忠于对方，把心都用在对方身上的时候，下的决心和努力也是最大的。</p>
+<h2 id="先难后易">先难后易</h2><p>如果双方都对对方完全付出，之后几年的情况如下：</p>
+<p>$t=1$</p>
+<table>
+<thead>
+<tr>
+<th>$X_a$</th>
+<th>0</th>
+<th>1</th>
+<th>difference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$X_b$</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>0</td>
+<td>1.5</td>
+<td>1.75</td>
+<td>0.25</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0.75</td>
+<td>1</td>
+<td>0.25</td>
+</tr>
+</tbody>
+</table>
+<p>$t=2$</p>
+<table>
+<thead>
+<tr>
+<th>$X_a$</th>
+<th>0</th>
+<th>1</th>
+<th>difference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$X_b$</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>0</td>
+<td>1.75</td>
+<td>1.875</td>
+<td>0.125</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0.875</td>
+<td>1</td>
+<td>0.125</td>
+</tr>
+</tbody>
+</table>
+<p>$t=6$</p>
+<table>
+<thead>
+<tr>
+<th>$X_a$</th>
+<th>0</th>
+<th>1</th>
+<th>difference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$X_b$</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>0</td>
+<td>1.9844</td>
+<td>1.9922</td>
+<td>0.0078</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0.9922</td>
+<td>1</td>
+<td>0.0078</td>
+</tr>
+</tbody>
+</table>
+<p>爱情密切程度与困难程度随着时间推移的变化情况如下图：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/l1.jpg" alt="这里写图片描述"></p>
+<p>容易发现：对A来说一方面爱情越来越密切，另一方面不同的决定差值正在变得越来越小，越来越微不足道。</p>
+<p>也就是说，婚姻刚开始的阶段维持对对方的付出很苦难，因为需要面对对方不付出自己单独付出的损失，但是如果两个人彼此信任彼此扶持。那么随着时间的推移，对对方付出变得没有那么“困难”了，反而是一件很简单很平常的事情。而且因为彼此的付出与信任，两个人都脱离了囚徒困境，实现了个人和集体<code>utility</code>值的最大化。</p>
+<h1 id="结论">结论</h1><p>以海灵格的一句话做结吧：良好持久的关系是一方付出了一些，另一方回报的时候稍稍多一些，然后这一方再稍稍多一些，这样是使关系能健康维持下去的保障。</p>
+<p>希望天下有情人终成眷属！</p>
 </span>
       
     </div>
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/consumer-sheory/" rel="tag">#consumer sheory</a>
-          
-            <a href="/tags/optimization/" rel="tag">#optimization</a>
-          
-        </div>
-      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/01/12/JPEG算法及其实现/" rel="next" title="JPEG算法及其实现">
-                <i class="fa fa-chevron-left"></i> JPEG算法及其实现
+              <a href="/2016/01/13/局部放电的特征选择/" rel="next" title="局部放电的特征选择">
+                <i class="fa fa-chevron-left"></i> 局部放电的特征选择
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/01/13/局部放电的特征选择/" rel="prev" title="局部放电的特征选择">
-                局部放电的特征选择 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -493,8 +573,8 @@
         
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/01/13/消费者理论概述/"
-           data-title="消费者理论概述" data-url="http://younggy.com/2016/01/13/消费者理论概述/">
+      <div class="ds-thread" data-thread-key="2016/06/13/婚姻关系的简单建模分析/"
+           data-title="婚姻关系的简单建模分析" data-url="http://younggy.com/2016/06/13/婚姻关系的简单建模分析/">
       </div>
     
   </div>
@@ -640,7 +720,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#优化问题"><span class="nav-number">1.</span> <span class="nav-text">优化问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基本模型"><span class="nav-number">1.1.</span> <span class="nav-text">基本模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#无约束优化"><span class="nav-number">1.2.</span> <span class="nav-text">无约束优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#约束优化"><span class="nav-number">1.3.</span> <span class="nav-text">约束优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">1.4.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#消费者理论"><span class="nav-number">2.</span> <span class="nav-text">消费者理论</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#consumer_demand"><span class="nav-number">2.1.</span> <span class="nav-text">consumer demand</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#utility模型"><span class="nav-number">2.1.1.</span> <span class="nav-text">utility模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#utility优化问题"><span class="nav-number">2.1.2.</span> <span class="nav-text">utility优化问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#demand模型"><span class="nav-number">2.1.3.</span> <span class="nav-text">demand模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#consumer_surplus"><span class="nav-number">2.2.</span> <span class="nav-text">consumer surplus</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据到模型"><span class="nav-number">2.3.</span> <span class="nav-text">数据到模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#consumer_mistake"><span class="nav-number">2.4.</span> <span class="nav-text">consumer mistake</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#例子"><span class="nav-number">2.5.</span> <span class="nav-text">例子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#例1"><span class="nav-number">2.5.1.</span> <span class="nav-text">例1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#例2"><span class="nav-number">2.5.2.</span> <span class="nav-text">例2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#例3"><span class="nav-number">2.5.3.</span> <span class="nav-text">例3</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结-1"><span class="nav-number">2.6.</span> <span class="nav-text">小结</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#模型建立"><span class="nav-number">1.</span> <span class="nav-text">模型建立</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#特殊情况分析"><span class="nav-number">2.</span> <span class="nav-text">特殊情况分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#帕累托最优"><span class="nav-number">2.1.</span> <span class="nav-text">帕累托最优</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#纳什均衡"><span class="nav-number">2.2.</span> <span class="nav-text">纳什均衡</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#两种婚姻的对比分析"><span class="nav-number">3.</span> <span class="nav-text">两种婚姻的对比分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#完全为自己"><span class="nav-number">3.1.</span> <span class="nav-text">完全为自己</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#完全为对方"><span class="nav-number">3.2.</span> <span class="nav-text">完全为对方</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#囚徒困境"><span class="nav-number">3.3.</span> <span class="nav-text">囚徒困境</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#婚姻的阶段性分析"><span class="nav-number">4.</span> <span class="nav-text">婚姻的阶段性分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#模型延伸"><span class="nav-number">4.1.</span> <span class="nav-text">模型延伸</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#婚姻需要努力"><span class="nav-number">4.2.</span> <span class="nav-text">婚姻需要努力</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#先难后易"><span class="nav-number">4.3.</span> <span class="nav-text">先难后易</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">5.</span> <span class="nav-text">结论</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
