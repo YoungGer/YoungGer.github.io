@@ -1,0 +1,856 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="电力改革如火如荼，针对电力交易的广东规则，本文进行了详细地阐述并附上了代码与实例，供大家一起交流学习。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="电力竞价(广东规则)详解与代码">
+<meta property="og:url" content="http://younggy.com/2016/08/26/电力竞价-广东规则-详解与代码/index.html">
+<meta property="og:site_name" content="YoungGy">
+<meta property="og:description" content="电力改革如火如荼，针对电力交易的广东规则，本文进行了详细地阐述并附上了代码与实例，供大家一起交流学习。">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/5.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/1.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/2.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/3.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/4.png">
+<meta property="og:updated_time" content="2016-08-26T02:29:32.111Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="电力竞价(广东规则)详解与代码">
+<meta name="twitter:description" content="电力改革如火如荼，针对电力交易的广东规则，本文进行了详细地阐述并附上了代码与实例，供大家一起交流学习。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post',
+    motion: false
+  };
+</script>
+
+  <title> 电力竞价(广东规则)详解与代码 | YoungGy </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?your-analytics-id";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">YoungGy</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">心有猛虎 细嗅蔷薇</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tools">
+          <a href="/tools" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            工具
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'owv-2W-dWzRWk1KttzWi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                电力竞价(广东规则)详解与代码
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-08-26T10:28:30+08:00" content="2016-08-26">
+              2016-08-26
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/08/26/电力竞价-广东规则-详解与代码/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/26/电力竞价-广东规则-详解与代码/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/5.png" alt="这里写图片描述"></p>
+<p>电力改革如火如荼，针对电力交易的广东规则，本文进行了详细地阐述并附上了代码与实例，供大家一起交流学习。<br><a id="more"></a></p>
+<h1 id="竞价规则">竞价规则</h1><p>本竞价规则参考广东电力交易中心目前的竞价规则。</p>
+<p>该内容及算例引用了<code>售电市场研修院</code>的内容，并感谢<code>北京清软创新科技股份有限公司</code>研究中心主任<code>罗欣</code>的讲解。</p>
+<h2 id="交易规模">交易规模</h2><p>交易牵涉两大角色，卖电方和买电方：</p>
+<ul>
+<li>卖电方：发电企业</li>
+<li>买电方：售电公司、电力大用户</li>
+</ul>
+<p>交易牵涉一个变量：</p>
+<ul>
+<li>成交比例</li>
+</ul>
+<p>也就是说，买卖双方的电量不会全部成交。  </p>
+<p>例如，如果发电企业意向申报交易规模100万千瓦时，售电公司意向申报规模80万千瓦时，电力大用户意向申报20万千瓦时。<br>若设置成交比例为<em>80%</em>，则竞争交易电力规模为100*0.8=80万千瓦时。</p>
+<h2 id="报价规则">报价规则</h2><p>报价规则牵涉的变量有：</p>
+<ul>
+<li>报价形式（双向报价，下面内容均特指该报价形式）</li>
+<li>发电企业申报与上网电价的<strong>价差</strong></li>
+<li>发电企业申报与上网电价的<strong>价差范围</strong></li>
+<li>售电公司、电力大用户申报与现行目录电价中的<strong>价差</strong></li>
+<li>售电公司、电力大用户申报与现行目录电价中的<strong>价差范围</strong></li>
+</ul>
+<p>所报价差必须在指定的价差范围内。</p>
+<p>例如：<br>发电企业申报价差范围：-50到-500厘/千瓦时。<br>售电公司及电力用户申报价差范围：0到-100厘/千瓦时。<br>发电企业上网电价为：500厘/千瓦时，申报价差：-100厘/千瓦时，表示期望卖出电价为400厘/千瓦时。<br>售电公司及电力用户目录电价为500厘/千瓦时，申报价差为-50千瓦时，表示期望买入电价为450厘/千瓦时。</p>
+<h2 id="撮合规则">撮合规则</h2><p>这里，首先介绍下<strong>价差对</strong>的概念：</p>
+<p>$$价差对=发电企业申报价差-售电公司或电力用户申报价差$$</p>
+<p>例如：发电企业申报价差为-100厘/千瓦时，电力大用户申报价差为-50厘/千瓦时，价差对为-100-（-50）= -50厘/千瓦时。</p>
+<p>需要注意的是：</p>
+<ul>
+<li>价差对只有是负的才可以成交，表示卖方对买方让利（试想，如果卖方一直保持高价格不对买方让利，交易怎么可能成交呢）。</li>
+<li>卖方（发电企业）肯定希望价差的绝对值越小越好，这样表示他让利让的少啊。</li>
+<li>买方（售电企业与电力用户）肯定希望价差的绝对值越大越好，因为这意味着自己买电的价格更低，从卖方获利越大。</li>
+<li>价差对绝对值越大的越优先成交（相当于卖家让利最大）。</li>
+<li>当价差对相同的时候，按申报价差对应电量比例确定中标电量。</li>
+</ul>
+<h2 id="结算规则">结算规则</h2><p>结算规则主要涉及两点：</p>
+<ul>
+<li>价差电费返还：配对成交的买卖双方存在价差对，因此会产生价差电费，价差电费按照各自申报成交电费成比例返还给发电企业和大用户。</li>
+<li>价差返还系数：50%意味着价差电费在价差对双方之间平均分配。</li>
+<li>平均结算价格：（成交电量部分申报价差*成交电量+-返还电费）/总成交量</li>
+</ul>
+<h1 id="实例讲解">实例讲解</h1><p>下面附上一个例子，并附上相应代码仅供交流学习。</p>
+<h2 id="交易双方">交易双方</h2><p>该交易涉及的发电企业与用电大用户数据如下：</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/1.png" alt="这里写图片描述"></p>
+<h2 id="交易情况概述">交易情况概述</h2><p>每轮的交易情况概述如下：</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/2.png" alt="这里写图片描述"></p>
+<h2 id="交易结算">交易结算</h2><p>发电企业的交易结算如下：</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/3.png" alt="这里写图片描述"></p>
+<p>电力用户的交易结算如下：</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/4.png" alt="这里写图片描述"></p>
+<h2 id="代码">代码</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># coding: utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># In[1]:</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> division</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># # 基础类定义</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># In[2]:</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Producer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,name,amount,price)</span>:</span></span><br><span class="line">        self.name = name</span><br><span class="line">        self.amount = amount</span><br><span class="line">        self.price = price</span><br><span class="line">        self.amount_left = amount</span><br><span class="line">        self.accu_money = <span class="number">0</span></span><br><span class="line">        self.accu_money_diff = <span class="number">0</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&lt;Producer name:%2s  amount:%6s  price:%7s amount_left:%6s&gt;"</span> % (self.name, self.amount, self.price, self.amount_left)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,name,amount,price)</span>:</span></span><br><span class="line">        self.name = name</span><br><span class="line">        self.amount = amount</span><br><span class="line">        self.price = price</span><br><span class="line">        self.amount_left = amount</span><br><span class="line">        self.accu_money = <span class="number">0</span></span><br><span class="line">        self.accu_money_diff = <span class="number">0</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&lt;User name:%2s  amount:%6s  price:%7s amount_left:%6s&gt;"</span> % (self.name, self.amount, self.price, self.amount_left)</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Process</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,amount,p_price,u_price)</span>:</span></span><br><span class="line">        self.amount = amount</span><br><span class="line">        self.p_price = p_price</span><br><span class="line">        self.u_price = u_price</span><br><span class="line">        self.diff_price = p_price-u_price</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&lt;Process amount:%6s  p_price:%7s  u_price:%7s  diff_price:%7s&gt;"</span> % (self.amount, self.p_price, self.u_price, self.diff_price)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># # 参数设置</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># In[3]:</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置买卖双方的参数</span></span><br><span class="line">producers_name = [<span class="string">'A'</span>,<span class="string">'B'</span>,<span class="string">'C'</span>,<span class="string">'D'</span>,<span class="string">'E'</span>]</span><br><span class="line">producers_amount = [<span class="number">14975</span>,<span class="number">18099</span>,<span class="number">59015</span>,<span class="number">53707</span>,<span class="number">87809</span>]</span><br><span class="line">producers_price = [-<span class="number">500</span>,-<span class="number">334.3</span>,-<span class="number">145.7</span>,-<span class="number">105.8</span>,-<span class="number">60.6</span>]</span><br><span class="line"></span><br><span class="line">users_name = [<span class="string">'1'</span>,<span class="string">'2'</span>,<span class="string">'3'</span>,<span class="string">'4'</span>,<span class="string">'5'</span>]</span><br><span class="line">users_amount = [<span class="number">67983</span>,<span class="number">39403</span>,<span class="number">64478</span>,<span class="number">38592</span>,<span class="number">19799</span>]</span><br><span class="line">users_price = [-<span class="number">45</span>,-<span class="number">35.8</span>,-<span class="number">26.7</span>,-<span class="number">14.3</span>,-<span class="number">0.1</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># In[4]:</span></span><br><span class="line"></span><br><span class="line">producers = []</span><br><span class="line"><span class="keyword">for</span> name,amount,price <span class="keyword">in</span> zip(producers_name,producers_amount,producers_price):</span><br><span class="line">    producers.append(Producer(name,amount,price))</span><br><span class="line">users = []</span><br><span class="line"><span class="keyword">for</span> name,amount,price <span class="keyword">in</span> zip(users_name,users_amount,users_price):</span><br><span class="line">    users.append(User(name,amount,price))</span><br><span class="line">    </span><br><span class="line"><span class="comment"># sort producers and users</span></span><br><span class="line"><span class="keyword">import</span> operator</span><br><span class="line">producers_inline = sorted(producers, key=operator.attrgetter(<span class="string">'price'</span>), reverse=<span class="keyword">False</span>)</span><br><span class="line">users_inline = sorted(users, key=operator.attrgetter(<span class="string">'price'</span>), reverse=<span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># In[5]:</span></span><br><span class="line"></span><br><span class="line">producers_inline</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># In[6]:</span></span><br><span class="line"></span><br><span class="line">users_inline</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># # 交易撮合</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># In[7]:</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 确定针对producers_inline和users_inline的指针</span></span><br><span class="line">producer_pt = <span class="number">0</span></span><br><span class="line">user_pt = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 指定参数</span></span><br><span class="line">deal_ratio_proc = <span class="number">0.8</span>  <span class="comment">#发电企业的成交比例</span></span><br><span class="line">deal_amounts = <span class="number">0</span>      <span class="comment">#成交数量累计</span></span><br><span class="line">deal_amounts_max = sum(producers_amount)*deal_ratio_proc   <span class="comment">#最大的成交数量</span></span><br><span class="line">df = pd.DataFrame(columns=(<span class="string">'发电企业'</span>, <span class="string">'申报电量'</span>, <span class="string">'申报价差'</span>,<span class="string">'售电公司'</span>, <span class="string">'申报电量'</span>, <span class="string">'申报价差'</span>, <span class="string">'价差'</span>, <span class="string">'成交电量'</span>))  <span class="comment">#数据框初始化</span></span><br><span class="line">df_i = <span class="number">0</span>   <span class="comment">#数据框的行指针</span></span><br><span class="line">processes = []     <span class="comment">#累计每个交易流程</span></span><br><span class="line">flag_stop = <span class="keyword">False</span>  <span class="comment">#判断是否到达成交比例的flag</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 交易流程</span></span><br><span class="line"><span class="keyword">while</span> user_pt &lt; len(users_inline) <span class="keyword">and</span> producer_pt &lt; len(producers_inline):</span><br><span class="line">    cur_producer = producers_inline[producer_pt]</span><br><span class="line">    cur_user = users_inline[user_pt]</span><br><span class="line">    diff_amount = cur_producer.amount_left - cur_user.amount_left</span><br><span class="line">    diff_price = float(cur_producer.price) - float(cur_user.price)</span><br><span class="line">    <span class="comment"># 只有当价差对为负的时候才有可能成交</span></span><br><span class="line">    <span class="keyword">if</span> diff_price &gt; <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    deal_amount =  min(cur_producer.amount_left,cur_user.amount_left)</span><br><span class="line">    deal_amounts += deal_amount</span><br><span class="line">    <span class="comment"># 只有当交易量在规定范围内才有可能成交，否则将flag_stop设置为True</span></span><br><span class="line">    <span class="keyword">if</span> deal_amounts &gt; deal_amounts_max:</span><br><span class="line">        curr_del_amount = deal_amounts_max - (deal_amounts-deal_amount)</span><br><span class="line">        flag_stop = <span class="keyword">True</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        curr_del_amount = deal_amount </span><br><span class="line">    <span class="comment"># 针对每次交易过程的数据统计计算</span></span><br><span class="line">    <span class="comment">##输出信息</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">"P:%s U:%s P_left_Amount:%6s U_left_Amount:%6s Deal_Amount:%6s Price_Differ:%s"</span> % (cur_producer.name,     cur_user.name, cur_producer.amount_left, cur_user.amount_left, int(curr_del_amount),     cur_producer.price-cur_user.price) </span><br><span class="line">    <span class="comment">##进程信息统计</span></span><br><span class="line">    processes.append(Process(int(curr_del_amount),cur_producer.price,cur_user.price))</span><br><span class="line">    <span class="comment">##累计电费与累计价差电费</span></span><br><span class="line">    cur_user.accu_money += cur_user.price*int(curr_del_amount)</span><br><span class="line">    cur_user.accu_money_diff += (cur_producer.price-cur_user.price)*int(curr_del_amount)</span><br><span class="line">    cur_producer.accu_money += cur_producer.price*int(curr_del_amount)</span><br><span class="line">    cur_producer.accu_money_diff += (cur_producer.price-cur_user.price)*int(curr_del_amount)</span><br><span class="line">    <span class="comment">##数据库信息统计</span></span><br><span class="line">    df.loc[df_i] = [cur_producer.name,cur_producer.amount,cur_producer.price,            cur_user.name,cur_user.amount,cur_user.price,           cur_producer.price-cur_user.price,curr_del_amount]</span><br><span class="line">    df_i += <span class="number">1</span></span><br><span class="line">    <span class="comment">##判断终止条件</span></span><br><span class="line">    <span class="keyword">if</span> flag_stop:</span><br><span class="line">        cur_user.amount_left -= curr_del_amount</span><br><span class="line">        cur_producer.amount_left -= curr_del_amount</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    <span class="comment">##判断交易方向，卖者还是买者退出市场</span></span><br><span class="line">    <span class="keyword">if</span> diff_amount == <span class="number">0</span>:</span><br><span class="line">        user_pt += <span class="number">1</span></span><br><span class="line">        producer_pt += <span class="number">1</span></span><br><span class="line">        cur_user.amount_left = <span class="number">0</span></span><br><span class="line">        cur_producer.amount_left = <span class="number">0</span></span><br><span class="line">    <span class="keyword">elif</span> diff_amount &lt; <span class="number">0</span>:  <span class="comment">#卖的少，买的多，卖者退出市场</span></span><br><span class="line">        producer_pt += <span class="number">1</span></span><br><span class="line">        cur_user.amount_left -= curr_del_amount</span><br><span class="line">        cur_producer.amount_left = <span class="number">0</span></span><br><span class="line">    <span class="keyword">else</span>:                  <span class="comment">#卖的多，买的少，买者退出市场</span></span><br><span class="line">        user_pt += <span class="number">1</span></span><br><span class="line">        cur_user.amount_left = <span class="number">0</span></span><br><span class="line">        cur_producer.amount_left -= curr_del_amount</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># # 交易整理</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># In[8]:</span></span><br><span class="line"></span><br><span class="line">df</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># # 结算情况</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ## 发电公司</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># In[9]:</span></span><br><span class="line"></span><br><span class="line">producers_accounts = pd.DataFrame([(i.name,i.amount,i.amount_left,i.accu_money,i.accu_money_diff)<span class="keyword">for</span> i <span class="keyword">in</span> producers],columns=(<span class="string">'name'</span>,<span class="string">'amount'</span>,<span class="string">'amount_left'</span>,<span class="string">'accu_money'</span>,<span class="string">'accu_money_diff'</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># In[10]:</span></span><br><span class="line"></span><br><span class="line">producers_accounts[<span class="string">'price'</span>] = producers_price</span><br><span class="line">producers_accounts[<span class="string">'amount_deal'</span>] = producers_accounts[<span class="string">'amount'</span>] - producers_accounts[<span class="string">'amount_left'</span>]</span><br><span class="line">producers_accounts[<span class="string">'accu_money_ratio'</span>] = producers_accounts[<span class="string">'accu_money'</span>]/sum(producers_accounts[<span class="string">'accu_money'</span>])</span><br><span class="line">producers_accounts[<span class="string">'return_money'</span>] = producers_accounts[<span class="string">'accu_money_ratio'</span>]*sum(producers_accounts[<span class="string">'accu_money_diff'</span>])*<span class="number">0.5</span></span><br><span class="line">producers_accounts[<span class="string">'real_monty'</span>] = producers_accounts[<span class="string">'accu_money'</span>] -  producers_accounts[<span class="string">'return_money'</span>]</span><br><span class="line">producers_accounts[<span class="string">'real_price'</span>] = producers_accounts[<span class="string">'real_monty'</span>]/producers_accounts[<span class="string">'amount_deal'</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># In[11]:</span></span><br><span class="line"></span><br><span class="line">columns_ordered = [<span class="string">'name'</span>, <span class="string">'price'</span>,<span class="string">'amount'</span>, <span class="string">'amount_left'</span>,<span class="string">'amount_deal'</span>, <span class="string">'accu_money'</span>,<span class="string">'accu_money_ratio'</span>, <span class="string">'accu_money_diff'</span>,                   <span class="string">'return_money'</span>,<span class="string">'real_monty'</span>, <span class="string">'real_price'</span>]</span><br><span class="line">producers_accounts = producers_accounts[columns_ordered]</span><br><span class="line">producers_accounts.columns = [<span class="string">'名称'</span>,<span class="string">'申报价差'</span>,<span class="string">'申报电量'</span>,<span class="string">'剩余电量'</span>,<span class="string">'中标电量'</span>,<span class="string">'累计电费(不含返还)'</span>,<span class="string">'累计电费占比'</span>,<span class="string">'累计价差电费'</span>,                             <span class="string">'返还电费'</span>,<span class="string">'中标电费(含返还)'</span>,<span class="string">'中标价差'</span>]</span><br><span class="line">producers_accounts</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># ## 售电公司与电力用户</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># In[12]:</span></span><br><span class="line"></span><br><span class="line">users_accounts = pd.DataFrame([(i.name,i.amount,i.amount_left,i.accu_money,i.accu_money_diff)<span class="keyword">for</span> i <span class="keyword">in</span> users],columns=(<span class="string">'name'</span>,<span class="string">'amount'</span>,<span class="string">'amount_left'</span>,<span class="string">'accu_money'</span>,<span class="string">'accu_money_diff'</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># In[13]:</span></span><br><span class="line"></span><br><span class="line">users_accounts[<span class="string">'price'</span>] = users_price</span><br><span class="line">users_accounts[<span class="string">'amount_deal'</span>] = users_accounts[<span class="string">'amount'</span>] - users_accounts[<span class="string">'amount_left'</span>]</span><br><span class="line">users_accounts[<span class="string">'accu_money_ratio'</span>] = users_accounts[<span class="string">'accu_money'</span>]/sum(users_accounts[<span class="string">'accu_money'</span>])</span><br><span class="line">users_accounts[<span class="string">'return_money'</span>] = users_accounts[<span class="string">'accu_money_ratio'</span>]*sum(users_accounts[<span class="string">'accu_money_diff'</span>])*<span class="number">0.5</span></span><br><span class="line">users_accounts[<span class="string">'real_monty'</span>] = users_accounts[<span class="string">'accu_money'</span>] +  users_accounts[<span class="string">'return_money'</span>]</span><br><span class="line">users_accounts[<span class="string">'real_price'</span>] = users_accounts[<span class="string">'real_monty'</span>]/users_accounts[<span class="string">'amount_deal'</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># In[14]:</span></span><br><span class="line"></span><br><span class="line">columns_ordered = [<span class="string">'name'</span>, <span class="string">'price'</span>,<span class="string">'amount'</span>, <span class="string">'amount_left'</span>,<span class="string">'amount_deal'</span>, <span class="string">'accu_money'</span>,<span class="string">'accu_money_ratio'</span>, <span class="string">'accu_money_diff'</span>,                   <span class="string">'return_money'</span>,<span class="string">'real_monty'</span>, <span class="string">'real_price'</span>]</span><br><span class="line">users_accounts = users_accounts[columns_ordered]</span><br><span class="line">users_accounts.columns = [<span class="string">'名称'</span>,<span class="string">'申报价差'</span>,<span class="string">'申报电量'</span>,<span class="string">'剩余电量'</span>,<span class="string">'中标电量'</span>,<span class="string">'累计电费(不含返还)'</span>,<span class="string">'累计电费占比'</span>,<span class="string">'累计价差电费'</span>,                             <span class="string">'返还电费'</span>,<span class="string">'中标电费(含返还)'</span>,<span class="string">'中标价差'</span>]</span><br><span class="line">users_accounts</span><br></pre></td></tr></table></figure>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/06/28/浅谈小波分析/" rel="next" title="浅谈小波分析">
+                <i class="fa fa-chevron-left"></i> 浅谈小波分析
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/08/26/电力竞价-广东规则-详解与代码/"
+           data-title="电力竞价(广东规则)详解与代码" data-url="http://younggy.com/2016/08/26/电力竞价-广东规则-详解与代码/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/uploads/touxiang.jpg" alt="Guangyao Yang" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Guangyao Yang</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Guangyao Yang</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">14</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/young_gy" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> CSDN
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YoungGer" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-twitter-url" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i> Twitter
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-weibo-url" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-douban-url" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> DouBan
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/ger-young" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> ZhiHu
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#竞价规则"><span class="nav-number">1.</span> <span class="nav-text">竞价规则</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#交易规模"><span class="nav-number">1.1.</span> <span class="nav-text">交易规模</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#报价规则"><span class="nav-number">1.2.</span> <span class="nav-text">报价规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#撮合规则"><span class="nav-number">1.3.</span> <span class="nav-text">撮合规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结算规则"><span class="nav-number">1.4.</span> <span class="nav-text">结算规则</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实例讲解"><span class="nav-number">2.</span> <span class="nav-text">实例讲解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#交易双方"><span class="nav-number">2.1.</span> <span class="nav-text">交易双方</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#交易情况概述"><span class="nav-number">2.2.</span> <span class="nav-text">交易情况概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#交易结算"><span class="nav-number">2.3.</span> <span class="nav-text">交易结算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码"><span class="nav-number">2.4.</span> <span class="nav-text">代码</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guangyao Yang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"younggy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+
+  
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/MathJax.js"></script>
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/config/TeX-AMS-MML_HTMLorMML.js"></script>
+  
+
+
+  
+  
+
+</body>
+</html>
