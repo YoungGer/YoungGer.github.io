@@ -35,7 +35,7 @@
 <link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="ROC,confusion matrix," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -51,19 +51,22 @@
 
 
 
-<meta name="description" content="ROC曲线在二分类问题中应用很广，最早可以追溯到二战中用雷达识别海鸥和敌机。本文将阐述ROC曲线、confusion matrix，如何评价二分类问题，最后以癌症分类的例子，讲一讲有时候现实和常识可能不太一样的地方。">
+<meta name="description" content="售电模拟，纸上得来终觉浅，绝知此事要躬行。本文附上了售电模拟应用介绍及其核心算法，供大家共同学习。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ROC曲线与癌症分类">
-<meta property="og:url" content="http://younggy.com/2015/11/25/ROC曲线与癌症分类/index.html">
+<meta property="og:title" content="售电模拟应用功能简介">
+<meta property="og:url" content="http://younggy.com/2016/08/29/售电模拟应用功能简介/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="ROC曲线在二分类问题中应用很广，最早可以追溯到二战中用雷达识别海鸥和敌机。本文将阐述ROC曲线、confusion matrix，如何评价二分类问题，最后以癌症分类的例子，讲一讲有时候现实和常识可能不太一样的地方。">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/ROC_curve_MedCalc_Snap17.gif">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/confusionmatrix.png">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/ROC_curve_MedCalc_Snap17.gif">
-<meta property="og:updated_time" content="2016-01-21T07:19:52.349Z">
+<meta property="og:description" content="售电模拟，纸上得来终觉浅，绝知此事要躬行。本文附上了售电模拟应用介绍及其核心算法，供大家共同学习。">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/116.jpg">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/111.jpg">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/112.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/113.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/114.png">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/115.png">
+<meta property="og:updated_time" content="2016-08-29T08:25:45.917Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ROC曲线与癌症分类">
-<meta name="twitter:description" content="ROC曲线在二分类问题中应用很广，最早可以追溯到二战中用雷达识别海鸥和敌机。本文将阐述ROC曲线、confusion matrix，如何评价二分类问题，最后以癌症分类的例子，讲一讲有时候现实和常识可能不太一样的地方。">
+<meta name="twitter:title" content="售电模拟应用功能简介">
+<meta name="twitter:description" content="售电模拟，纸上得来终觉浅，绝知此事要躬行。本文附上了售电模拟应用介绍及其核心算法，供大家共同学习。">
 
 
 
@@ -75,7 +78,7 @@
   };
 </script>
 
-  <title> ROC曲线与癌症分类 | YoungGy </title>
+  <title> 售电模拟应用功能简介 | YoungGy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -256,7 +259,7 @@
             
             
               
-                ROC曲线与癌症分类
+                售电模拟应用功能简介
               
             
           </h1>
@@ -265,34 +268,19 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2015-11-25T09:47:46+08:00" content="2015-11-25">
-              2015-11-25
+            <time itemprop="dateCreated" datetime="2016-08-29T16:14:41+08:00" content="2016-08-29">
+              2016-08-29
             </time>
           </span>
 
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/机器学习/" itemprop="url" rel="index">
-                    <span itemprop="name">机器学习</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
           
 
           
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2015/11/25/ROC曲线与癌症分类/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/25/ROC曲线与癌症分类/" itemprop="commentsCount"></span>
+                <a href="/2016/08/29/售电模拟应用功能简介/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/29/售电模拟应用功能简介/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -311,90 +299,52 @@
       
 
       
-        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/ROC_curve_MedCalc_Snap17.gif" alt="这里写图片描述"></p>
-<p><code>ROC</code>曲线在二分类问题中应用很广，最早可以追溯到二战中用雷达识别海鸥和敌机。<br>本文将阐述<code>ROC</code>曲线、<code>confusion matrix</code>，如何评价二分类问题，最后以癌症分类的例子，讲一讲有时候现实和常识可能不太一样的地方。</p>
+        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/116.jpg" alt="售电模拟图片"></p>
+<p>售电模拟，纸上得来终觉浅，绝知此事要躬行。<br>本文附上了售电模拟应用介绍及其核心算法，供大家共同学习。</p>
 <a id="more"></a>
-<h1 id="ROC曲线">ROC曲线</h1><p>ROC(receiver operating characteristic curve)曲线的对象是二分类问题，选择不同的阈值会有不同的分类结果。<br>ROC将不同阈值下的<code>TP rate</code>和<code>FP rate</code>表示在一张图表上，便于直观地看到不同阈值的作用以及分类器本身的作用情况。</p>
-<p><code>Confusion Matrix</code>如下：</p>
-<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/confusionmatrix.png" alt="这里写图片描述"></p>
-<p><code>ROC curve</code>如下，不同的阈值对应着图上不同的点：</p>
-<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/ROC_curve_MedCalc_Snap17.gif" alt="这里写图片描述"></p>
-<hr>
-<p>其中，</p>
-<p>$$\begin{split}<br>\mathrm{Sensitivity} = \mathrm{TPrate}  = \frac{TP}{TP+FN} \<br>\mathrm{Specificity} = \mathrm{FPrate}  = \frac{FP}{FP+TN}<br>\end{split}$$<br>一般认为越靠近左上角分类结果越好（TP rate高，FP rate低）。这表示对于Positive的样本有很大的概率识别出来（TP rate高），同时对Negative的样本有较小的误判几率（FP rate低）。</p>
-<h1 id="二分类问题的评价标准">二分类问题的评价标准</h1><p>最典型的评价标准是<code>AUC</code>，也就是<code>ROC</code>曲线下的面积（<code>baseline model的AUC是0.5</code>）。<br>同时，根据不同分类的严重性不同，也可以定义自己的<code>cost function</code>。</p>
-<h1 id="癌症分类">癌症分类</h1><p>下面举一个癌症分类的例子，你会发现有时候现实和常识往往不一样哦。</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">Tables</th>
-<th style="text-align:center">Positive</th>
-<th style="text-align:center">Negative</th>
-<th style="text-align:center">All Row</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">$+$</td>
-<td style="text-align:center">0.0095</td>
-<td style="text-align:center">0.0005</td>
-<td style="text-align:center">0.01</td>
-</tr>
-<tr>
-<td style="text-align:center">$-$</td>
-<td style="text-align:center">0.198</td>
-<td style="text-align:center">0.792</td>
-<td style="text-align:center">0.99</td>
-</tr>
-<tr>
-<td style="text-align:center">All Column</td>
-<td style="text-align:center">0.2075</td>
-<td style="text-align:center">0.7925</td>
-<td style="text-align:center">1.00</td>
-</tr>
-</tbody>
-</table>
-<p>对上面的<code>confusion matrix</code>简单阐述下：</p>
+<h1 id="应用功能">应用功能</h1><p>本应用地址为：<a href="https://younggy.shinyapps.io/pwshinyio/" target="_blank" rel="external">售电模拟应用</a>。</p>
+<p>本应用目前针对售电情况进行模拟分析，参考的售电过程如下图（该图来源于郭卓瑜）：</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/111.jpg" alt="这里写图片描述"></p>
+<h1 id="应用流程">应用流程</h1><p>本应用分为四个tab，分别是：</p>
 <ul>
-<li>人群中患癌症的概率是$P(+)=0.01$，不患癌症的概率是$P(-)=0.99$</li>
-<li>患癌症的人被检测出来患癌症的概率是$\frac{P(P|+)}{P(+)}=95\%$。</li>
+<li>主页：应用的简单信息</li>
+<li>数据输入：输入数据</li>
+<li>交易结果：查看交易结果</li>
+<li>可视化：对交易结果进行简单的可视化</li>
 </ul>
-<p>那么，问题是如果有一个人被检测出来患癌症，那么他真的患癌症的概率是多少呢？</p>
-<p>想一想，在心里面给一个答案^_^。</p>
-<p>真实的答案是$4.6\%$。  </p>
-<p>$$P(P|+) = \frac{P(P+)}{P(P)}=\frac{0.0095}{0.2075}=4.6\%$$</p>
-<p>有没有觉得跟自己想象的差别很大，$95\%$的<code>TP rate</code>虽然很高，但是也得关注下$20\%$的<code>FP rate</code>，并且人群中不患癌症的占了$99\%$。</p>
-<p>或者换个角度，假如把所有病人都判定为患癌症，那么<code>TP rate</code>是1感觉还不错哦，但是这时候的<code>FP rate</code>是1，也就是把所有不患癌症的都判断患癌症，这不是很好啊。这个时候即使判断你为癌症那么可信度也不高。<br>$$P(P|+) = \frac{P(P+)}{P(P)}=1\%$$</p>
+<p>使用顺序建议为：数据输入-&gt;交易结果-&gt;可视化。</p>
+<p>下面，将具体介绍各个tab及其完成的功能。</p>
+<h1 id="数据输入">数据输入</h1><p>输入数据，包括：</p>
+<ul>
+<li>市场竞价方式（目前暂只支持广东竞价）</li>
+<li>市场成交比例（默认80%）</li>
+<li>发电公司的数据（名称，申购量，申购价）</li>
+<li>售电公司的数据（名称，申购量，申购价）</li>
+</ul>
+<p>数据输入格式为：<code>a,b,c</code>，用英文逗号隔开即可，然后点击<code>提交</code>即完成了数据输入。</p>
+<p>输入完成后，会在页面提示输入的大致信息，如下图：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/112.png" alt="这里写图片描述"></p>
+<h1 id="交易结果">交易结果</h1><p>输入数据后，可在交易结果tab处查看交易结果，并且支持排序功能，例如按照成交电量、中标价等排序，如下图：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/113.png" alt="这里写图片描述"></p>
+<h1 id="可视化">可视化</h1><p>本tab对整个交易过程进行了简单的可视化分析，并且支持动态查看。</p>
+<p>实例如下图：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/114.png" alt="这里写图片描述"><br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/115.png" alt="这里写图片描述"></p>
+<h1 id="核心算法">核心算法</h1><p>核心算法及其代码可见<a href="http://blog.younggy.com/2016/08/26/%E7%94%B5%E5%8A%9B%E7%AB%9E%E4%BB%B7-%E5%B9%BF%E4%B8%9C%E8%A7%84%E5%88%99-%E8%AF%A6%E8%A7%A3%E4%B8%8E%E4%BB%A3%E7%A0%81/#more" target="_blank" rel="external">电力竞价(广东规则)详解与代码</a></p>
 </span>
       
     </div>
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/ROC/" rel="tag">#ROC</a>
-          
-            <a href="/tags/confusion-matrix/" rel="tag">#confusion matrix</a>
-          
-        </div>
-      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/11/24/矩阵求导与实例/" rel="next" title="矩阵求导与实例">
-                <i class="fa fa-chevron-left"></i> 矩阵求导与实例
+              <a href="/2016/08/26/电力竞价-广东规则-详解与代码/" rel="next" title="电力竞价(广东规则)详解与代码">
+                <i class="fa fa-chevron-left"></i> 电力竞价(广东规则)详解与代码
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2015/11/26/SVD分解及其应用/" rel="prev" title="SVD分解及其应用">
-                SVD分解及其应用 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -444,8 +394,8 @@
         
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2015/11/25/ROC曲线与癌症分类/"
-           data-title="ROC曲线与癌症分类" data-url="http://younggy.com/2015/11/25/ROC曲线与癌症分类/">
+      <div class="ds-thread" data-thread-key="2016/08/29/售电模拟应用功能简介/"
+           data-title="售电模拟应用功能简介" data-url="http://younggy.com/2016/08/29/售电模拟应用功能简介/">
       </div>
     
   </div>
@@ -591,7 +541,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ROC曲线"><span class="nav-number">1.</span> <span class="nav-text">ROC曲线</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二分类问题的评价标准"><span class="nav-number">2.</span> <span class="nav-text">二分类问题的评价标准</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#癌症分类"><span class="nav-number">3.</span> <span class="nav-text">癌症分类</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#应用功能"><span class="nav-number">1.</span> <span class="nav-text">应用功能</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#应用流程"><span class="nav-number">2.</span> <span class="nav-text">应用流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据输入"><span class="nav-number">3.</span> <span class="nav-text">数据输入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#交易结果"><span class="nav-number">4.</span> <span class="nav-text">交易结果</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#可视化"><span class="nav-number">5.</span> <span class="nav-text">可视化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#核心算法"><span class="nav-number">6.</span> <span class="nav-text">核心算法</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
