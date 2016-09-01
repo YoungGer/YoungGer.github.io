@@ -51,22 +51,23 @@
 
 
 
-<meta name="description" content="售电模拟，纸上得来终觉浅，绝知此事要躬行。本文附上了售电模拟应用介绍及其核心算法，供大家共同学习。">
+<meta name="description" content="本文简要介绍了次贷危机是如何产生的，以及CDO/CDS是如何对次贷危机产生推波助澜的作用。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="售电模拟应用功能简介">
-<meta property="og:url" content="http://younggy.com/2016/08/29/售电模拟应用功能简介/index.html">
+<meta property="og:title" content="CDO/CDS与次贷危机">
+<meta property="og:url" content="http://younggy.com/2016/09/01/CDO-CDS与次贷危机/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="售电模拟，纸上得来终觉浅，绝知此事要躬行。本文附上了售电模拟应用介绍及其核心算法，供大家共同学习。">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/116.jpg">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/111.jpg">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/112.png">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/113.png">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/114.png">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/115.png">
-<meta property="og:updated_time" content="2016-08-29T08:25:45.917Z">
+<meta property="og:description" content="本文简要介绍了次贷危机是如何产生的，以及CDO/CDS是如何对次贷危机产生推波助澜的作用。">
+<meta property="og:image" content="http://pic.baike.soso.com/p/20130628/20130628170314-780721664.jpg">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Collateralized_Debt_Obligations.svg/700px-Collateralized_Debt_Obligations.svg.png">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/1/12/CDO_-_FCIC_and_IMF_Diagram.png">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/CDS-nodefault.PNG/450px-CDS-nodefault.PNG">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/CDS-default.PNG/450px-CDS-default.PNG">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Cds_paymentstream_protection_noloss.svg/270px-Cds_paymentstream_protection_noloss.svg.png">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Cds_paymentstream_protection_loss_event.svg/270px-Cds_paymentstream_protection_loss_event.svg.png">
+<meta property="og:updated_time" content="2016-09-01T13:22:05.005Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="售电模拟应用功能简介">
-<meta name="twitter:description" content="售电模拟，纸上得来终觉浅，绝知此事要躬行。本文附上了售电模拟应用介绍及其核心算法，供大家共同学习。">
+<meta name="twitter:title" content="CDO/CDS与次贷危机">
+<meta name="twitter:description" content="本文简要介绍了次贷危机是如何产生的，以及CDO/CDS是如何对次贷危机产生推波助澜的作用。">
 
 
 
@@ -78,7 +79,7 @@
   };
 </script>
 
-  <title> 售电模拟应用功能简介 | YoungGy </title>
+  <title> CDO/CDS与次贷危机 | YoungGy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -259,7 +260,7 @@
             
             
               
-                售电模拟应用功能简介
+                CDO/CDS与次贷危机
               
             
           </h1>
@@ -268,8 +269,8 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2016-08-29T16:14:41+08:00" content="2016-08-29">
-              2016-08-29
+            <time itemprop="dateCreated" datetime="2016-09-01T21:19:28+08:00" content="2016-09-01">
+              2016-09-01
             </time>
           </span>
 
@@ -279,8 +280,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/08/29/售电模拟应用功能简介/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/29/售电模拟应用功能简介/" itemprop="commentsCount"></span>
+                <a href="/2016/09/01/CDO-CDS与次贷危机/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/01/CDO-CDS与次贷危机/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -299,34 +300,68 @@
       
 
       
-        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/116.jpg" alt="售电模拟图片"></p>
-<p>售电模拟，纸上得来终觉浅，绝知此事要躬行。<br>本文附上了售电模拟应用介绍及其核心算法，供大家共同学习。</p>
+        <span itemprop="articleBody"><p><img src="http://pic.baike.soso.com/p/20130628/20130628170314-780721664.jpg" alt="这里写图片描述"></p>
+<p>本文简要介绍了次贷危机是如何产生的，以及CDO/CDS是如何对次贷危机产生推波助澜的作用。</p>
 <a id="more"></a>
-<h1 id="应用功能">应用功能</h1><p>本应用地址为：<a href="https://younggy.shinyapps.io/pwshinyio/" target="_blank" rel="external">售电模拟应用</a>。</p>
-<p>本应用目前针对售电情况进行模拟分析，参考的售电过程如下图（该图来源于郭卓瑜）：</p>
-<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/111.jpg" alt="这里写图片描述"></p>
-<h1 id="应用流程">应用流程</h1><p>本应用分为四个tab，分别是：</p>
+<h1 id="术语简介">术语简介</h1><h2 id="CDO">CDO</h2><p>债务担保证券（Collateralized Debt Obligation），简称CDO，是一种信贷挂钩票据形式的结构性投资产品，是一种包含有资产抵押债券(ABS)，由债权组合构成的证券化商品。</p>
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Collateralized_Debt_Obligations.svg/700px-Collateralized_Debt_Obligations.svg.png" alt="这里写图片描述"></p>
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/1/12/CDO_-_FCIC_and_IMF_Diagram.png" alt="这里写图片描述"></p>
+<h2 id="CDS">CDS</h2><p>信用违约交换（英语：credit default swap，缩写CDS）也称信用违约掉期、信贷违约掉期、贷款违约保险；是信贷与保险的衍生工具之一，合约由两个法人交易，一个称为买方（信贷违约时受保护的一方），另一个称为卖方（保障买方于信贷违约时损失）。主要为约定期内信用违约提供一个高比率的保险业务，若担保方没有足够的保证金，会来相当大的投机行为。若保证金充足，其意义在于为买方提供被违约时的本金保障。</p>
+<p>图示一：</p>
+<blockquote>
+<p>If the reference bond performs without default, the protection buyer pays quarterly payments to the seller until maturity<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/CDS-nodefault.PNG/450px-CDS-nodefault.PNG" alt="这里写图片描述"><br>If the reference bond defaults, the protection seller pays par value of the bond to the buyer, and the buyer transfers ownership of the bond to the seller<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/CDS-default.PNG/450px-CDS-default.PNG" alt="这里写图片描述"></p>
+</blockquote>
+<p>图示2：</p>
+<blockquote>
+<p>Buyer purchased a CDS at time t0 and makes regular premium payments at times t1, t2, t3, and t4. If the associated credit instrument suffers no credit event, then the buyer continues paying premiums at t5, t6 and so on until the end of the contract at time tn.<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Cds_paymentstream_protection_noloss.svg/270px-Cds_paymentstream_protection_noloss.svg.png" alt="这里写图片描述"><br>However, if the associated credit instrument suffered a credit event at t5, then the seller pays the buyer for the loss, and the buyer would cease paying premiums to the seller.<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Cds_paymentstream_protection_loss_event.svg/270px-Cds_paymentstream_protection_loss_event.svg.png" alt="这里写图片描述"></p>
+</blockquote>
+<h2 id="次贷危机">次贷危机</h2><h3 id="次级贷款">次级贷款</h3><p>银行给信用不好的人的贷款。</p>
+<h3 id="为什么发放次级贷款">为什么发放次级贷款</h3><p>一般来说，银行发放贷款时会考虑贷款人的信用。那么，为什么银行会给信用不好的人以贷款呢？原因主要有以下三个：</p>
 <ul>
-<li>主页：应用的简单信息</li>
-<li>数据输入：输入数据</li>
-<li>交易结果：查看交易结果</li>
-<li>可视化：对交易结果进行简单的可视化</li>
+<li>政府施压</li>
+<li>增加收入</li>
+<li>贷款利率增长</li>
 </ul>
-<p>使用顺序建议为：数据输入-&gt;交易结果-&gt;可视化。</p>
-<p>下面，将具体介绍各个tab及其完成的功能。</p>
-<h1 id="数据输入">数据输入</h1><p>输入数据，包括：</p>
+<h4 id="政府施压">政府施压</h4><p>2000年到2006年，房价很高，低收入或信用不好的群体很难申请到住房贷款。政府方面对贷款公司施压，希望能够降低贷款的标准，以减少无家可居的人数。</p>
+<h4 id="增加收入">增加收入</h4><p>当时的大环境下，房价迅猛增长，但是市场上的利率却是一个比较低的状态。对于贷款公司，要么提高利率，要么提高贷款量。因此，贷款公司通过提高贷款量来增加收入。</p>
+<h4 id="贷款利率增长">贷款利率增长</h4><p>增加了次级贷款，那么就会面对更大的赖账风险。贷款公司通过以下两个办法来解决的：</p>
 <ul>
-<li>市场竞价方式（目前暂只支持广东竞价）</li>
-<li>市场成交比例（默认80%）</li>
-<li>发电公司的数据（名称，申购量，申购价）</li>
-<li>售电公司的数据（名称，申购量，申购价）</li>
+<li>贷款前几年利率较低，后面几年利率升高，以弥补前几年的低利率贷款。</li>
+<li>贷款公司认为房价会持续升高。如果贷款者因为高利率违约了，那么贷款公司只需要收回作为抵押品的房子，卖掉就可以弥补损失甚至获得收益。</li>
 </ul>
-<p>数据输入格式为：<code>a,b,c</code>，用英文逗号隔开即可，然后点击<code>提交</code>即完成了数据输入。</p>
-<p>输入完成后，会在页面提示输入的大致信息，如下图：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/112.png" alt="这里写图片描述"></p>
-<h1 id="交易结果">交易结果</h1><p>输入数据后，可在交易结果tab处查看交易结果，并且支持排序功能，例如按照成交电量、中标价等排序，如下图：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/113.png" alt="这里写图片描述"></p>
-<h1 id="可视化">可视化</h1><p>本tab对整个交易过程进行了简单的可视化分析，并且支持动态查看。</p>
-<p>实例如下图：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/114.png" alt="这里写图片描述"><br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/115.png" alt="这里写图片描述"></p>
-<h1 id="核心算法">核心算法</h1><p>核心算法及其代码可见<a href="http://blog.younggy.com/2016/08/26/%E7%94%B5%E5%8A%9B%E7%AB%9E%E4%BB%B7-%E5%B9%BF%E4%B8%9C%E8%A7%84%E5%88%99-%E8%AF%A6%E8%A7%A3%E4%B8%8E%E4%BB%A3%E7%A0%81/#more" target="_blank" rel="external">电力竞价(广东规则)详解与代码</a></p>
+<h1 id="次贷危机的爆发">次贷危机的爆发</h1><h2 id="无追索权">无追索权</h2><blockquote>
+<p>房贷的无追索权，指的就是，如果贷款者无力偿还房贷，贷款公司没有权利没收贷款者除抵押房产以外的任何资产。</p>
+</blockquote>
+<p>举个例子，你在五年前向银行贷款了100万美金买房，现在还有五年的偿还时间，剩余未偿还的贷款数额是70万美金。而五年前，你的房子价值是100万美金，但现在房价跌到50万美金了，而且并没有回涨的势头。那么在无追索权的条件下，你还会继续偿还放房贷吗？必然不会。如果你足够理性，你会放弃你的房产，因为它的价值只有50万美金，你没有必要为了价值50万的东西去偿还剩余的70万债务。</p>
+<p>所以，如果房价暴跌，很多的贷款者其实会直接放弃偿还贷款，直接导致贷款公司的坏账大增。</p>
+<h2 id="CDO-1">CDO</h2><p>次级贷款的信用评级都是很垃圾的，但是<code>资产证券化</code>给了他们从垃圾中掘金的能力。掘金的办法是打包所有次级贷款，然后将未来的现金流形成一个瀑布。</p>
+<p>瀑布中分为三类资产，高级、中级、低级。未来通过次级贷款获得的现金流，先保证高级资产的收益实现，然后是中级资产，最后是低级资产。<br>所以，高级资产往往收益率最低风险最低，中级次之，最危险的是低级。</p>
+<p>分类的原因是贷款公司希望把次级贷款打包卖出去，以获得现金并且转移风险。因为直接卖并卖不出去，所以可以通过打包再切片，人为地制造AAA评级的资产。<br>这种高信用评级的资产在市场上的流动性很高，所以贷款公司通过打包在切片出售的方式，将次级贷款卖了出去，从垃圾中获得了黄金，获得了现金转移了风险。</p>
+<p>对于中级（往往评级BBB）和低级资产很难卖出。解决办法是：继续重复资产证券化的步骤，在证券化基础上继续证券化，获得CDO的平方。</p>
+<p>需要注意的是：</p>
+<ul>
+<li>AAA评级的产品风险不一定相同。CDO平方中的AAA级切片的风险要高于原CDO中的AAA级切片，CDO三次方中的AAA级切片风险也要高于CDO平方中的AAA级切片。道理很简单，因为“瀑布”使得CDO的AAA切片先安全，其次才是CDO平方中的AAA切片，以此类推。可以说，你打包的次数越频繁，你获得的AAA级产品的风险就越大，尽管它们都是AAA级产品。所以，其实对资产的信用评级系统也是金融危机之后遭受大家诟病的一个点。</li>
+<li>当危机来临的时候，CDO内部资产的correlation会猛增，这样会导致更大的风险。而在危机之前，这种correlation的风险在很大程度上并没有被重视。</li>
+</ul>
+<h2 id="CDS-1">CDS</h2><p>CDS是一种类似于保险的产品，你担心与你交易的对手B违约，你去找券商C买一个CDS，这样，B违约的时候，因为违约所造成的一部分损失将由C支付给你。而你所需要做的就是，如果B不违约，你要持续的每隔一段时间就支付给C一部分固定资金，类似于保费。</p>
+<p>因为这种特征，一旦出现了违约事件，CDS在很大程度上其实是在给违约推波助澜，因为一个卖出CDS产品的企业，会因为各个公司的违约而不得不支付巨额的违约金，甚至会导致自身的违约。一个很好的例子就是金融危机之下依赖政府援助才幸免倒闭的AIG。就这样，CDS在很大程度上大大增加了金融系统的整体系统风险。因此，CDS就继CDO之后，成了恶魔的第二个象征。</p>
+<h2 id="金融危机">金融危机</h2><p>金融危机的流程为：</p>
+<ol>
+<li>次级贷款：因为政府压力，贷款公司盈利的目的，贷款公司降低贷款的标准，产生了很多的次级贷款。</li>
+<li>CDO：贷款公司将次级贷款打包CDO，人为地创造了高评级的资产，通过资产证券化获得了现金转移了风险，当然也扩大了潜在危机范围。</li>
+<li>CDS：贷款公司购入CDS，将风险转移到了CDS的保方，继续扩大了风险的范围。</li>
+<li>一次违约：次级贷款低利率到期了，出现一部分贷款违约。</li>
+<li>房子出售：贷款公司将一次违约的资产（房产）在市场上出售，使得房价下降。</li>
+<li>二次违约：因为房价下降和无追索权，新入手房贷的人发现房子不值钱了，出现了第二波的贷款违约。</li>
+<li>房子出售：贷款公司将二次违约的资产（房产）在市场上出售，使得房价继续下降。</li>
+<li>CDO暴跌：房贷公司再试图向投资者推销的CDO也不再获得之前的成功了。于是乎，很多房贷公司和被信用评级所误导而投资CDO产品的公司都倒闭了，包括着房地美，房利美，以及赫赫大名的雷曼兄弟。</li>
+<li>CDS暴跌：房贷公司的大规模倒闭，直接导致了发行CDS的公司遭受了前所未有的巨大压力，这些卖CDS的公司，比如AIG、美林证券，都遭受了前所未有的巨大损失。</li>
+</ol>
+<h1 id="参考资料">参考资料</h1><ol>
+<li><a href="https://zhuanlan.zhihu.com/p/22180342?refer=quantjiang" target="_blank" rel="external">用大白话来讲次贷危机</a></li>
+<li><a href="https://www.zhihu.com/question/23003804" target="_blank" rel="external">知乎：次贷危机是怎么回事</a></li>
+<li><a href="https://www.zhihu.com/question/20222121" target="_blank" rel="external">cds/cdo与金融危机</a></li>
+</ol>
 </span>
       
     </div>
@@ -338,17 +373,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/08/26/电力竞价-广东规则-详解与代码/" rel="next" title="电力竞价(广东规则)详解与代码">
-                <i class="fa fa-chevron-left"></i> 电力竞价(广东规则)详解与代码
+              <a href="/2016/08/29/售电模拟应用功能简介/" rel="next" title="售电模拟应用功能简介">
+                <i class="fa fa-chevron-left"></i> 售电模拟应用功能简介
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/09/01/CDO-CDS与次贷危机/" rel="prev" title="CDO/CDS与次贷危机">
-                CDO/CDS与次贷危机 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -398,8 +429,8 @@
         
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/08/29/售电模拟应用功能简介/"
-           data-title="售电模拟应用功能简介" data-url="http://younggy.com/2016/08/29/售电模拟应用功能简介/">
+      <div class="ds-thread" data-thread-key="2016/09/01/CDO-CDS与次贷危机/"
+           data-title="CDO/CDS与次贷危机" data-url="http://younggy.com/2016/09/01/CDO-CDS与次贷危机/">
       </div>
     
   </div>
@@ -545,7 +576,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#应用功能"><span class="nav-number">1.</span> <span class="nav-text">应用功能</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#应用流程"><span class="nav-number">2.</span> <span class="nav-text">应用流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据输入"><span class="nav-number">3.</span> <span class="nav-text">数据输入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#交易结果"><span class="nav-number">4.</span> <span class="nav-text">交易结果</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#可视化"><span class="nav-number">5.</span> <span class="nav-text">可视化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#核心算法"><span class="nav-number">6.</span> <span class="nav-text">核心算法</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#术语简介"><span class="nav-number">1.</span> <span class="nav-text">术语简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CDO"><span class="nav-number">1.1.</span> <span class="nav-text">CDO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CDS"><span class="nav-number">1.2.</span> <span class="nav-text">CDS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#次贷危机"><span class="nav-number">1.3.</span> <span class="nav-text">次贷危机</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#次级贷款"><span class="nav-number">1.3.1.</span> <span class="nav-text">次级贷款</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么发放次级贷款"><span class="nav-number">1.3.2.</span> <span class="nav-text">为什么发放次级贷款</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#政府施压"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">政府施压</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#增加收入"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">增加收入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#贷款利率增长"><span class="nav-number">1.3.2.3.</span> <span class="nav-text">贷款利率增长</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#次贷危机的爆发"><span class="nav-number">2.</span> <span class="nav-text">次贷危机的爆发</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#无追索权"><span class="nav-number">2.1.</span> <span class="nav-text">无追索权</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CDO-1"><span class="nav-number">2.2.</span> <span class="nav-text">CDO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CDS-1"><span class="nav-number">2.3.</span> <span class="nav-text">CDS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#金融危机"><span class="nav-number">2.4.</span> <span class="nav-text">金融危机</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
