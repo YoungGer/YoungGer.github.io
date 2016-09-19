@@ -35,7 +35,7 @@
 <link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="ROC,confusion matrix," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -51,19 +51,17 @@
 
 
 
-<meta name="description" content="ROC曲线在二分类问题中应用很广，最早可以追溯到二战中用雷达识别海鸥和敌机。本文将阐述ROC曲线、confusion matrix，如何评价二分类问题，最后以癌症分类的例子，讲一讲有时候现实和常识可能不太一样的地方。">
+<meta name="description" content="在统计学理论的估计中，用不放回抽样来估计离散型均匀分布最大值问题在英语世界中是著名的德国坦克问题（German tank problem），它因在第二次世界大战中用于估计德国坦克数量而得名。本文将从频率以及贝叶斯的角度探索坦克问题。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ROC曲线与癌症分类">
-<meta property="og:url" content="http://younggy.com/2015/11/25/ROC曲线与癌症分类/index.html">
+<meta property="og:title" content="坦克问题的频率及贝叶斯解释">
+<meta property="og:url" content="http://younggy.com/2016/09/19/坦克问题的频率及贝叶斯解释/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="ROC曲线在二分类问题中应用很广，最早可以追溯到二战中用雷达识别海鸥和敌机。本文将阐述ROC曲线、confusion matrix，如何评价二分类问题，最后以癌症分类的例子，讲一讲有时候现实和常识可能不太一样的地方。">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/ROC_curve_MedCalc_Snap17.gif">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/confusionmatrix.png">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/ROC_curve_MedCalc_Snap17.gif">
-<meta property="og:updated_time" content="2016-01-21T07:19:52.349Z">
+<meta property="og:description" content="在统计学理论的估计中，用不放回抽样来估计离散型均匀分布最大值问题在英语世界中是著名的德国坦克问题（German tank problem），它因在第二次世界大战中用于估计德国坦克数量而得名。本文将从频率以及贝叶斯的角度探索坦克问题。">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/tank.jpg?imageView/2/w/400">
+<meta property="og:updated_time" content="2016-09-19T09:29:17.307Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ROC曲线与癌症分类">
-<meta name="twitter:description" content="ROC曲线在二分类问题中应用很广，最早可以追溯到二战中用雷达识别海鸥和敌机。本文将阐述ROC曲线、confusion matrix，如何评价二分类问题，最后以癌症分类的例子，讲一讲有时候现实和常识可能不太一样的地方。">
+<meta name="twitter:title" content="坦克问题的频率及贝叶斯解释">
+<meta name="twitter:description" content="在统计学理论的估计中，用不放回抽样来估计离散型均匀分布最大值问题在英语世界中是著名的德国坦克问题（German tank problem），它因在第二次世界大战中用于估计德国坦克数量而得名。本文将从频率以及贝叶斯的角度探索坦克问题。">
 
 
 
@@ -75,7 +73,7 @@
   };
 </script>
 
-  <title> ROC曲线与癌症分类 | YoungGy </title>
+  <title> 坦克问题的频率及贝叶斯解释 | YoungGy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -256,7 +254,7 @@
             
             
               
-                ROC曲线与癌症分类
+                坦克问题的频率及贝叶斯解释
               
             
           </h1>
@@ -265,34 +263,19 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2015-11-25T09:47:46+08:00" content="2015-11-25">
-              2015-11-25
+            <time itemprop="dateCreated" datetime="2016-09-19T17:17:01+08:00" content="2016-09-19">
+              2016-09-19
             </time>
           </span>
 
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/机器学习/" itemprop="url" rel="index">
-                    <span itemprop="name">机器学习</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
           
 
           
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2015/11/25/ROC曲线与癌症分类/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/25/ROC曲线与癌症分类/" itemprop="commentsCount"></span>
+                <a href="/2016/09/19/坦克问题的频率及贝叶斯解释/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/19/坦克问题的频率及贝叶斯解释/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -311,90 +294,118 @@
       
 
       
-        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/ROC_curve_MedCalc_Snap17.gif" alt="这里写图片描述"></p>
-<p><code>ROC</code>曲线在二分类问题中应用很广，最早可以追溯到二战中用雷达识别海鸥和敌机。<br>本文将阐述<code>ROC</code>曲线、<code>confusion matrix</code>，如何评价二分类问题，最后以癌症分类的例子，讲一讲有时候现实和常识可能不太一样的地方。</p>
+        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/tank.jpg?imageView/2/w/400" alt="这里写图片描述"></p>
+<p>在统计学理论的估计中，用不放回抽样来估计离散型均匀分布最大值问题在英语世界中是著名的德国坦克问题（German tank problem），它因在第二次世界大战中用于估计德国坦克数量而得名。本文将从频率以及贝叶斯的角度探索坦克问题。</p>
 <a id="more"></a>
-<h1 id="ROC曲线">ROC曲线</h1><p>ROC(receiver operating characteristic curve)曲线的对象是二分类问题，选择不同的阈值会有不同的分类结果。<br>ROC将不同阈值下的<code>TP rate</code>和<code>FP rate</code>表示在一张图表上，便于直观地看到不同阈值的作用以及分类器本身的作用情况。</p>
-<p><code>Confusion Matrix</code>如下：</p>
-<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/confusionmatrix.png" alt="这里写图片描述"></p>
-<p><code>ROC curve</code>如下，不同的阈值对应着图上不同的点：</p>
-<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/ROC_curve_MedCalc_Snap17.gif" alt="这里写图片描述"></p>
-<hr>
-<p>其中，</p>
-<p>$$\begin{split}<br>\mathrm{Sensitivity} = \mathrm{TPrate}  = \frac{TP}{TP+FN} \<br>\mathrm{Specificity} = \mathrm{FPrate}  = \frac{FP}{FP+TN}<br>\end{split}$$<br>一般认为越靠近左上角分类结果越好（TP rate高，FP rate低）。这表示对于Positive的样本有很大的概率识别出来（TP rate高），同时对Negative的样本有较小的误判几率（FP rate低）。</p>
-<h1 id="二分类问题的评价标准">二分类问题的评价标准</h1><p>最典型的评价标准是<code>AUC</code>，也就是<code>ROC</code>曲线下的面积（<code>baseline model的AUC是0.5</code>）。<br>同时，根据不同分类的严重性不同，也可以定义自己的<code>cost function</code>。</p>
-<h1 id="癌症分类">癌症分类</h1><p>下面举一个癌症分类的例子，你会发现有时候现实和常识往往不一样哦。</p>
+<h1 id="背景">背景</h1><p>假设所有的德国坦克是从1开始按自然数递增编号的，坦克的总数为N，也就是说坦克的最大编号为N。盟军在战斗中共随机俘获/击毁了k辆坦克，且这些坦克的最大编号为m，那么应当如何对N的大小进行估计？</p>
+<p>盟军利用统计理论做的的估计取得了很棒的结果，与德军真实数据非常接近，如下表所示：</p>
 <table>
 <thead>
 <tr>
-<th style="text-align:center">Tables</th>
-<th style="text-align:center">Positive</th>
-<th style="text-align:center">Negative</th>
-<th style="text-align:center">All Row</th>
+<th>月份</th>
+<th>统计估计</th>
+<th>情报估计</th>
+<th>德国记录</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">$+$</td>
-<td style="text-align:center">0.0095</td>
-<td style="text-align:center">0.0005</td>
-<td style="text-align:center">0.01</td>
+<td>1940-06</td>
+<td>169</td>
+<td>1000</td>
+<td>122</td>
 </tr>
 <tr>
-<td style="text-align:center">$-$</td>
-<td style="text-align:center">0.198</td>
-<td style="text-align:center">0.792</td>
-<td style="text-align:center">0.99</td>
+<td>1941-06</td>
+<td>244</td>
+<td>1550</td>
+<td>271</td>
 </tr>
 <tr>
-<td style="text-align:center">All Column</td>
-<td style="text-align:center">0.2075</td>
-<td style="text-align:center">0.7925</td>
-<td style="text-align:center">1.00</td>
+<td>1942-08</td>
+<td>327</td>
+<td>1550</td>
+<td>342</td>
 </tr>
 </tbody>
 </table>
-<p>对上面的<code>confusion matrix</code>简单阐述下：</p>
+<p>上面的问题，转化为数学问题是：用<code>不放回抽样</code>来估计<code>离散型均匀分布</code>的<code>最大值</code>。<br>已知样本数量<code>k</code>和样本最大值<code>m</code>，求群体最大值<code>N</code>。</p>
+<h1 id="频率解释">频率解释</h1><h2 id="推导">推导</h2><p>定义样本最大值随机变量M，那么$P_M(m) = \frac{\binom {m-1} {k-1} }{\binom N k}$。<br>M的期望为：$E_M(m) = \mu_M=  \sum_{m=k}^{N} m*\frac{\binom {m-1} {k-1} }{\binom N k} = \frac{k(N+1)}{k+1}$<br>因此，$N = \mu_M(1+k^{-1})-1$，问题转化为了求$\mu_M$。  因为实验只进行了一次（实际上也无法进行多次），因此以单次实验的值作为$\mu_M$的估计值，即$\mu_M = m$。所以有：<br>$$\hat{N} = m(1+k^{-1})-1$$</p>
+<h2 id="直观理解">直观理解</h2><p>$$\hat{N} = m(1+k^{-1})-1 = m + \frac{m-k}{k}$$</p>
+<p>直观理解如上，群体最大值的估计值等于样本最大值加上样本观测值之间的平均距离。</p>
+<h2 id="置信区间">置信区间</h2><p>假定抽样后放回以简化计算，记k次抽样都集中在分位数p内，那么该k次抽样出现的的概率为$p = q^k$。<br>设两个概率$p1,p2$，那么其对应的分位数为$[p1^{1/k},p2^{1/k}]$，其对应样本的抽样区间的最大值为$[Np1^{1/k},Np2^{1/k}]$。<br>那么，已知样本最大值m，估计群体最大值的置信区间为$[m/p2^{1/k},m/p1^{1/k}]$。</p>
+<p>例如，k=5，p1=2.5%，p2=97.5%。那么置信区间大约为$[1.005m,2.09m]$。</p>
+<p>更一般地，若选择95%置信区间$[m,m/0.05^{1/k}]$，对于一系列的k，可得下表：</p>
+<table>
+<thead>
+<tr>
+<th>k</th>
+<th>点估计值</th>
+<th>置信区间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>2m</td>
+<td>[m,20m]</td>
+</tr>
+<tr>
+<td>2</td>
+<td>1.5m</td>
+<td>[m,4.5m]</td>
+</tr>
+<tr>
+<td>5</td>
+<td>1.2m</td>
+<td>[m,1.82m]</td>
+</tr>
+<tr>
+<td>10</td>
+<td>1.1m</td>
+<td>[m,1.35m]</td>
+</tr>
+<tr>
+<td>20</td>
+<td>1.05m</td>
+<td>[m,1.16m]</td>
+</tr>
+</tbody>
+</table>
+<h1 id="贝叶斯解释">贝叶斯解释</h1><p>贝叶斯法，在给定m，k的情况下使用贝叶斯公式计算N的概率分布，然后再求期望和方差。</p>
+<p>$$\begin{split}<br>P(n|m,k) &amp;= \frac{P(n,m,k)}{P(m,k)} = \frac{P(m|n,k)P(n|k)P(k)}{P(m|k)P(k)} \\<br> &amp;=  \frac{P(m|n,k)P(n|k)}{P(m|k)} \\<br> &amp;=  \frac{P(m|n,k)P(n|k)}{\sum_n P(m|n,k)P(n|k)}<br>\end{split}$$</p>
+<p>对于$P(n|k)$，表示的是在收集到k量坦克信息（仅知道收集了k辆坦克而不知其数字）的条件下对群体数n的先验估计。假定其为某种离散均匀分布：</p>
+<p>$$ P(n|k) = \left\{<br>\begin{aligned}<br>&amp;\frac{1}{\Omega-k}  \quad &amp;\text{if k $\le$n $\lt$ $\Omega$} \\<br>&amp;0 \quad &amp;\text{otherwise}<br>\end{aligned}<br>\right.<br>$$</p>
+<p>所以，上式可化简为：</p>
+<p>$$ P(n|m,k) = \left\{<br>\begin{aligned}<br>&amp;\frac{P(m|n,k)}{\sum_{n=m}^{\Omega-1} P(m|n,k)}  \quad &amp;\text{if m $\le$n $\lt$ $\Omega$} \\<br>&amp;0 \quad &amp;\text{otherwise}<br>\end{aligned}<br>\right.<br>$$</p>
+<p>这样便根据m，k的信息求出了n的后验概率分布。一些信息如下：</p>
 <ul>
-<li>人群中患癌症的概率是$P(+)=0.01$，不患癌症的概率是$P(-)=0.99$</li>
-<li>患癌症的人被检测出来患癌症的概率是$\frac{P(P|+)}{P(+)}=95\%$。</li>
+<li>当k ≥ 1时，敌方坦克数量分布的众数为m。</li>
+<li>当k ≥ 3时， N的均值有限：$\frac{(m-1)(k-1)}{(k-2)}$</li>
+<li>当k ≥ 4时， N的标准差有限：$\sqrt{\frac{(m-1)(k-1)(m+1-k)}{ (k-2)^2(k-3) } }  $</li>
 </ul>
-<p>那么，问题是如果有一个人被检测出来患癌症，那么他真的患癌症的概率是多少呢？</p>
-<p>想一想，在心里面给一个答案^_^。</p>
-<p>真实的答案是$4.6\%$。  </p>
-<p>$$P(P|+) = \frac{P(P+)}{P(P)}=\frac{0.0095}{0.2075}=4.6\%$$</p>
-<p>有没有觉得跟自己想象的差别很大，$95\%$的<code>TP rate</code>虽然很高，但是也得关注下$20\%$的<code>FP rate</code>，并且人群中不患癌症的占了$99\%$。</p>
-<p>或者换个角度，假如把所有病人都判定为患癌症，那么<code>TP rate</code>是1感觉还不错哦，但是这时候的<code>FP rate</code>是1，也就是把所有不患癌症的都判断患癌症，这不是很好啊。这个时候即使判断你为癌症那么可信度也不高。<br>$$P(P|+) = \frac{P(P+)}{P(P)}=1\%$$</p>
+<h1 id="参考资料">参考资料</h1><ol>
+<li><a href="https://zh.wikipedia.org/wiki/%E5%BE%B7%E5%9B%BD%E5%9D%A6%E5%85%8B%E9%97%AE%E9%A2%98" target="_blank" rel="external">wiki</a></li>
+<li><a href="http://tonysh-thu.blogspot.com/2013/11/blog-post.html" target="_blank" rel="external">Tony blog</a></li>
+</ol>
 </span>
       
     </div>
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/ROC/" rel="tag">#ROC</a>
-          
-            <a href="/tags/confusion-matrix/" rel="tag">#confusion matrix</a>
-          
-        </div>
-      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/11/24/矩阵求导与实例/" rel="next" title="矩阵求导与实例">
-                <i class="fa fa-chevron-left"></i> 矩阵求导与实例
+              <a href="/2016/09/01/CDO-CDS与次贷危机/" rel="next" title="CDO/CDS与次贷危机">
+                <i class="fa fa-chevron-left"></i> CDO/CDS与次贷危机
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2015/11/26/SVD分解及其应用/" rel="prev" title="SVD分解及其应用">
-                SVD分解及其应用 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -444,8 +455,8 @@
         
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2015/11/25/ROC曲线与癌症分类/"
-           data-title="ROC曲线与癌症分类" data-url="http://younggy.com/2015/11/25/ROC曲线与癌症分类/">
+      <div class="ds-thread" data-thread-key="2016/09/19/坦克问题的频率及贝叶斯解释/"
+           data-title="坦克问题的频率及贝叶斯解释" data-url="http://younggy.com/2016/09/19/坦克问题的频率及贝叶斯解释/">
       </div>
     
   </div>
@@ -591,7 +602,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ROC曲线"><span class="nav-number">1.</span> <span class="nav-text">ROC曲线</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二分类问题的评价标准"><span class="nav-number">2.</span> <span class="nav-text">二分类问题的评价标准</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#癌症分类"><span class="nav-number">3.</span> <span class="nav-text">癌症分类</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#频率解释"><span class="nav-number">2.</span> <span class="nav-text">频率解释</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#推导"><span class="nav-number">2.1.</span> <span class="nav-text">推导</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#直观理解"><span class="nav-number">2.2.</span> <span class="nav-text">直观理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#置信区间"><span class="nav-number">2.3.</span> <span class="nav-text">置信区间</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#贝叶斯解释"><span class="nav-number">3.</span> <span class="nav-text">贝叶斯解释</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
