@@ -35,7 +35,7 @@
 <link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="SVM,gredient descent,linear regression,logistic regression,stochastic gradient descent,矩阵求导," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -51,17 +51,17 @@
 
 
 
-<meta name="description" content="机器学习的算法中很多都牵涉到了矩阵求导，本文将对矩阵求导做简要阐述。一方面举一些简单的例子，另一方面推导了SVM,linear regression、logistic regression等。">
+<meta name="description" content="曲线拟合是一个经典的问题,本文将从误差和概率的角度探讨如何解决曲线拟合的问题以及这些方法的异同之处。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="矩阵求导与实例">
-<meta property="og:url" content="http://younggy.com/2015/11/24/矩阵求导与实例/index.html">
+<meta property="og:title" content="曲线拟合误差和概率的几种解释">
+<meta property="og:url" content="http://younggy.com/2016/10/28/曲线拟合误差和概率的几种解释/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="机器学习的算法中很多都牵涉到了矩阵求导，本文将对矩阵求导做简要阐述。一方面举一些简单的例子，另一方面推导了SVM,linear regression、logistic regression等。">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/ZNhsLa2.jpg">
-<meta property="og:updated_time" content="2016-01-21T07:18:49.282Z">
+<meta property="og:description" content="曲线拟合是一个经典的问题,本文将从误差和概率的角度探讨如何解决曲线拟合的问题以及这些方法的异同之处。">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Figure1.17.png?imageView/2/w/400">
+<meta property="og:updated_time" content="2016-10-28T08:48:48.466Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="矩阵求导与实例">
-<meta name="twitter:description" content="机器学习的算法中很多都牵涉到了矩阵求导，本文将对矩阵求导做简要阐述。一方面举一些简单的例子，另一方面推导了SVM,linear regression、logistic regression等。">
+<meta name="twitter:title" content="曲线拟合误差和概率的几种解释">
+<meta name="twitter:description" content="曲线拟合是一个经典的问题,本文将从误差和概率的角度探讨如何解决曲线拟合的问题以及这些方法的异同之处。">
 
 
 
@@ -73,7 +73,7 @@
   };
 </script>
 
-  <title> 矩阵求导与实例 | YoungGy </title>
+  <title> 曲线拟合误差和概率的几种解释 | YoungGy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -254,7 +254,7 @@
             
             
               
-                矩阵求导与实例
+                曲线拟合误差和概率的几种解释
               
             
           </h1>
@@ -263,34 +263,19 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2015-11-24T15:52:52+08:00" content="2015-11-24">
-              2015-11-24
+            <time itemprop="dateCreated" datetime="2016-10-28T16:40:16+08:00" content="2016-10-28">
+              2016-10-28
             </time>
           </span>
 
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/矩阵/" itemprop="url" rel="index">
-                    <span itemprop="name">矩阵</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
           
 
           
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2015/11/24/矩阵求导与实例/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/24/矩阵求导与实例/" itemprop="commentsCount"></span>
+                <a href="/2016/10/28/曲线拟合误差和概率的几种解释/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/28/曲线拟合误差和概率的几种解释/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -309,116 +294,61 @@
       
 
       
-        <span itemprop="articleBody"><div align="center"><br>    <img src="http://7xlwwh.com1.z0.glb.clouddn.com/ZNhsLa2.jpg" width="400" alt="图片名称" align="center"><br></div>
-
-<p>机器学习的算法中很多都牵涉到了矩阵求导，本文将对矩阵求导做简要阐述。<br>一方面举一些简单的例子，另一方面推导了<code>SVM</code>,<code>linear regression</code>、<code>logistic regression</code>等。</p>
+        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Figure1.17.png?imageView/2/w/400" alt="这里写图片描述"></p>
+<p>曲线拟合是一个经典的问题,本文将从误差和概率的角度探讨如何解决曲线拟合的问题以及这些方法的异同之处。</p>
 <a id="more"></a>
-<h1 id="缘由">缘由</h1><p>机器学习的很多算法表示中都采用了矩阵的形式，对算法的描述分析中就涉及到了对向量、对矩阵的求导。<br>比如SVM、linear regression的推导等。</p>
-<h1 id="布局">布局</h1><p>矩阵求导有两种布局：</p>
+<p>曲线拟合是一个经典的问题，将其数学化后是：已知训练数据$\bf{x}$和对应的目标值$\bf{t}$。通过构建参数为$\bf{w}$的模型，当新的$x$出现，对应的$t$是多少。</p>
+<p>本文将从误差和概率的角度探讨如何解决曲线拟合的问题，具体地，将阐述以下概念：</p>
 <ul>
-<li>分子布局（numerator layout）</li>
-<li>分母布局（denominator layout）</li>
+<li>误差函数</li>
+<li>正则化</li>
+<li>最大似然估计（MLE）</li>
+<li>最大后验估计（MAP）</li>
+<li>贝叶斯</li>
 </ul>
-<p>下面用向量$\mathrm{\mathbf{y}}$对标量$x$求导简单说明这两种布局的区别。<br>我们假定所有的向量都是列向量。<br>$$\mathbf{y}=\begin{bmatrix}y_{1}\<br>y_{2}\<br>\vdots\<br>y_{m}<br>\end{bmatrix}$$</p>
-<p>在分子布局下：<br>$$\frac{\partial\mathbf{y}}{\partial x}=\begin{bmatrix}\frac{\partial y_{1}}{\partial x}\<br>\frac{\partial y_{2}}{\partial x}\<br>\vdots\<br>\frac{\partial y_{m}}{\partial x}<br>\end{bmatrix}$$</p>
-<p>在分母布局下：<br>$$\frac{\partial\mathbf{y}}{\partial x}=\begin{bmatrix}\frac{\partial y_{1}}{\partial x} &amp; \frac{\partial y_{2}}{\partial x} &amp; \cdots &amp; \frac{\partial y_{m}}{\partial x}\end{bmatrix} %]]&gt;$$</p>
-<p>在下面的推导中，都将采用分母布局，也就是向量（列）对标量求导的结果都是行向量。（采用这种布局的主要原因是向量对向量的求导就是一个矩阵了）</p>
-<h1 id="求导的类别">求导的类别</h1><p>求导大致分为5类：</p>
-<ol>
-<li>向量对标量</li>
-<li>标量对向量</li>
-<li>向量对向量</li>
-<li>矩阵对向量</li>
-<li>向量对矩阵</li>
-</ol>
-<p>矩阵求导的大致规则如下：<br>对标量求导结果都要转置，而标量对向量或者矩阵求导的话位置不变。<br>简单来说，上变下不变。</p>
-<p>向量对标量求导：<br>$$\frac{\partial\mathbf{y}}{\partial x}=\begin{bmatrix}\frac{\partial y_{1}}{\partial x} &amp; \frac{\partial y_{2}}{\partial x} &amp; \cdots &amp; \frac{\partial y_{m}}{\partial x}\end{bmatrix} %]]&gt;$$</p>
-<p>标量对向量求导：<br>$$\frac{\partial y}{\partial\mathbf{x}}=\begin{bmatrix}\frac{\partial y}{\partial x_{1}}\<br>\frac{\partial y}{\partial x_{2}}\<br>\vdots\<br>\frac{\partial y}{\partial x_{m}}<br>\end{bmatrix}$$</p>
-<p>向量对向量求导：<br>$$\mathbf{x}=\begin{bmatrix}x_{1}\<br>x_{2}\<br>\vdots\<br>x_{n}<br>\end{bmatrix}$$<br>$$\mathbf{y}=\begin{bmatrix}y_{1}\<br>y_{2}\<br>\vdots\<br>y_{m}<br>\end{bmatrix}$$<br>$$\frac{\partial\mathbf{y}}{\partial\mathbf{x}}=\begin{bmatrix}\frac{\partial y_{1}}{\partial x_{1}} &amp; \frac{\partial y_{2}}{\partial x_{1}} &amp; \cdots &amp; \frac{\partial y_{m}}{\partial x_{1}}\\<br>\frac{\partial y_{1}}{\partial x_{2}} &amp; \frac{\partial y_{2}}{\partial x_{2}} &amp; \cdots &amp; \frac{\partial y_{m}}{\partial x_{2}}\\<br>\vdots &amp; \vdots &amp; \ddots &amp; \vdots\\<br>\frac{\partial y_{1}}{\partial x_{n}} &amp; \frac{\partial y_{2}}{\partial x_{n}} &amp; \cdots &amp; \frac{\partial y_{m}}{\partial x_{n}}<br>\end{bmatrix} %]]&gt;$$</p>
-<p>矩阵对标量求导：<br>$$\frac{\partial\mathbf{y}}{\partial x}=\begin{bmatrix}\frac{\partial y_{11}}{\partial x} &amp; \frac{\partial y_{21}}{\partial x} &amp; \cdots &amp; \frac{\partial y_{m1}}{\partial x}\\<br>\frac{\partial y_{12}}{\partial x} &amp; \frac{\partial y_{22}}{\partial x} &amp; \cdots &amp; \frac{\partial y_{m2}}{\partial x}\\<br>\vdots &amp; \vdots &amp; \ddots &amp; \vdots\\<br>\frac{\partial y_{1n}}{\partial x} &amp; \frac{\partial y_{2n}}{\partial x} &amp; \cdots &amp; \frac{\partial y_{mn}}{\partial x}<br>\end{bmatrix}$$</p>
-<p>标量对矩阵求导：<br>$$\frac{\partial y}{\partial\mathbf{X}}=\begin{bmatrix}\frac{\partial y}{\partial x_{11}} &amp; \frac{\partial y}{\partial x_{12}} &amp; \cdots &amp; \frac{\partial y}{\partial x_{1q}}\\<br>\frac{\partial y}{\partial x_{21}} &amp; \frac{\partial y}{\partial x_{22}} &amp; \cdots &amp; \frac{\partial y}{\partial x_{2q}}\\<br>\vdots &amp; \vdots &amp; \ddots &amp; \vdots\\<br>\frac{\partial y}{\partial x_{p1}} &amp; \frac{\partial y}{\partial x_{p2}} &amp; \cdots &amp; \frac{\partial y}{\partial x_{pq}}<br>\end{bmatrix} %]]&gt;$$</p>
-<h1 id="从简单的例子说起">从简单的例子说起</h1><p><strong>例子1：</strong></p>
-<p>$$\mathbb{y} = \mathbb{a}^\mathrm{T}\mathbb{x}$$</p>
-<p>其中，$\mathbb{y} \in \mathbb{R}, \mathbb{a} \in \mathbb{R}^{n \times 1}, \mathbb{x} \in \mathbb{R}^{n \times 1}$。</p>
-<p>属于标量对向量求导，所以有：<br>$$\frac{\partial y}{\partial x} = a$$</p>
-<p><strong>例子2：</strong></p>
-<p>$$\mathbb{y} = \mathrm{A}\mathrm{x}$$</p>
-<p>其中，$\mathbb{y} \in \mathbb{R}^{m \times 1}, \mathrm{A} \in \mathbb{R}^{m \times n}, \mathbb{x} \in \mathbb{R}^{n \times 1}$。</p>
-<p>属于向量对向量求导，所以有：<br>$$\frac{\partial y}{\partial x} = \mathrm{A}^\mathrm{T}$$</p>
-<p><strong>例子3：</strong><br>$$\mathbb{y} = \mathrm{A}\mathrm{u}(x)$$</p>
-<p>其中，$\mathbb{y} \in \mathbb{R}^{m \times 1}, \mathrm{A} \in \mathbb{R}^{m \times n},  \mathrm{u} \in \mathbb{R}^{n \times 1},\mathbb{x} \in \mathbb{R}^{p \times 1}$。</p>
-<p>属于向量对向量的求导，所以有：<br>$$\frac{\partial y}{\partial x} = \frac{\partial u}{\partial x} \mathrm{A}^{\mathrm{T}}$$</p>
-<p><strong>例子4：</strong></p>
-<p>$$\mathbb{y} = \mathrm{a(x)}\mathrm{u}(x)$$</p>
-<p>其中，$\mathbb{y} \in \mathbb{R}^{m \times 1}, \mathrm{a} \in \mathbb{R},  \mathrm{u} \in \mathbb{R}^{m \times 1},\mathbb{x} \in \mathbb{R}^{n \times 1}$。</p>
-<p>属于向量对向量的求导，所以有：<br>$$\frac{\partial y}{\partial x} = \frac{\partial u}{\partial x} \mathrm{a}+\frac{\partial a}{\partial x} \mathrm{u}^{\mathrm{T}}$$</p>
-<p>假如已知：<br>$$<br>\begin{split}<br>a(x)&amp;=Bx\<br>u(x)&amp;=Cx<br>\end{split}$$</p>
-<p>其中，$\mathrm{B} \in \mathbb{R}^{1 \times n}, \mathrm{C} \in \mathbb{R}^{m \times n}$<br>那么，<br>$$\frac{\partial y}{\partial x} =\mathrm{C}^{\mathrm{T}}\mathrm{a}+\mathrm{B}^{\mathrm{T}}\mathrm{u}^{\mathrm{T}}$$</p>
-<p><strong>例子5：</strong><br>$$\mathrm{f} = \mathbf{x}^{\mathrm{T}}\mathbf{Ay(x)}$$<br>那么，<br>$$\frac{\partial f}{\partial x} =Ay+\frac{\partial y}{\partial x} A^T x$$</p>
-<p>其中，$\mathbf{x}\in\mathbb{R}^{m\times1},\mathbf{y}\in\mathbb{R}^{n\times1},\mathbf{A}\in\mathbb{R}^{m\times n},\mathbf{f}\in\mathbb{R}$。</p>
-<p>上面的式子，当$\mathbb{y(x)}=x$时，也就是$m=n$时。<br>$$<br>\begin{split}<br>&amp;\mathrm{f}&amp; = \mathbf{x}^{\mathrm{T}}\mathrm{A}\mathbf{x}\<br>&amp;\frac{\partial f}{\partial x} &amp;= (A+A^T)x<br>\end{split}$$</p>
-<p><strong>例子6：</strong></p>
-<p>$$\mathbb{f} = \mathbf{a}^{\mbox{T}}\mathbf{xx}^{\mbox{T}}\mathbf{b} ,\mathbf{a,b,x}\in\mathbb{R}^{m\times1}$$</p>
-<p>则<br>$$\frac{\partial f}{\partial x} = a(x^Tb) + b(a^Tx) = (ab^T+ba^T)x $$</p>
-<h1 id="实例">实例</h1><h2 id="SVM的对偶形式转换">SVM的对偶形式转换</h2><p>SVM的原形式（primary form）是：<br>$$<br>\begin{split}<br>&amp;\min_{w,b} \quad &amp;\frac{1}{2} w^Tw\<br>&amp;s.t. &amp; y_n(w^Tx_n+b) \ge1<br>\end{split}$$</p>
-<p>SVM的对偶形式（dual form）是：</p>
-<p>$$\begin{split}<br>&amp;\min_{w,b} \max_{\alpha\ge 0} &amp; \frac{1}{2} w^Tw + \sum_{n=1}^N \alpha_n [1- y_n(w^Tx_n+b)] \<br>&amp;\max_{\alpha\ge 0}  \min_{w,b} &amp;\frac{1}{2} w^Tw + \sum_{n=1}^N \alpha_n [1- y_n(w^Tx_n+b)]\end{split}$$</p>
-<p>上升分别对$w,b$求导后，得到<br>$$\begin{split}<br>w &amp;=  \sum_{n=1}^N \alpha_n y_n x_n\<br> \sum_{n=1}^N  \alpha_n y_n &amp;= 0<br>\end{split}$$</p>
-<p>代入原式中，有<br>$$\begin{split}\min_\alpha  \frac{1}{2}\sum_{n=1}^N&amp;\sum_{m=1}^N \alpha_n \alpha_m y_n y_m {x_m}^T x_n - \sum_{n=1}^N \alpha_n \<br>s.t.  \quad  \sum_{n=1}^N  \alpha_n y_n &amp;= 0 \<br> \alpha_n &amp;\ge 0<br>\end{split}$$</p>
-<p>这个对偶问题，可以用相应的quadprog包求解。其中，$\sum_{n=1}^N\sum_{m=1}^N \alpha_n \alpha_m y_n y_m {x_m}^T x_n$是矩阵$\mathbb{\alpha}^T \mathrm{Q}\mathbb{\alpha}$。$y_n y_m {x_m}^T x_n$是矩阵中m行n列的元素。这个元素再乘以$ \alpha_n \alpha_m $。<br>同时，这个也是$w^Tw$的内积。可以理解为把$w$拆开多项，每一项分别做内积然后相加，就像多次项展开公式一样。</p>
-<h2 id="Soft-SVM对偶形式转换">Soft-SVM对偶形式转换</h2><p>SVM的原形式（primary form）是：<br>$$<br>\begin{split}<br>&amp;\min_{w,b,\varepsilon} \quad &amp;\frac{1}{2} w^Tw + C \sum_{n=1}^N \varepsilon_n \<br>&amp;s.t. &amp; y_n(w^Tx_n+b) \ge1-\varepsilon_n \<br>&amp; &amp;\varepsilon_n \ge 0<br>\end{split}$$</p>
-<p>对偶形式是：<br>$$\begin{split}\min_\alpha  \frac{1}{2}\sum_{n=1}^N&amp;\sum_{m=1}^N \alpha_n \alpha_m y_n y_m {x_m}^T x_n - \sum_{n=1}^N \alpha_n \\<br>s.t.  \quad  \sum_{n=1}^N  \alpha_n y_n &amp;= 0 \\<br>0 \le\alpha_n &amp;\le C<br>\end{split}$$</p>
-<h2 id="线性回归">线性回归</h2><p>原问题是：<br>$${E}_{in} (w) = \frac{1}{N}  \sum_{n=1}^N (w^T x -y)^2=\frac{1}{N} \Vert XW-Y\Vert ^2$$</p>
-<p>当最佳值存在时：<br>$$\nabla E_{in}(w)=\frac{2}{N} X^T(XW-Y)$$</p>
-<p>所以有:<br>$$\begin{split}<br>W &amp;= (X^TX)^{-1} X^TY \\<br>W &amp;=X^\dagger Y<br>\end{split}$$</p>
-<h2 id="logistic回归">logistic回归</h2><p>首先，定义需要的函数：<br>$$\begin{split}<br>\theta(s) &amp;= \frac{e^s}{1+e^s} = \frac{1}{1+e^{-s}} \\<br>h(x)&amp;= \theta(w^Tx)<br>\end{split}$$<br>接着，根据最大似然，并且利用 $1-h(x) = h(-x)$的性质，最大化点出现的概率：<br>$$\begin{split}<br>&amp;\max \prod \theta(y_n w^T x_n) \\<br>&amp;\min \sum_{n=1}^N ln(1+exp(-y_nw^Tx_n))<br>\end{split}$$</p>
-<p>上式对$w$的倒数为0，所以有：</p>
-<p>$$\begin{split}<br>&amp;\min \sum_{n=1}^N ln(1+exp(-y_nw^Tx_n)) \\<br>s.t. &amp; \sum_{n=1}^N \theta(-y_n w^T x_n)(-y_nx_n) = 0<br>\end{split}$$</p>
-<p>下面，可以利用GD或者SGD求解。</p>
-<p><strong>GD:</strong><br>$$\begin{split}<br>\nabla E_{in} (w_t) &amp;= \frac{1}{N} \sum_{n=1}^N \theta(-y_n w^T x_n)(-y_nx_n)   \<br>w_{t+1}&amp;= w_t - \eta \nabla E_{in} (w_t)<br>\end{split}$$</p>
-<p><strong>SGD:</strong></p>
-<p>$$w_{t+1}= w_t -\eta \theta(-y_n w^T x_n)(-y_nx_n)$$</p>
-<h1 id="参考资料">参考资料</h1><ol>
-<li><a href="http://xuehy.github.io/applied\_math/2014/04/18/matrixcalc/" target="_blank" rel="external">闲话矩阵求导</a></li>
-</ol>
+<h1 id="误差角度">误差角度</h1><h2 id="误差函数">误差函数</h2><p>直观的解决思路是最小化训练误差，公式如下：</p>
+<p>$$\min_w \frac{1}{2}\sum_{n=1}^N{ y(x_n,\textbf{w}) -t_n}^2$$</p>
+<h2 id="正则化">正则化</h2><p>上面的方法会遇到过拟合的问题，所以可以加上正则化的参数避免过拟合，改进后的公式如下：</p>
+<p>$$\min_w \frac{1}{2}\sum_{n=1}^N{ y(x_n,\textbf{w}) -t_n}^2+\frac{\lambda}{2} \Vert \textbf{w} \Vert ^2$$</p>
+<h1 id="概率角度">概率角度</h1><h2 id="高斯分布假设">高斯分布假设</h2><p>假设每个点都服从均值不一样方差一样的高斯分布，均值为$ y(x_n,\textbf{w})$，方差为$\beta^{-1}$。那么，每个点的的概率分布是：</p>
+<p>$$p(t|x,\textbf{w},\beta) =N(y(x_n,\textbf{w}),\beta^{-1}) $$</p>
+<h2 id="最大似然估计">最大似然估计</h2><p>为了求出上面的概率分布，首先要求出模型$\textbf{w}$的值，假设每个点之间相互独立，那么似然函数为：</p>
+<p>$$p(\textbf{t}|\textbf{x},\textbf{w},\beta) =\prod_{n=1}^N N(t_n|y(x_n,\textbf{w}),\beta^{-1}) $$</p>
+<p>对上式取log，并最大化，得到：</p>
+<p>$$\max_{\textbf{w}} \ln p(\textbf{t}|\textbf{x},\textbf{w},\beta) =  -\frac{\beta}{2}\sum_{n=1}^N{ y(x_n,\textbf{w}) -t_n}^2 + \frac{N}{2}\ln\beta-\frac{N}{2} \ln (2\pi)$$</p>
+<p>计算$\textbf{w}$只和上式右边的第一项有关，可以看到，最大似然的结果等同于误差函数的结果，也就是MLE等同于sum squared error function。</p>
+<h2 id="最大后验估计">最大后验估计</h2><p>根据MLE，我们可以得到模型$\textbf{w}$的参数，并且可以计算出$p(\textbf{t}|\textbf{x},\textbf{w},\beta)$似然函数进而求得对应点的值，可是这样同样存在过拟合的问题，为了解决这个问题，我们引入了先验估计，并结合似然函数计算出了后验估计。</p>
+<p>假设$\textbf{w}$的先验估计如下：<br>$$p(\textbf{w} | \alpha) = N(\textbf{w}|\textbf{0},\alpha^{-1}\textbf{I})$$</p>
+<p>根据后验估计等于似然函数乘以先验估计，也就是</p>
+<p>$$p(\textbf{w}|\textbf{x},\textbf{t},\alpha,\beta)   \propto $p(\textbf{t}|\textbf{x},\textbf{w},\beta)   p(\textbf{w} | \alpha)$$</p>
+<p>同样适用最大似然估计的方法，不过这里不是作用在似然函数上，而是作用在后验分布上，我们得到：</p>
+<p>$$\min_w \frac{\beta}{2}\sum_{n=1}^N{ y(x_n,\textbf{w}) -t_n}^2+\frac{\alpha}{2} \Vert \textbf{w} \Vert ^2$$</p>
+<p>因此可以看到：</p>
+<ul>
+<li>最大化似然函数等同于最小化SSE。</li>
+<li>最大化后验分布等同于最小化SSE加上regulation。</li>
+</ul>
+<h2 id="贝叶斯">贝叶斯</h2><p>所谓贝叶斯，就是多次重复使用概率中的和规则和积规则。</p>
+<p>为了方便，下文中认为$\alpha,\beta$是固定的，在公式中省略了这两者，公式如下：</p>
+<p>$$p(t|x,\textbf{x,t})  =\int  p(t|x,\textbf{w})  p(\textbf{w}|\textbf{x},\textbf{t}) \textbf{dw}$$</p>
 </span>
       
     </div>
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/SVM/" rel="tag">#SVM</a>
-          
-            <a href="/tags/gredient-descent/" rel="tag">#gredient descent</a>
-          
-            <a href="/tags/linear-regression/" rel="tag">#linear regression</a>
-          
-            <a href="/tags/logistic-regression/" rel="tag">#logistic regression</a>
-          
-            <a href="/tags/stochastic-gradient-descent/" rel="tag">#stochastic gradient descent</a>
-          
-            <a href="/tags/矩阵求导/" rel="tag">#矩阵求导</a>
-          
-        </div>
-      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/11/22/Viruses/" rel="next" title="Viruses">
-                <i class="fa fa-chevron-left"></i> Viruses
+              <a href="/2016/09/19/坦克问题的频率及贝叶斯解释/" rel="next" title="坦克问题的频率及贝叶斯解释">
+                <i class="fa fa-chevron-left"></i> 坦克问题的频率及贝叶斯解释
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2015/11/25/ROC曲线与癌症分类/" rel="prev" title="ROC曲线与癌症分类">
-                ROC曲线与癌症分类 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -468,8 +398,8 @@
         
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2015/11/24/矩阵求导与实例/"
-           data-title="矩阵求导与实例" data-url="http://younggy.com/2015/11/24/矩阵求导与实例/">
+      <div class="ds-thread" data-thread-key="2016/10/28/曲线拟合误差和概率的几种解释/"
+           data-title="曲线拟合误差和概率的几种解释" data-url="http://younggy.com/2016/10/28/曲线拟合误差和概率的几种解释/">
       </div>
     
   </div>
@@ -615,7 +545,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#缘由"><span class="nav-number">1.</span> <span class="nav-text">缘由</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#布局"><span class="nav-number">2.</span> <span class="nav-text">布局</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#求导的类别"><span class="nav-number">3.</span> <span class="nav-text">求导的类别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#从简单的例子说起"><span class="nav-number">4.</span> <span class="nav-text">从简单的例子说起</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实例"><span class="nav-number">5.</span> <span class="nav-text">实例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SVM的对偶形式转换"><span class="nav-number">5.1.</span> <span class="nav-text">SVM的对偶形式转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Soft-SVM对偶形式转换"><span class="nav-number">5.2.</span> <span class="nav-text">Soft-SVM对偶形式转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线性回归"><span class="nav-number">5.3.</span> <span class="nav-text">线性回归</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#logistic回归"><span class="nav-number">5.4.</span> <span class="nav-text">logistic回归</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#误差角度"><span class="nav-number">1.</span> <span class="nav-text">误差角度</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#误差函数"><span class="nav-number">1.1.</span> <span class="nav-text">误差函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正则化"><span class="nav-number">1.2.</span> <span class="nav-text">正则化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#概率角度"><span class="nav-number">2.</span> <span class="nav-text">概率角度</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#高斯分布假设"><span class="nav-number">2.1.</span> <span class="nav-text">高斯分布假设</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最大似然估计"><span class="nav-number">2.2.</span> <span class="nav-text">最大似然估计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最大后验估计"><span class="nav-number">2.3.</span> <span class="nav-text">最大后验估计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#贝叶斯"><span class="nav-number">2.4.</span> <span class="nav-text">贝叶斯</span></a></li></ol></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
