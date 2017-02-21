@@ -35,7 +35,7 @@
 <link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="ROC,confusion matrix," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -51,19 +51,18 @@
 
 
 
-<meta name="description" content="ROC曲线在二分类问题中应用很广，最早可以追溯到二战中用雷达识别海鸥和敌机。本文将阐述ROC曲线、confusion matrix，如何评价二分类问题，最后以癌症分类的例子，讲一讲有时候现实和常识可能不太一样的地方。">
+<meta name="description" content="机器学习、人工智能炙手可热，但是机器到底为什么可以学习呢？本文将从霍夫丁不等式讲到VC维，探究机器学习的原因所在。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ROC曲线与癌症分类">
-<meta property="og:url" content="http://younggy.com/2015/11/25/ROC曲线与癌症分类/index.html">
+<meta property="og:title" content="机器为什么可以学习">
+<meta property="og:url" content="http://younggy.com/2017/02/21/机器为什么可以学习/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="ROC曲线在二分类问题中应用很广，最早可以追溯到二战中用雷达识别海鸥和敌机。本文将阐述ROC曲线、confusion matrix，如何评价二分类问题，最后以癌症分类的例子，讲一讲有时候现实和常识可能不太一样的地方。">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/ROC_curve_MedCalc_Snap17.gif">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/confusionmatrix.png">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/ROC_curve_MedCalc_Snap17.gif">
-<meta property="og:updated_time" content="2016-01-21T07:19:52.349Z">
+<meta property="og:description" content="机器学习、人工智能炙手可热，但是机器到底为什么可以学习呢？本文将从霍夫丁不等式讲到VC维，探究机器学习的原因所在。">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/timg.jpg?imageView/2/w/400">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/QQ%E6%88%AA%E5%9B%BE20170221141300.png">
+<meta property="og:updated_time" content="2017-02-21T07:55:39.196Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ROC曲线与癌症分类">
-<meta name="twitter:description" content="ROC曲线在二分类问题中应用很广，最早可以追溯到二战中用雷达识别海鸥和敌机。本文将阐述ROC曲线、confusion matrix，如何评价二分类问题，最后以癌症分类的例子，讲一讲有时候现实和常识可能不太一样的地方。">
+<meta name="twitter:title" content="机器为什么可以学习">
+<meta name="twitter:description" content="机器学习、人工智能炙手可热，但是机器到底为什么可以学习呢？本文将从霍夫丁不等式讲到VC维，探究机器学习的原因所在。">
 
 
 
@@ -75,7 +74,7 @@
   };
 </script>
 
-  <title> ROC曲线与癌症分类 | YoungGy </title>
+  <title> 机器为什么可以学习 | YoungGy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -256,7 +255,7 @@
             
             
               
-                ROC曲线与癌症分类
+                机器为什么可以学习
               
             
           </h1>
@@ -265,34 +264,19 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2015-11-25T09:47:46+08:00" content="2015-11-25">
-              2015-11-25
+            <time itemprop="dateCreated" datetime="2017-02-21T15:50:39+08:00" content="2017-02-21">
+              2017-02-21
             </time>
           </span>
 
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/机器学习/" itemprop="url" rel="index">
-                    <span itemprop="name">机器学习</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
           
 
           
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2015/11/25/ROC曲线与癌症分类/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/25/ROC曲线与癌症分类/" itemprop="commentsCount"></span>
+                <a href="/2017/02/21/机器为什么可以学习/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/21/机器为什么可以学习/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -311,90 +295,154 @@
       
 
       
-        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/ROC_curve_MedCalc_Snap17.gif" alt="这里写图片描述"></p>
-<p><code>ROC</code>曲线在二分类问题中应用很广，最早可以追溯到二战中用雷达识别海鸥和敌机。<br>本文将阐述<code>ROC</code>曲线、<code>confusion matrix</code>，如何评价二分类问题，最后以癌症分类的例子，讲一讲有时候现实和常识可能不太一样的地方。</p>
+        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/timg.jpg?imageView/2/w/400" alt="这里写图片描述"></p>
+<p>机器学习、人工智能炙手可热，但是机器到底为什么可以学习呢？本文将从霍夫丁不等式讲到VC维，探究机器学习的原因所在。</p>
 <a id="more"></a>
-<h1 id="ROC曲线">ROC曲线</h1><p>ROC(receiver operating characteristic curve)曲线的对象是二分类问题，选择不同的阈值会有不同的分类结果。<br>ROC将不同阈值下的<code>TP rate</code>和<code>FP rate</code>表示在一张图表上，便于直观地看到不同阈值的作用以及分类器本身的作用情况。</p>
-<p><code>Confusion Matrix</code>如下：</p>
-<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/confusionmatrix.png" alt="这里写图片描述"></p>
-<p><code>ROC curve</code>如下，不同的阈值对应着图上不同的点：</p>
-<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/ROC_curve_MedCalc_Snap17.gif" alt="这里写图片描述"></p>
-<hr>
-<p>其中，</p>
-<p>$$\begin{split}<br>\mathrm{Sensitivity} = \mathrm{TPrate}  = \frac{TP}{TP+FN} \<br>\mathrm{Specificity} = \mathrm{FPrate}  = \frac{FP}{FP+TN}<br>\end{split}$$<br>一般认为越靠近左上角分类结果越好（TP rate高，FP rate低）。这表示对于Positive的样本有很大的概率识别出来（TP rate高），同时对Negative的样本有较小的误判几率（FP rate低）。</p>
-<h1 id="二分类问题的评价标准">二分类问题的评价标准</h1><p>最典型的评价标准是<code>AUC</code>，也就是<code>ROC</code>曲线下的面积（<code>baseline model的AUC是0.5</code>）。<br>同时，根据不同分类的严重性不同，也可以定义自己的<code>cost function</code>。</p>
-<h1 id="癌症分类">癌症分类</h1><p>下面举一个癌症分类的例子，你会发现有时候现实和常识往往不一样哦。</p>
+<p>本文的主要内容参考国立台湾大学的《机器学习基石》课程，作者在其基础上进行了部分提炼与整合。</p>
+<h1 id="机器怎么可能学习">机器怎么可能学习</h1><p>机器学习乍听之下很厉害，这时候人就会想，这一个普普通通的死板的机器，怎么会学习呢？<br>很容易地，人们举了个简单的问题（如下图）：$x,y,g,f$分别表示：数据集、数据标签、预测模型、实际的模型。前5行的数据代表已知的，后三行的数据需要机器学习预测模型去预测。</p>
+<p>悲催的是，符合已知的数据的预测模型最多有8种，这8种任选一种，都可以完全符合已知的数据，也都可以完全不符合未知的数据。这么看来，机器确实是学习不到东西的。</p>
+<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/QQ%E6%88%AA%E5%9B%BE20170221141300.png" alt="机器不能学习的例子"></p>
+<h1 id="机器确实可能会学习">机器确实可能会学习</h1><p>假定面前有一个箱子，箱子里面有绿球和黄球，已知黄球的比例是$\mu$，希望通过抽取$N$个样本，学习样本中黄球的比例$v$去逼近$\mu$。</p>
+<p>$\mu,v$满足的关系如下，其中$\epsilon$代表误差限，下面的式子叫做<code>Hoeffding</code>不等式。</p>
+<p>$$\begin{split}<br>&amp;P(|v-\mu| &gt; \epsilon) &amp;\le 2\exp(-2\epsilon^2N) \\<br>&amp;P(|E_{in}-E_{out}| &gt; \epsilon) &amp;\le 2\exp(-2\epsilon^2N)  \\<br>&amp;P(BAD) &amp;\le 2\exp(-2\epsilon^2N)<br>\end{split}$$</p>
+<p>设定一定的误差容忍限$\epsilon$后，需要做到如下的事情机器才可能学习：</p>
+<ul>
+<li>采样样本量$N$足够大</li>
+<li>$E_{in}$足够小</li>
+</ul>
+<p>有了<code>Hoeffding</code>不等式后，我们会想，机器如果有足够大的数据，是不是就可以学习到数据背后的模型，也就实现了机器学习？</p>
+<h1 id="机器为什么可以学习">机器为什么可以学习</h1><h2 id="机器学习的一般模式">机器学习的一般模式</h2><p>在探讨机器为什么可以学习之前，先阐述下机器学习的一般模式。</p>
+<p>一句话阐述如下：算法$A$通过数据$D$和假设集$H$去学习实际模型$f$的估计$g$。</p>
+<p>机器要学习，需要满足这两件事情：</p>
+<ul>
+<li>$E_{in}$小</li>
+<li>$E_{in} \approx E_{out}$</li>
+</ul>
+<h2 id="多次试验与假设集">多次试验与假设集</h2><p>上述的<code>Hoeffding</code>不等式只适用于单次实验，假定假设集是$R^2$上的直线，那么单次实验相当于确定直线为$y=x+1$的时候，$E_{in},E_{out}$的差值受<code>Hoeffding</code>不等式的限制。</p>
+<p>可是，一般情况下，我们的假设集是很大的，$R^2$上的直线包含无限个假设$g$。如果不断尝试假设$g$，视比例$v$为$E_{in}$，那么总会找到对应$E_{in}很小的$$g$。对应计算盒子中黄球的比例$v$很低，那么当取了非常非常多次后，非常大的可能会出现$v=0$（也就是$E_{in}=0$）的情况。可是，这种时候不能说$\mu=0$（也就是$E_{out}=0$）。</p>
+<p>同样的，当假设集的大小是$M$时，$P(BAD)$的上限是$M$个假设$g$的$P(BAD)$的和，所以有：</p>
+<p>$$\begin{split}<br>&amp;P(|E_{in}-E_{out}| &gt; \epsilon) &amp;\le 2M\exp(-2\epsilon^2N)  \\<br>&amp;P(BAD) &amp;\le 2M\exp(-2\epsilon^2N)<br>\end{split}$$</p>
+<p>设定一定的误差容忍限$\epsilon$后，需要做到如下的事情机器才可能学习：</p>
+<ul>
+<li>采样样本量$N$足够大</li>
+<li>$E_{in}$足够小</li>
+<li>$M$不能太大</li>
+</ul>
+<p>这样一来，又一个问题接踵而来，很多假设集（比如$R^2$上直线）的$M$都是无穷的啊，这样的话机器岂不是不能学习？</p>
+<h2 id="M从哪来">M从哪来</h2><p>首先，先来分析下上面式子中的$M$来源于哪里。<br>$M$是假设集中所有$g$的个数，但是以$R^2$上的直线为例，相当多的直线长得差不多，这样$M$中的所有$g$重叠了很大一部分，所以自然而然地引出了一个问题：</p>
+<p>对于一个假设集$H$，有效的$M$是多少呢（揭露下，是$m_H(N)$啦）？</p>
+<h2 id="break_point与VC维">break point与VC维</h2><p>有效的假设集的个数，和假设集的break point关系很大。假设集的break point指的是：不能被假设集打散（shatter）的最小的点的个数。需要注意的是，这里不能被打散是指点的所有分布都不能被打散。</p>
+<p>举个例子，$R^2$上的直线，3个点有可以打散的分布，也有不可以打散的分布；但是4个点的任何分布都是打不散的。所以$R^2$上的直线的break point是4。</p>
+<p>常见的假设集及其break point如下：</p>
 <table>
 <thead>
 <tr>
-<th style="text-align:center">Tables</th>
-<th style="text-align:center">Positive</th>
-<th style="text-align:center">Negative</th>
-<th style="text-align:center">All Row</th>
+<th>假设集</th>
+<th>break point</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">$+$</td>
-<td style="text-align:center">0.0095</td>
-<td style="text-align:center">0.0005</td>
-<td style="text-align:center">0.01</td>
+<td>positive ray</td>
+<td>2</td>
 </tr>
 <tr>
-<td style="text-align:center">$-$</td>
-<td style="text-align:center">0.198</td>
-<td style="text-align:center">0.792</td>
-<td style="text-align:center">0.99</td>
+<td>positive intervals</td>
+<td>3</td>
 </tr>
 <tr>
-<td style="text-align:center">All Column</td>
-<td style="text-align:center">0.2075</td>
-<td style="text-align:center">0.7925</td>
-<td style="text-align:center">1.00</td>
+<td>convex sets</td>
+<td>no</td>
+</tr>
+<tr>
+<td>2D perceptrons</td>
+<td>4</td>
 </tr>
 </tbody>
 </table>
-<p>对上面的<code>confusion matrix</code>简单阐述下：</p>
+<p>break point求出之后，$m_H(n) = O(N^{k-1})$，其增长率受break point的限制。</p>
+<p>VC维是break point-1的值，物理含义是自由参数。</p>
+<p>通过前面的计算，得到了：</p>
+<p>$$\begin{split}<br>&amp;P(|E_{in}-E_{out}| &gt; \epsilon) &amp;\le 2M\exp(-2\epsilon^2N)  \\<br>&amp;P(BAD) &amp;\le 2M\exp(-2\epsilon^2N)<br>\end{split}$$</p>
+<p>稍作变换， 即得到：</p>
+<p>$$\begin{split}<br>&amp;P(|E_{in}-E_{out}| &gt; \epsilon) &amp;\le 4(2N)^{d_{vc}}\exp(-\frac{1}{8}\epsilon^2N)  \\<br>&amp;P(BAD) &amp;\le 4(2N)^{d_{vc}}\exp(-\frac{1}{8}\epsilon^2N)<br>\end{split}$$</p>
+<p>设定一定的误差容忍限$\epsilon$后，需要做到如下的事情机器才可能学习：</p>
 <ul>
-<li>人群中患癌症的概率是$P(+)=0.01$，不患癌症的概率是$P(-)=0.99$</li>
-<li>患癌症的人被检测出来患癌症的概率是$\frac{P(P|+)}{P(+)}=95\%$。</li>
+<li>采样样本量$N$足够大</li>
+<li>$E_{in}$足够小</li>
+<li>VC维不能太大</li>
 </ul>
-<p>那么，问题是如果有一个人被检测出来患癌症，那么他真的患癌症的概率是多少呢？</p>
-<p>想一想，在心里面给一个答案^_^。</p>
-<p>真实的答案是$4.6\%$。  </p>
-<p>$$P(P|+) = \frac{P(P+)}{P(P)}=\frac{0.0095}{0.2075}=4.6\%$$</p>
-<p>有没有觉得跟自己想象的差别很大，$95\%$的<code>TP rate</code>虽然很高，但是也得关注下$20\%$的<code>FP rate</code>，并且人群中不患癌症的占了$99\%$。</p>
-<p>或者换个角度，假如把所有病人都判定为患癌症，那么<code>TP rate</code>是1感觉还不错哦，但是这时候的<code>FP rate</code>是1，也就是把所有不患癌症的都判断患癌症，这不是很好啊。这个时候即使判断你为癌症那么可信度也不高。<br>$$P(P|+) = \frac{P(P+)}{P(P)}=1\%$$</p>
+<p>这样一来，选择合适的假设集，机器学习成为了可能。</p>
+<h1 id="机器什么时候可以学习">机器什么时候可以学习</h1><ul>
+<li>潜在的模式</li>
+<li>没有明确的公式，不容易编程解决</li>
+<li>有关于模式的数据</li>
+</ul>
+<h1 id="机器怎么学习">机器怎么学习</h1><p>最简单的学习方法是PLA，其假设集是$h(x) = sign(w^T x)$。</p>
+<p>其算法核心是：更正错误，迭代提高。</p>
+<ol>
+<li>找到在当前模型参数下$w_t$错误的数据$(x_n,y_n)$，即$sign(w_t^T x_n) \neq y_n$</li>
+<li>更正模型参数，$w_{t+1} = w_t + y_n x_n$</li>
+</ol>
+<p>这样更正的依据是：让$w^Txy&gt;0$，通过每次更正，保证了$w_{t+1}^T x_n y_n \ge w_t ^T x_n y_n$。</p>
+<p>PLA保证如果线性可分，那么最终模型收敛。</p>
+<p>PLA如果线性不可分，则可设定迭代次数，每次获得新的模型，与先前模型比较，选择最优模型。</p>
+<h1 id="如何让机器学得更好">如何让机器学得更好</h1><p>让机器学得更好，可参考如下几点：</p>
+<ul>
+<li>数据预处理</li>
+<li>合适假设集</li>
+<li>特征变换</li>
+<li>特征选择</li>
+<li>处理过拟合</li>
+<li>验证</li>
+<li>核方法</li>
+<li>集合模型</li>
+<li>特征提取</li>
+</ul>
+<h1 id="总结">总结</h1><table>
+<thead>
+<tr>
+<th>理论</th>
+<th>适用范围</th>
+<th>公式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hoeffding</td>
+<td>单假设集</td>
+<td>$P(BAD) \le 2\exp(-2\epsilon^2N)$</td>
+</tr>
+<tr>
+<td>Multi-Bin Hoeffding</td>
+<td>$M$个假设集</td>
+<td>$P(BAD) \le 2M\exp(-2\epsilon^2N)$</td>
+</tr>
+<tr>
+<td>VC</td>
+<td>假设集集合$H$</td>
+<td>$P(BAD) \le 4(2N)^{d_{vc}}\exp(-\frac{1}{8}\epsilon^2N)$</td>
+</tr>
+</tbody>
+</table>
 </span>
       
     </div>
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/ROC/" rel="tag">#ROC</a>
-          
-            <a href="/tags/confusion-matrix/" rel="tag">#confusion matrix</a>
-          
-        </div>
-      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/11/24/矩阵求导与实例/" rel="next" title="矩阵求导与实例">
-                <i class="fa fa-chevron-left"></i> 矩阵求导与实例
+              <a href="/2016/10/28/曲线拟合误差和概率的几种解释/" rel="next" title="曲线拟合误差和概率的几种解释">
+                <i class="fa fa-chevron-left"></i> 曲线拟合误差和概率的几种解释
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2015/11/26/SVD分解及其应用/" rel="prev" title="SVD分解及其应用">
-                SVD分解及其应用 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -444,8 +492,8 @@
         
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2015/11/25/ROC曲线与癌症分类/"
-           data-title="ROC曲线与癌症分类" data-url="http://younggy.com/2015/11/25/ROC曲线与癌症分类/">
+      <div class="ds-thread" data-thread-key="2017/02/21/机器为什么可以学习/"
+           data-title="机器为什么可以学习" data-url="http://younggy.com/2017/02/21/机器为什么可以学习/">
       </div>
     
   </div>
@@ -591,7 +639,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ROC曲线"><span class="nav-number">1.</span> <span class="nav-text">ROC曲线</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二分类问题的评价标准"><span class="nav-number">2.</span> <span class="nav-text">二分类问题的评价标准</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#癌症分类"><span class="nav-number">3.</span> <span class="nav-text">癌症分类</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#机器怎么可能学习"><span class="nav-number">1.</span> <span class="nav-text">机器怎么可能学习</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#机器确实可能会学习"><span class="nav-number">2.</span> <span class="nav-text">机器确实可能会学习</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#机器为什么可以学习"><span class="nav-number">3.</span> <span class="nav-text">机器为什么可以学习</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#机器学习的一般模式"><span class="nav-number">3.1.</span> <span class="nav-text">机器学习的一般模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多次试验与假设集"><span class="nav-number">3.2.</span> <span class="nav-text">多次试验与假设集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#M从哪来"><span class="nav-number">3.3.</span> <span class="nav-text">M从哪来</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#break_point与VC维"><span class="nav-number">3.4.</span> <span class="nav-text">break point与VC维</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#机器什么时候可以学习"><span class="nav-number">4.</span> <span class="nav-text">机器什么时候可以学习</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#机器怎么学习"><span class="nav-number">5.</span> <span class="nav-text">机器怎么学习</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何让机器学得更好"><span class="nav-number">6.</span> <span class="nav-text">如何让机器学得更好</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
