@@ -51,17 +51,17 @@
 
 
 
-<meta name="description" content="曲线拟合是一个经典的问题,本文将从误差和概率的角度探讨如何解决曲线拟合的问题以及这些方法的异同之处。">
+<meta name="description" content="机器学习算法众多，各种算法又涉及较多参数，本文将简要介绍RF，GBDT等算法的调优经验与步骤。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="曲线拟合误差和概率的几种解释">
-<meta property="og:url" content="http://younggy.com/2016/10/28/曲线拟合误差和概率的几种解释/index.html">
+<meta property="og:title" content="机器学习算法调优">
+<meta property="og:url" content="http://younggy.com/2017/02/24/机器学习算法调优/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="曲线拟合是一个经典的问题,本文将从误差和概率的角度探讨如何解决曲线拟合的问题以及这些方法的异同之处。">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Figure1.17.png?imageView/2/w/400">
-<meta property="og:updated_time" content="2017-02-24T03:08:59.767Z">
+<meta property="og:description" content="机器学习算法众多，各种算法又涉及较多参数，本文将简要介绍RF，GBDT等算法的调优经验与步骤。">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/3644f9d01110fa7d9c6dcbfaa1b7bf88.png?imageView/2/w/400">
+<meta property="og:updated_time" content="2017-02-24T03:12:19.394Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="曲线拟合误差和概率的几种解释">
-<meta name="twitter:description" content="曲线拟合是一个经典的问题,本文将从误差和概率的角度探讨如何解决曲线拟合的问题以及这些方法的异同之处。">
+<meta name="twitter:title" content="机器学习算法调优">
+<meta name="twitter:description" content="机器学习算法众多，各种算法又涉及较多参数，本文将简要介绍RF，GBDT等算法的调优经验与步骤。">
 
 
 
@@ -73,7 +73,7 @@
   };
 </script>
 
-  <title> 曲线拟合误差和概率的几种解释 | YoungGy </title>
+  <title> 机器学习算法调优 | YoungGy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -254,7 +254,7 @@
             
             
               
-                曲线拟合误差和概率的几种解释
+                机器学习算法调优
               
             
           </h1>
@@ -263,8 +263,8 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2016-10-28T16:40:16+08:00" content="2016-10-28">
-              2016-10-28
+            <time itemprop="dateCreated" datetime="2017-02-24T11:05:51+08:00" content="2017-02-24">
+              2017-02-24
             </time>
           </span>
 
@@ -273,8 +273,8 @@
               &nbsp; | &nbsp; 分类于
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/数学/" itemprop="url" rel="index">
-                    <span itemprop="name">数学</span>
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
                   </a>
                 </span>
 
@@ -289,8 +289,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/10/28/曲线拟合误差和概率的几种解释/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/28/曲线拟合误差和概率的几种解释/" itemprop="commentsCount"></span>
+                <a href="/2017/02/24/机器学习算法调优/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/24/机器学习算法调优/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -309,43 +309,89 @@
       
 
       
-        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Figure1.17.png?imageView/2/w/400" alt="这里写图片描述"></p>
-<p>曲线拟合是一个经典的问题,本文将从误差和概率的角度探讨如何解决曲线拟合的问题以及这些方法的异同之处。</p>
+        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/3644f9d01110fa7d9c6dcbfaa1b7bf88.png?imageView/2/w/400" alt="这里写图片描述"></p>
+<p>机器学习算法众多，各种算法又涉及较多参数，本文将简要介绍RF，GBDT等算法的调优经验与步骤。</p>
 <a id="more"></a>
-<p>曲线拟合是一个经典的问题，将其数学化后是：已知训练数据$\bf{x}$和对应的目标值$\bf{t}$。通过构建参数为$\bf{w}$的模型，当新的$x$出现，对应的$t$是多少。</p>
-<p>本文将从误差和概率的角度探讨如何解决曲线拟合的问题，具体地，将阐述以下概念：</p>
-<ul>
-<li>误差函数</li>
-<li>正则化</li>
-<li>最大似然估计（MLE）</li>
-<li>最大后验估计（MAP）</li>
-<li>贝叶斯</li>
+<h1 id="BP">BP</h1><h2 id="调优事项">调优事项</h2><ul>
+<li>BP对<code>feature scaling</code>很敏感，要先scale data。</li>
+<li>CV找到最好的正则项系数$\alpha$。</li>
+<li>经验来说，<code>L-BFGS</code>在小数据上收敛更快效果更好；<code>Adam</code>在大数据上表现很好；<code>SGD</code>在参数<code>learning rate</code>调整好的基础效果更好。</li>
 </ul>
-<h1 id="误差角度">误差角度</h1><h2 id="误差函数">误差函数</h2><p>直观的解决思路是最小化训练误差，公式如下：</p>
-<p>$$\min_w \frac{1}{2}\sum_{n=1}^N{ y(x_n,\textbf{w}) -t_n}^2$$</p>
-<h2 id="正则化">正则化</h2><p>上面的方法会遇到过拟合的问题，所以可以加上正则化的参数避免过拟合，改进后的公式如下：</p>
-<p>$$\min_w \frac{1}{2}\sum_{n=1}^N{ y(x_n,\textbf{w}) -t_n}^2+\frac{\lambda}{2} \Vert \textbf{w} \Vert ^2$$</p>
-<h1 id="概率角度">概率角度</h1><h2 id="高斯分布假设">高斯分布假设</h2><p>假设每个点都服从均值不一样方差一样的高斯分布，均值为$ y(x_n,\textbf{w})$，方差为$\beta^{-1}$。那么，每个点的的概率分布是：</p>
-<p>$$p(t|x,\textbf{w},\beta) =N(y(x_n,\textbf{w}),\beta^{-1}) $$</p>
-<h2 id="最大似然估计">最大似然估计</h2><p>为了求出上面的概率分布，首先要求出模型$\textbf{w}$的值，假设每个点之间相互独立，那么似然函数为：</p>
-<p>$$p(\textbf{t}|\textbf{x},\textbf{w},\beta) =\prod_{n=1}^N N(t_n|y(x_n,\textbf{w}),\beta^{-1}) $$</p>
-<p>对上式取log，并最大化，得到：</p>
-<p>$$\max_{\textbf{w}} \ln p(\textbf{t}|\textbf{x},\textbf{w},\beta) =  -\frac{\beta}{2}\sum_{n=1}^N{ y(x_n,\textbf{w}) -t_n}^2 + \frac{N}{2}\ln\beta-\frac{N}{2} \ln (2\pi)$$</p>
-<p>计算$\textbf{w}$只和上式右边的第一项有关，可以看到，最大似然的结果等同于误差函数的结果，也就是MLE等同于sum squared error function。</p>
-<h2 id="最大后验估计">最大后验估计</h2><p>根据MLE，我们可以得到模型$\textbf{w}$的参数，并且可以计算出$p(\textbf{t}|\textbf{x},\textbf{w},\beta)$似然函数进而求得对应点的值，可是这样同样存在过拟合的问题，为了解决这个问题，我们引入了先验估计，并结合似然函数计算出了后验估计。</p>
-<p>假设$\textbf{w}$的先验估计如下：<br>$$p(\textbf{w} | \alpha) = N(\textbf{w}|\textbf{0},\alpha^{-1}\textbf{I})$$</p>
-<p>根据后验估计等于似然函数乘以先验估计，也就是</p>
-<p>$$p(\textbf{w}|\textbf{x},\textbf{t},\alpha,\beta)   \propto $p(\textbf{t}|\textbf{x},\textbf{w},\beta)   p(\textbf{w} | \alpha)$$</p>
-<p>同样适用最大似然估计的方法，不过这里不是作用在似然函数上，而是作用在后验分布上，我们得到：</p>
-<p>$$\min_w \frac{\beta}{2}\sum_{n=1}^N{ y(x_n,\textbf{w}) -t_n}^2+\frac{\alpha}{2} \Vert \textbf{w} \Vert ^2$$</p>
-<p>因此可以看到：</p>
-<ul>
-<li>最大化似然函数等同于最小化SSE。</li>
-<li>最大化后验分布等同于最小化SSE加上regulation。</li>
+<h2 id="调参">调参</h2><ol>
+<li>根据数据集大小选择合适的算法。<code>L-BFGS</code>适合小数据，<code>Adam</code>适合大数据。<code>SGD</code>更好不过得调到适合的参数。</li>
+<li>固定网络结构和学习率，画出学习曲线。</li>
+<li>如果学习曲线不稳定，那么减少学习率；如果学习曲线变化很慢，那么增大学习率。</li>
+<li>如果学习曲线发现过拟合，那么提前终止或加大正则系数或减少模型复杂度；如果学习曲线欠拟合，那么多迭代或减少正则项系数或增大模型复杂度。</li>
+</ol>
+<h1 id="LR">LR</h1><h2 id="参数">参数</h2><ul>
+<li>$C$：正则项$\lambda$的倒数，越小模型越简单。</li>
+<li>learning_rate</li>
 </ul>
-<h2 id="贝叶斯">贝叶斯</h2><p>所谓贝叶斯，就是多次重复使用概率中的和规则和积规则。</p>
-<p>为了方便，下文中认为$\alpha,\beta$是固定的，在公式中省略了这两者，公式如下：</p>
-<p>$$p(t|x,\textbf{x,t})  =\int  p(t|x,\textbf{w})  p(\textbf{w}|\textbf{x},\textbf{t}) \textbf{dw}$$</p>
+<h2 id="调优事项-1">调优事项</h2><ul>
+<li>sklearn中的<code>LogisticRegression</code>没有使用SGD，用的是一些<code>solver</code>，所以没有learning_rate。</li>
+<li>sklearn中<code>SGDClassifier</code>适合对线性模型（SVM、逻辑回归）用SGD优化，常调的参数有<code>learning_rate</code>和<code>alpha</code>。</li>
+</ul>
+<h2 id="调参-1">调参</h2><p>grid search cross validation</p>
+<h1 id="SVM">SVM</h1><h2 id="参数-1">参数</h2><p>$\gamma$越大，单个训练数据（SV）影响越小（只有靠近SV的才可以影响），只能影响到自己周围的小区域，这样可能需要更多的SV，模型复杂度升高。<br>$C$越大，模型为了不犯错，不得不变得更复杂，模型复杂度升高。</p>
+<ul>
+<li>$\gamma$：单个训练数据（SV）影响距离大小，因为高斯核是$\exp(-\gamma||x-x_n||^2)$，所以$\gamma$越小，单个训练数据（SV）影响越大。$\gamma$可以看做是SV影响半径的倒数。</li>
+<li>$C$：$C$参数在模型的复杂度与模型的正确率之间做权衡。如果$C$很大，那么模型可能会变得很复杂以尽量减少分类错误，可能会过拟合；如果$C$很小，那么模型可能会很简单以至于在训练集上效果不好。</li>
+</ul>
+<h2 id="调优事项-2">调优事项</h2><ul>
+<li>$10^{-3}$至$10^{3}$的log grid的调参区间便已足够</li>
+<li>模型非常受$\gamma$参数的影响，当$\gamma$很大，那么SV的影响半径就很小，只能影响到它自己，这样很容易过拟合。这种情况下即使改变$C$也无济于事。</li>
+<li>当$\gamma$很小，模型太受限了不能够捕捉到复杂的形状。每个SV的影响半径扩大以至于包含了整个训练集，这样模型就很简单，原因类似KNN中K很大。</li>
+<li>$\gamma，C$的最优组合一般在分布的对角线上，选择较平滑的模型（低$\gamma$），通过增大SV的数量（高$C$）就可以实现很好的效果。</li>
+<li>$\gamma$不可过大，否则调$C$也是没用的。</li>
+</ul>
+<h2 id="调参-2">调参</h2><p>grid search cross validation</p>
+<h1 id="RF">RF</h1><h2 id="参数-2">参数</h2><p>RF的参数主要涉及两部分：</p>
+<ul>
+<li>树参数：max depth、min_samples_split、min_samples_leaf、max_features</li>
+<li>bagging参数：n_estimators</li>
+</ul>
+<h2 id="调优事项-3">调优事项</h2><ul>
+<li>RF模型的子模型都有较低的bias（树深到头），整体模型的目标是降低variance，所以需要增大树的数目。同时降低子模型之间的相关度有助于降低variance，所以max_feature的值一般设置成特征数目的平方根。</li>
+<li><code>max_features</code>默认<code>sqrt</code>，一般设置地小一些。减少<code>max_features</code>有利于减少不同树的相关度，减少最终模型的variance，但是增加了单个模型的bias。</li>
+<li><code>max_features</code>的选择和数据质量也有关系，如果数据质量很差的话，小的<code>max_features</code>可能split的时候选错了feature因此很有可能影响最终的模型。</li>
+</ul>
+<h2 id="调参-3">调参</h2><ol>
+<li><code>max_features</code>是首要的调参参数，大概300个树的时候通过CV找到最优的<code>max_features</code></li>
+<li>调整<code>max_depth</code></li>
+<li>调整<code>n_estimators</code>，一般来说越大越好，调整到验证集上的精度提高不多就可。</li>
+</ol>
+<h1 id="GBDT">GBDT</h1><h2 id="参数-3">参数</h2><p>GBDT设计到的参数主要有三部分：</p>
+<ul>
+<li>树参数：max_depth（max_leaf_nodes）、min_samples_split（min_weight_fraction_leaf）、min_samples_leaf、max_features</li>
+<li>boost参数：learning_rate、n_estimators、subsample</li>
+<li>其他参数：loss、init、random_state、verbose、warm_start、presort</li>
+</ul>
+<p>一般调整的参数有：</p>
+<ul>
+<li>树参数：max_depth、min_samples_split、min_samples_leaf、max_features</li>
+<li>boost参数：learning_rate、n_estimators</li>
+</ul>
+<h2 id="调优事项-4">调优事项</h2><ul>
+<li>与RF相比，GBDT不仅降低了variance（多棵树的组合），而且降低了bias（对错误的数据去训练）。其主要目的是通过树的组合降低bias。每个子模型的bias很大但是variance很小。</li>
+<li>对于树的参数，RF主要调的是max_features，其目的是增加子模型间的随机性达到降低整体模型variance的作用。对于GBDT，首要目的是降低bias，所以比较关注<code>max_depth</code>之类的参数，通过调整增大子模型的复杂度降低子模型的bias从而降低整体模型的bias。</li>
+<li>GBDT如果一直进行下去，肯定也会过拟合的，只不过基本分类器很弱，所以GBDT的抗过拟合的能力很强。</li>
+<li>没有最佳的学习率，学习率越低越好，只要有足够多的树。</li>
+<li>如果学习率很低，树很多，那么时间上的开销就会很大。</li>
+</ul>
+<h2 id="调优策略">调优策略</h2><p>讲调优策略之前，先对一些值做下初始化：</p>
+<ul>
+<li>max_depth：一般选的小点，避免分类器太强，5-8即可。</li>
+<li>min_samples_split：根据数据大小选，选择数据量的1%即可。</li>
+<li>min_samples_leaf：根据数据与直觉选。</li>
+<li>max_features：一般选<code>sqrt</code>。</li>
+<li>subsample：一般选0.8。</li>
+</ul>
+<p>每次调优的方法都是<code>grid search</code>，评价参数好坏的标准是<code>cv score</code>。</p>
+<ol>
+<li>先对boosting参数调优，包括<code>learning_rate</code>和<code>n_estimators</code>。一般，、<code>learning_rate</code>值在0.05-2，<code>n_estimators</code>在30-80较好。如果<code>n_estimators</code>过大那么增大<code>learning_rate</code>，反之减少<code>learning_rate</code>。</li>
+<li>对树的参数在初始化周围调优，调优顺序是<code>max_depth</code>、<code>min_samples_split</code>、<code>min_samples_leaf</code>、<code>max_features</code>、，可视计算能力分步调优或组合参数调优。</li>
+<li>确定最优的参数组合，然后降低<code>learning_rate</code>，增加同样倍数的<code>n_estimators</code>，直到计算能力到达极限或验证集上模型的提升很小。</li>
+</ol>
 </span>
       
     </div>
@@ -357,17 +403,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/09/19/坦克问题的频率及贝叶斯解释/" rel="next" title="坦克问题的频率及贝叶斯解释">
-                <i class="fa fa-chevron-left"></i> 坦克问题的频率及贝叶斯解释
+              <a href="/2017/02/21/机器为什么可以学习/" rel="next" title="机器为什么可以学习">
+                <i class="fa fa-chevron-left"></i> 机器为什么可以学习
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/02/21/机器为什么可以学习/" rel="prev" title="机器为什么可以学习">
-                机器为什么可以学习 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -417,8 +459,8 @@
         
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/10/28/曲线拟合误差和概率的几种解释/"
-           data-title="曲线拟合误差和概率的几种解释" data-url="http://younggy.com/2016/10/28/曲线拟合误差和概率的几种解释/">
+      <div class="ds-thread" data-thread-key="2017/02/24/机器学习算法调优/"
+           data-title="机器学习算法调优" data-url="http://younggy.com/2017/02/24/机器学习算法调优/">
       </div>
     
   </div>
@@ -564,7 +606,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#误差角度"><span class="nav-number">1.</span> <span class="nav-text">误差角度</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#误差函数"><span class="nav-number">1.1.</span> <span class="nav-text">误差函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正则化"><span class="nav-number">1.2.</span> <span class="nav-text">正则化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#概率角度"><span class="nav-number">2.</span> <span class="nav-text">概率角度</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#高斯分布假设"><span class="nav-number">2.1.</span> <span class="nav-text">高斯分布假设</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最大似然估计"><span class="nav-number">2.2.</span> <span class="nav-text">最大似然估计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最大后验估计"><span class="nav-number">2.3.</span> <span class="nav-text">最大后验估计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#贝叶斯"><span class="nav-number">2.4.</span> <span class="nav-text">贝叶斯</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#BP"><span class="nav-number">1.</span> <span class="nav-text">BP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#调优事项"><span class="nav-number">1.1.</span> <span class="nav-text">调优事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调参"><span class="nav-number">1.2.</span> <span class="nav-text">调参</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LR"><span class="nav-number">2.</span> <span class="nav-text">LR</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#参数"><span class="nav-number">2.1.</span> <span class="nav-text">参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调优事项-1"><span class="nav-number">2.2.</span> <span class="nav-text">调优事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调参-1"><span class="nav-number">2.3.</span> <span class="nav-text">调参</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SVM"><span class="nav-number">3.</span> <span class="nav-text">SVM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#参数-1"><span class="nav-number">3.1.</span> <span class="nav-text">参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调优事项-2"><span class="nav-number">3.2.</span> <span class="nav-text">调优事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调参-2"><span class="nav-number">3.3.</span> <span class="nav-text">调参</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RF"><span class="nav-number">4.</span> <span class="nav-text">RF</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#参数-2"><span class="nav-number">4.1.</span> <span class="nav-text">参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调优事项-3"><span class="nav-number">4.2.</span> <span class="nav-text">调优事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调参-3"><span class="nav-number">4.3.</span> <span class="nav-text">调参</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GBDT"><span class="nav-number">5.</span> <span class="nav-text">GBDT</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#参数-3"><span class="nav-number">5.1.</span> <span class="nav-text">参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调优事项-4"><span class="nav-number">5.2.</span> <span class="nav-text">调优事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调优策略"><span class="nav-number">5.3.</span> <span class="nav-text">调优策略</span></a></li></ol></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
