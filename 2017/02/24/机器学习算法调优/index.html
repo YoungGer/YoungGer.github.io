@@ -58,7 +58,7 @@
 <meta property="og:site_name" content="YoungGy">
 <meta property="og:description" content="机器学习算法众多，各种算法又涉及较多参数，本文将简要介绍RF，GBDT等算法的调优经验与步骤。">
 <meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/3644f9d01110fa7d9c6dcbfaa1b7bf88.png?imageView/2/w/400">
-<meta property="og:updated_time" content="2017-02-24T03:12:19.394Z">
+<meta property="og:updated_time" content="2017-02-25T07:34:57.144Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="机器学习算法调优">
 <meta name="twitter:description" content="机器学习算法众多，各种算法又涉及较多参数，本文将简要介绍RF，GBDT等算法的调优经验与步骤。">
@@ -314,12 +314,12 @@
 <a id="more"></a>
 <h1 id="BP">BP</h1><h2 id="调优事项">调优事项</h2><ul>
 <li>BP对<code>feature scaling</code>很敏感，要先scale data。</li>
-<li>CV找到最好的正则项系数$\alpha$。</li>
 <li>经验来说，<code>L-BFGS</code>在小数据上收敛更快效果更好；<code>Adam</code>在大数据上表现很好；<code>SGD</code>在参数<code>learning rate</code>调整好的基础效果更好。</li>
 </ul>
 <h2 id="调参">调参</h2><ol>
-<li>根据数据集大小选择合适的算法。<code>L-BFGS</code>适合小数据，<code>Adam</code>适合大数据。<code>SGD</code>更好不过得调到适合的参数。</li>
-<li>固定网络结构和学习率，画出学习曲线。</li>
+<li>首先隐含层个数。一般来说，如果问题线性可分，那么不用隐含层就行；对于绝大多数问题，一个隐含层的效果就很好；多个隐含层的话训练起来更困难一些（需要用到自编码器或者RBM去预训练而且训练参数增长很快）。</li>
+<li>接下来确定隐含层的神经元个数，一般来说，神经元个数在输出层和输出层神经元个数之间比较好。可以通过CV确定合适的神经元个数。同时也可以先增大下神经元的个数，然后通过pruning减少神经元个数。pruning的原理是在神经网络训练的时候主动把没什么用的神经元去掉，没什么用的神经元的特征就是其连接的w很小，所以我们可以得到神经网络后看看W的权重矩阵再决定是否要删除部分神经元。</li>
+<li>画出学习曲线。</li>
 <li>如果学习曲线不稳定，那么减少学习率；如果学习曲线变化很慢，那么增大学习率。</li>
 <li>如果学习曲线发现过拟合，那么提前终止或加大正则系数或减少模型复杂度；如果学习曲线欠拟合，那么多迭代或减少正则项系数或增大模型复杂度。</li>
 </ol>
@@ -329,7 +329,8 @@
 </ul>
 <h2 id="调优事项-1">调优事项</h2><ul>
 <li>sklearn中的<code>LogisticRegression</code>没有使用SGD，用的是一些<code>solver</code>，所以没有learning_rate。</li>
-<li>sklearn中<code>SGDClassifier</code>适合对线性模型（SVM、逻辑回归）用SGD优化，常调的参数有<code>learning_rate</code>和<code>alpha</code>。</li>
+<li>sklearn中<code>SGDClassifier</code>适合对线性模型（SVM、逻辑回归）用SGD优化，常调的参数有<code>learning_rate</code>和<code>alpha</code>，SGD的速度更快一些。</li>
+<li>sklearn中有<code>LogisticRegressionCV</code>，可以实现更快的CV。适合调整正则项惩罚权重的算法。</li>
 </ul>
 <h2 id="调参-1">调参</h2><p>grid search cross validation</p>
 <h1 id="SVM">SVM</h1><h2 id="参数-1">参数</h2><p>$\gamma$越大，单个训练数据（SV）影响越小（只有靠近SV的才可以影响），只能影响到自己周围的小区域，这样可能需要更多的SV，模型复杂度升高。<br>$C$越大，模型为了不犯错，不得不变得更复杂，模型复杂度升高。</p>
