@@ -51,17 +51,22 @@
 
 
 
-<meta name="description" content="曲线拟合是一个经典的问题,本文将从误差和概率的角度探讨如何解决曲线拟合的问题以及这些方法的异同之处。">
+<meta name="description" content="机器学习的数学本质上是优化问题的求解，求解优化问题首先得构造相应优化问题的损失函数，本文将简要介绍squared loss、cross entropy、hinge loss、exponential loss损失函数。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="曲线拟合误差和概率的几种解释">
-<meta property="og:url" content="http://younggy.com/2016/10/28/曲线拟合误差和概率的几种解释/index.html">
+<meta property="og:title" content="机器学习中的损失函数">
+<meta property="og:url" content="http://younggy.com/2017/02/27/机器学习中的损失函数/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="曲线拟合是一个经典的问题,本文将从误差和概率的角度探讨如何解决曲线拟合的问题以及这些方法的异同之处。">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Figure1.17.png?imageView/2/w/400">
-<meta property="og:updated_time" content="2017-02-24T03:08:59.767Z">
+<meta property="og:description" content="机器学习的数学本质上是优化问题的求解，求解优化问题首先得构造相应优化问题的损失函数，本文将简要介绍squared loss、cross entropy、hinge loss、exponential loss损失函数。">
+<meta property="og:image" content="http://img.blog.csdn.net/20170227104033520?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170227094920303?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170227095722634?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170227100716365?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170227103901581?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170227104033520?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-02-27T03:03:21.801Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="曲线拟合误差和概率的几种解释">
-<meta name="twitter:description" content="曲线拟合是一个经典的问题,本文将从误差和概率的角度探讨如何解决曲线拟合的问题以及这些方法的异同之处。">
+<meta name="twitter:title" content="机器学习中的损失函数">
+<meta name="twitter:description" content="机器学习的数学本质上是优化问题的求解，求解优化问题首先得构造相应优化问题的损失函数，本文将简要介绍squared loss、cross entropy、hinge loss、exponential loss损失函数。">
 
 
 
@@ -73,7 +78,7 @@
   };
 </script>
 
-  <title> 曲线拟合误差和概率的几种解释 | YoungGy </title>
+  <title> 机器学习中的损失函数 | YoungGy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -254,7 +259,7 @@
             
             
               
-                曲线拟合误差和概率的几种解释
+                机器学习中的损失函数
               
             
           </h1>
@@ -263,8 +268,8 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2016-10-28T16:40:16+08:00" content="2016-10-28">
-              2016-10-28
+            <time itemprop="dateCreated" datetime="2017-02-27T10:55:35+08:00" content="2017-02-27">
+              2017-02-27
             </time>
           </span>
 
@@ -273,8 +278,8 @@
               &nbsp; | &nbsp; 分类于
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/数学/" itemprop="url" rel="index">
-                    <span itemprop="name">数学</span>
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
                   </a>
                 </span>
 
@@ -289,8 +294,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/10/28/曲线拟合误差和概率的几种解释/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/28/曲线拟合误差和概率的几种解释/" itemprop="commentsCount"></span>
+                <a href="/2017/02/27/机器学习中的损失函数/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/27/机器学习中的损失函数/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -309,43 +314,59 @@
       
 
       
-        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Figure1.17.png?imageView/2/w/400" alt="这里写图片描述"></p>
-<p>曲线拟合是一个经典的问题,本文将从误差和概率的角度探讨如何解决曲线拟合的问题以及这些方法的异同之处。</p>
+        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20170227104033520?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>机器学习的数学本质上是优化问题的求解，求解优化问题首先得构造相应优化问题的损失函数，本文将简要介绍squared loss、cross entropy、hinge loss、exponential loss损失函数。</p>
 <a id="more"></a>
-<p>曲线拟合是一个经典的问题，将其数学化后是：已知训练数据$\bf{x}$和对应的目标值$\bf{t}$。通过构建参数为$\bf{w}$的模型，当新的$x$出现，对应的$t$是多少。</p>
-<p>本文将从误差和概率的角度探讨如何解决曲线拟合的问题，具体地，将阐述以下概念：</p>
+<h1 id="机器学习三方面">机器学习三方面</h1><p>机器学习问题，大致包含这是哪个方面：</p>
 <ul>
-<li>误差函数</li>
-<li>正则化</li>
-<li>最大似然估计（MLE）</li>
-<li>最大后验估计（MAP）</li>
-<li>贝叶斯</li>
+<li>模型：建立什么样的模型</li>
+<li>目标：怎么定义最大化或最小化的目标函数</li>
+<li>算法：怎么求解最大或最小化目标函数的优化问题</li>
 </ul>
-<h1 id="误差角度">误差角度</h1><h2 id="误差函数">误差函数</h2><p>直观的解决思路是最小化训练误差，公式如下：</p>
-<p>$$\min_w \frac{1}{2}\sum_{n=1}^N{ y(x_n,\textbf{w}) -t_n}^2$$</p>
-<h2 id="正则化">正则化</h2><p>上面的方法会遇到过拟合的问题，所以可以加上正则化的参数避免过拟合，改进后的公式如下：</p>
-<p>$$\min_w \frac{1}{2}\sum_{n=1}^N{ y(x_n,\textbf{w}) -t_n}^2+\frac{\lambda}{2} \Vert \textbf{w} \Vert ^2$$</p>
-<h1 id="概率角度">概率角度</h1><h2 id="高斯分布假设">高斯分布假设</h2><p>假设每个点都服从均值不一样方差一样的高斯分布，均值为$ y(x_n,\textbf{w})$，方差为$\beta^{-1}$。那么，每个点的的概率分布是：</p>
-<p>$$p(t|x,\textbf{w},\beta) =N(y(x_n,\textbf{w}),\beta^{-1}) $$</p>
-<h2 id="最大似然估计">最大似然估计</h2><p>为了求出上面的概率分布，首先要求出模型$\textbf{w}$的值，假设每个点之间相互独立，那么似然函数为：</p>
-<p>$$p(\textbf{t}|\textbf{x},\textbf{w},\beta) =\prod_{n=1}^N N(t_n|y(x_n,\textbf{w}),\beta^{-1}) $$</p>
-<p>对上式取log，并最大化，得到：</p>
-<p>$$\max_{\textbf{w}} \ln p(\textbf{t}|\textbf{x},\textbf{w},\beta) =  -\frac{\beta}{2}\sum_{n=1}^N{ y(x_n,\textbf{w}) -t_n}^2 + \frac{N}{2}\ln\beta-\frac{N}{2} \ln (2\pi)$$</p>
-<p>计算$\textbf{w}$只和上式右边的第一项有关，可以看到，最大似然的结果等同于误差函数的结果，也就是MLE等同于sum squared error function。</p>
-<h2 id="最大后验估计">最大后验估计</h2><p>根据MLE，我们可以得到模型$\textbf{w}$的参数，并且可以计算出$p(\textbf{t}|\textbf{x},\textbf{w},\beta)$似然函数进而求得对应点的值，可是这样同样存在过拟合的问题，为了解决这个问题，我们引入了先验估计，并结合似然函数计算出了后验估计。</p>
-<p>假设$\textbf{w}$的先验估计如下：<br>$$p(\textbf{w} | \alpha) = N(\textbf{w}|\textbf{0},\alpha^{-1}\textbf{I})$$</p>
-<p>根据后验估计等于似然函数乘以先验估计，也就是</p>
-<p>$$p(\textbf{w}|\textbf{x},\textbf{t},\alpha,\beta)   \propto $p(\textbf{t}|\textbf{x},\textbf{w},\beta)   p(\textbf{w} | \alpha)$$</p>
-<p>同样适用最大似然估计的方法，不过这里不是作用在似然函数上，而是作用在后验分布上，我们得到：</p>
-<p>$$\min_w \frac{\beta}{2}\sum_{n=1}^N{ y(x_n,\textbf{w}) -t_n}^2+\frac{\alpha}{2} \Vert \textbf{w} \Vert ^2$$</p>
-<p>因此可以看到：</p>
+<p>举个例子：</p>
 <ul>
-<li>最大化似然函数等同于最小化SSE。</li>
-<li>最大化后验分布等同于最小化SSE加上regulation。</li>
+<li>逻辑回归。模型是$y=\theta(wx)$；通过最大似然（MLE）构造目标函数；通过SGD求解目标函数。</li>
+<li>线性回归。模型是$y=wx$；通过最小二乘构建目标函数；通过求解最小二乘得到优化问题的闭解。</li>
 </ul>
-<h2 id="贝叶斯">贝叶斯</h2><p>所谓贝叶斯，就是多次重复使用概率中的和规则和积规则。</p>
-<p>为了方便，下文中认为$\alpha,\beta$是固定的，在公式中省略了这两者，公式如下：</p>
-<p>$$p(t|x,\textbf{x,t})  =\int  p(t|x,\textbf{w})  p(\textbf{w}|\textbf{x},\textbf{t}) \textbf{dw}$$</p>
+<p>机器学习的目的，就是在确定好模型（假设集）的前提下，构建目标函数构建优化问题，然后通过优化算法求解模型的最优参数，通常可以表达成如下式子：</p>
+<p>$$\theta = \arg\min_{\theta} \frac{1}{N} \sum_{i=1}^N L(y_i, f(x_i, \theta)) + \lambda \phi(\theta)$$</p>
+<p>式子左边表示经验风险函数，损失函数是其核心部分；式子右边是正则项。式子整体是结构风险函数，其由经验风险函数和正则项组成。</p>
+<h1 id="损失函数">损失函数</h1><h2 id="交叉熵（逻辑回归）">交叉熵（逻辑回归）</h2><p>逻辑回归的经验风险函数如下：</p>
+<p>$$E_{in} = \frac{1}{N} \sum_{i=1}^N \log(1+\exp(-y_n w^T x_n)) $$</p>
+<p>其损失函数叫做交叉熵：</p>
+<p>$$L(y_n, x_n, w) = \log(1+\exp(-y_n w^T x_n)$$</p>
+<p>其函数图像如下（横坐标轴代表$ys$，即$yw^Tx$）：</p>
+<p><img src="http://img.blog.csdn.net/20170227094920303?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="平方损失函数（最小二乘）">平方损失函数（最小二乘）</h2><p>最小二乘的经验风险函数如下：</p>
+<p>$$E_{in} = \frac{1}{N} \sum_{i=1}^N (y_n-w^T x_n)^2 $$</p>
+<p>其损失函数为平方损失函数：</p>
+<p>$$L(y_n, x_n, w) =(y_n-w^T x_n)^2$$</p>
+<p>其函数图像如下（横坐标轴代表$ys$，即$yw^Tx$）：</p>
+<p><img src="http://img.blog.csdn.net/20170227095722634?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="Hinge损失函数（SVM）">Hinge损失函数（SVM）</h2><p>软间隔的SVM有如下表示：</p>
+<p>$$\begin{split}<br>&amp;\min _{b,w,\xi}\frac{1}{2} w^Tw + C\sum_{n=1}^N \xi_n \\<br>s.t. &amp;y_n(w^Tx_n +b) \ge 1-\xi_n,\xi_n \ge 0<br>\end{split}$$</p>
+<p>将约束条件放到最小化的式子中得到软间隔SVM的结构风险函数：<br>$$\min _{b,w,\xi}\frac{1}{2} w^Tw + C\sum_{n=1}^N \max(0,1-y_n(w^Tx_n +b))$$</p>
+<p>软间隔SVM的损失函数为Hinge损失函数：</p>
+<p>$$L(y_n, x_n, w,b) = \max(0,1-y_n(w^Tx_n +b))$$</p>
+<p>其图像为：</p>
+<p><img src="http://img.blog.csdn.net/20170227100716365?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="指数损失函数（AdaBoost）">指数损失函数（AdaBoost）</h2><p>在AdaBoost中，数据权重的更新方式为：</p>
+<p>$$\begin{split}<br>u_n^{(t+1)} &amp;= u_n^{(t)} \Diamond^{-y_n g_t(x_n)} \\<br>u_n^{(t+1)} &amp;= u_n^{(t)} \exp(-y_n \alpha_t g_t(x_n)) \\<br>u_n^{(T+1)} &amp;= \frac{1}{N} \exp(-y_n \sum_{t=1}^T\alpha_t g_t(x_n))  \\<br>\sum_{n=1}^N u_n^{(T+1)} &amp;= \frac{1}{N} \sum_{n=1}^N \exp(-y_n \sum_{t=1}^T\alpha_t g_t(x_n))<br>\end{split}$$</p>
+<p>AdaBoost的训练的目标就是减少$\sum_{n=1}^N u_n^{(T+1)} $，因此其风险函数为：</p>
+<p>$$ \frac{1}{N} \sum_{n=1}^N \exp(-y_n \sum_{t=1}^T\alpha_t g_t(x_n))$$</p>
+<p>其损失函数为：</p>
+<p>$$L(y_n, x_n, \alpha, g) =\exp(-y_n \sum_{t=1}^T\alpha_t g_t(x_n))$$</p>
+<p>其损失函数的图像为：</p>
+<p><img src="http://img.blog.csdn.net/20170227103901581?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h1 id="对比与总结">对比与总结</h1><p><img src="http://img.blog.csdn.net/20170227104033520?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<ul>
+<li>01 loss是最本质的分类损失函数，但是这个函数不易求导，在模型的训练不常用，通常用于模型的评价。</li>
+<li>squared loss方便求导，缺点是当分类正确的时候随着$ys$的增大损失函数也增大。</li>
+<li>cross entropy方便求导，逼近01 loss。</li>
+<li>Hinge Loss当$ys \ge 1$，损失为0，对应分类正确的情况；当$ys &lt;1$时，损失与$ys$成正比，对应分类不正确的情况（软间隔中的松弛变量）。</li>
+<li>exponential loss方便求导，逼近01 loss。</li>
+<li>squared loss， cross entropy，exponential loss以及hinge loss的左侧都是凸函数，方便求导有利于优化问题的求解；同时这些loss函数都是01 error的上界，可以通过减少loss来实现01问题的求解，即求解分类问题。</li>
+</ul>
 </span>
       
     </div>
@@ -357,17 +378,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/09/19/坦克问题的频率及贝叶斯解释/" rel="next" title="坦克问题的频率及贝叶斯解释">
-                <i class="fa fa-chevron-left"></i> 坦克问题的频率及贝叶斯解释
+              <a href="/2017/02/24/机器学习算法调优/" rel="next" title="机器学习算法调优">
+                <i class="fa fa-chevron-left"></i> 机器学习算法调优
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/02/21/机器为什么可以学习/" rel="prev" title="机器为什么可以学习">
-                机器为什么可以学习 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -417,8 +434,8 @@
         
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/10/28/曲线拟合误差和概率的几种解释/"
-           data-title="曲线拟合误差和概率的几种解释" data-url="http://younggy.com/2016/10/28/曲线拟合误差和概率的几种解释/">
+      <div class="ds-thread" data-thread-key="2017/02/27/机器学习中的损失函数/"
+           data-title="机器学习中的损失函数" data-url="http://younggy.com/2017/02/27/机器学习中的损失函数/">
       </div>
     
   </div>
@@ -564,7 +581,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#误差角度"><span class="nav-number">1.</span> <span class="nav-text">误差角度</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#误差函数"><span class="nav-number">1.1.</span> <span class="nav-text">误差函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正则化"><span class="nav-number">1.2.</span> <span class="nav-text">正则化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#概率角度"><span class="nav-number">2.</span> <span class="nav-text">概率角度</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#高斯分布假设"><span class="nav-number">2.1.</span> <span class="nav-text">高斯分布假设</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最大似然估计"><span class="nav-number">2.2.</span> <span class="nav-text">最大似然估计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最大后验估计"><span class="nav-number">2.3.</span> <span class="nav-text">最大后验估计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#贝叶斯"><span class="nav-number">2.4.</span> <span class="nav-text">贝叶斯</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#机器学习三方面"><span class="nav-number">1.</span> <span class="nav-text">机器学习三方面</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#损失函数"><span class="nav-number">2.</span> <span class="nav-text">损失函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#交叉熵（逻辑回归）"><span class="nav-number">2.1.</span> <span class="nav-text">交叉熵（逻辑回归）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#平方损失函数（最小二乘）"><span class="nav-number">2.2.</span> <span class="nav-text">平方损失函数（最小二乘）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hinge损失函数（SVM）"><span class="nav-number">2.3.</span> <span class="nav-text">Hinge损失函数（SVM）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指数损失函数（AdaBoost）"><span class="nav-number">2.4.</span> <span class="nav-text">指数损失函数（AdaBoost）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#对比与总结"><span class="nav-number">3.</span> <span class="nav-text">对比与总结</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
