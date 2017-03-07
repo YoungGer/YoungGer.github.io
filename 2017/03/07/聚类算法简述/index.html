@@ -51,22 +51,18 @@
 
 
 
-<meta name="description" content="售电模拟，纸上得来终觉浅，绝知此事要躬行。本文附上了售电模拟应用介绍及其核心算法，供大家共同学习。">
+<meta name="description" content="本文简要介绍K-MEANS、高斯混合模型GMM、主题模型LDA三种聚类方法。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="售电模拟应用功能简介">
-<meta property="og:url" content="http://younggy.com/2016/08/29/售电模拟应用功能简介/index.html">
+<meta property="og:title" content="聚类算法简述">
+<meta property="og:url" content="http://younggy.com/2017/03/07/聚类算法简述/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="售电模拟，纸上得来终觉浅，绝知此事要躬行。本文附上了售电模拟应用介绍及其核心算法，供大家共同学习。">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/116.jpg">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/111.jpg">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/112.png">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/113.png">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/114.png">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/115.png">
-<meta property="og:updated_time" content="2016-08-29T08:25:45.917Z">
+<meta property="og:description" content="本文简要介绍K-MEANS、高斯混合模型GMM、主题模型LDA三种聚类方法。">
+<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/plot_mean_shift.png?imageView/2/w/400">
+<meta property="og:image" content="http://img.blog.csdn.net/20170307211950812?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-03-07T14:15:50.769Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="售电模拟应用功能简介">
-<meta name="twitter:description" content="售电模拟，纸上得来终觉浅，绝知此事要躬行。本文附上了售电模拟应用介绍及其核心算法，供大家共同学习。">
+<meta name="twitter:title" content="聚类算法简述">
+<meta name="twitter:description" content="本文简要介绍K-MEANS、高斯混合模型GMM、主题模型LDA三种聚类方法。">
 
 
 
@@ -78,7 +74,7 @@
   };
 </script>
 
-  <title> 售电模拟应用功能简介 | YoungGy </title>
+  <title> 聚类算法简述 | YoungGy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -259,7 +255,7 @@
             
             
               
-                售电模拟应用功能简介
+                聚类算法简述
               
             
           </h1>
@@ -268,19 +264,34 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2016-08-29T16:14:41+08:00" content="2016-08-29">
-              2016-08-29
+            <time itemprop="dateCreated" datetime="2017-03-07T22:04:38+08:00" content="2017-03-07">
+              2017-03-07
             </time>
           </span>
 
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
           
 
           
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/08/29/售电模拟应用功能简介/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/29/售电模拟应用功能简介/" itemprop="commentsCount"></span>
+                <a href="/2017/03/07/聚类算法简述/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/07/聚类算法简述/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -299,34 +310,107 @@
       
 
       
-        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/116.jpg" alt="售电模拟图片"></p>
-<p>售电模拟，纸上得来终觉浅，绝知此事要躬行。<br>本文附上了售电模拟应用介绍及其核心算法，供大家共同学习。</p>
+        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/plot_mean_shift.png?imageView/2/w/400" alt="这里写图片描述"></p>
+<p>本文简要介绍<code>K-MEANS</code>、高斯混合模型<code>GMM</code>、主题模型<code>LDA</code>三种聚类方法。</p>
 <a id="more"></a>
-<h1 id="应用功能">应用功能</h1><p>本应用地址为：<a href="https://younggy.shinyapps.io/pwshinyio/" target="_blank" rel="external">售电模拟应用</a>。</p>
-<p>本应用目前针对售电情况进行模拟分析，参考的售电过程如下图（该图来源于郭卓瑜）：</p>
-<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/111.jpg" alt="这里写图片描述"></p>
-<h1 id="应用流程">应用流程</h1><p>本应用分为四个tab，分别是：</p>
+<h1 id="K-MEANS">K-MEANS</h1><h2 id="算法">算法</h2><p>K-MEANS是一种coordinate descent algorithm或者叫alternating optimizing算法，每次固定其他变量，只优化部分变量。</p>
+<ol>
+<li>样本点划分到最近聚类中心的那一类<br>$$z_i \leftarrow \arg \min_j ||\mu_j-x_i||^2$$</li>
+<li>根据重新划分的样本点，计算每个类的新聚类中心<br>$$\mu_j \leftarrow \arg \min_\mu \sum_{i:z_i=j} ||\mu-x_i||^2 $$</li>
+</ol>
+<h2 id="K-MEANS++">K-MEANS++</h2><p>改进了初始样本中心的选择方法。</p>
+<ol>
+<li>从数据中随机选择样本点作为第一个聚类中心</li>
+<li>对每个样本点，计算到最近的聚类中心的距离</li>
+<li>根据第二步计算的样本点到最近的聚类中心的距离，成概率地选择新的聚类中心</li>
+<li>重复2-3直到获得K个聚类中心</li>
+</ol>
+<p>这样做的优点有：</p>
 <ul>
-<li>主页：应用的简单信息</li>
-<li>数据输入：输入数据</li>
-<li>交易结果：查看交易结果</li>
-<li>可视化：对交易结果进行简单的可视化</li>
+<li>提高了局部最优点的质量</li>
+<li>收敛更快</li>
 </ul>
-<p>使用顺序建议为：数据输入-&gt;交易结果-&gt;可视化。</p>
-<p>下面，将具体介绍各个tab及其完成的功能。</p>
-<h1 id="数据输入">数据输入</h1><p>输入数据，包括：</p>
+<p>这样做的缺点有：</p>
 <ul>
-<li>市场竞价方式（目前暂只支持广东竞价）</li>
-<li>市场成交比例（默认80%）</li>
-<li>发电公司的数据（名称，申购量，申购价）</li>
-<li>售电公司的数据（名称，申购量，申购价）</li>
+<li>相比随机选择中心点计算较大</li>
 </ul>
-<p>数据输入格式为：<code>a,b,c</code>，用英文逗号隔开即可，然后点击<code>提交</code>即完成了数据输入。</p>
-<p>输入完成后，会在页面提示输入的大致信息，如下图：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/112.png" alt="这里写图片描述"></p>
-<h1 id="交易结果">交易结果</h1><p>输入数据后，可在交易结果tab处查看交易结果，并且支持排序功能，例如按照成交电量、中标价等排序，如下图：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/113.png" alt="这里写图片描述"></p>
-<h1 id="可视化">可视化</h1><p>本tab对整个交易过程进行了简单的可视化分析，并且支持动态查看。</p>
-<p>实例如下图：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/114.png" alt="这里写图片描述"><br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/115.png" alt="这里写图片描述"></p>
-<h1 id="核心算法">核心算法</h1><p>核心算法及其代码可见<a href="http://blog.younggy.com/2016/08/26/%E7%94%B5%E5%8A%9B%E7%AB%9E%E4%BB%B7-%E5%B9%BF%E4%B8%9C%E8%A7%84%E5%88%99-%E8%AF%A6%E8%A7%A3%E4%B8%8E%E4%BB%A3%E7%A0%81/#more" target="_blank" rel="external">电力竞价(广东规则)详解与代码</a></p>
+<h2 id="评估聚类结果与选择K">评估聚类结果与选择K</h2><p>$$\min \sum_{j=1}^k \sum_{i:z_i=j} ||\mu_j-x_i||^2$$</p>
+<p>找到上述误差式随着K增大而减小的拐点即可</p>
+<h2 id="MapReduce">MapReduce</h2><ul>
+<li>map：每个node存储中心点，计算到node中的点距离最近的中心点，划分类别</li>
+<li>reduce：根据每个类别，重新计算新的中心点，然后在分发到各个node上</li>
+</ul>
+<h1 id="GMM">GMM</h1><h2 id="算法-1">算法</h2><ol>
+<li>E步骤：根据模型参数估计样本$i$到类别$k$的概率$r_{ik}$<br>$$r_{ik} = \frac{\pi_{k} N(x_i| \mu_k, \Sigma_k)}{\sum_{k=1}^K \pi_{k} N(x_i| \mu_k, \Sigma_k)}$$</li>
+<li>M步骤：根据样本$i$到类别$k$的概率$r_{ik}$最大似然模型参数<br>$$\begin{split}<br>N_k^{soft} &amp;= \sum_{i=1}^N r_{ik} \\<br>\pi_k&amp;= \frac{N_k^{soft} }{N} \\<br>\mu_k &amp;= \frac{\sum_{i=1}^N r_{ik} x_i}{N_k^{soft} } \\<br>\Sigma_k &amp;= \frac{\sum_{i=1}^N r_{ik} (x_i-\mu_k)^2}{N_k^{soft} }<br>\end{split}$$</li>
+</ol>
+<h2 id="初始化">初始化</h2><p>初始化对于收敛速率以及局部最优点的质量很关键，参数初始化的方法如下：</p>
+<ul>
+<li>随机选择K个点，计算每个点到K个中心点的距离，采用硬划分计算每个聚类的模型参数。</li>
+<li>类似K-MEANS++，一步步选择K个点，以期好的收敛性。</li>
+<li>通过K-MEANS的结果初始化参数。</li>
+</ul>
+<h2 id="过拟合">过拟合</h2><p>M步骤的最大似然可能会导致训练数据的过拟合。</p>
+<p>例如：K=2。类1只有一个点，其他的点都在类2。这样的话协方差为0的话似然函数最大为正无穷。这样的话类1的中心就是那一个点，样本点只要跟这个点不相同，那么样本点落在类1的似然就是0。</p>
+<p>解决办法：不要让协方差变成0，在协方差的对角阵上加上一个小的常数量。</p>
+<h2 id="K-MEANS比较">K-MEANS比较</h2><p>K-MEANS是种特殊的GMM，特殊如下：</p>
+<ul>
+<li>协方差矩阵对角化，并且对角线上的元素都相等；其聚类区域是圆形。</li>
+<li>E步骤中计算$r_{ik}$，协方差对角线上的元素很小，使得类别的决定与样本点到类别中心的距离有关。</li>
+<li>M步骤最大似然得到模型参数，是硬区分的。</li>
+</ul>
+<p>GMM相比K-MEANS优点如下：</p>
+<ul>
+<li>软间隔划分，样本点可以属于多个类别，可以计算属于各个类别的概率</li>
+<li>K-MEANS只记录了聚类中心，GMM记录了聚类的形状</li>
+<li>K-MEANS的聚类区域是超球形的不可以重叠，GMM的聚类区域可以是椭圆形的，而且可以斜着摆，可以重叠。</li>
+<li>GMM可以学习到聚类划分时各维度的权重，比如对文本聚类，可以知道哪个词划分更好。</li>
+</ul>
+<h1 id="LDA">LDA</h1><p>LDA，通过文档中词语的类别归属训练，学习到了文档的类别归属，不同主题的词汇概率分布。</p>
+<p>LDA，认为文章作者首先对文章设定了一系列主题，然后根据主题遣词造句。LDA就是从已获得的语料库反推文章主题。</p>
+<h2 id="LDA和clustering的区别">LDA和clustering的区别</h2><ul>
+<li>clustering发现的是语料级别上不同类别的先验概率分布；LDA发现的是文档级别上不同类别的先验概率分布。</li>
+<li>K-MEANS认为一个样本属于一个类；GMM认为一个样本以某个概率属于某类，认为可能属于A类或者B类，但是其本质上还是认为样本只属于一个类别。LDA可以认为样本属于多个类别。例如，一个讲运动科学的文章，K-MEANS认为它就属于运动类；GMM认为它有可能属于运动类，也有可能属于科学类；LDA认为它既属于运动类又属于科学类。本质上，LDA（mixed membership modeling）想要发现样本的<strong>多个类别</strong>，而K-MEANS和GMM则想要发现文本的<strong>单个类别</strong>。</li>
+<li>传统判断两个文档相似性的方法是通过查看两个文档共同词出现的多少，这样没有考虑语义。主题模型中，主题表现一个概念，更具体地表现一系列词的条件概率分布。相同主题分布的文档往往很相似。</li>
+</ul>
+<h2 id="LDA的结构">LDA的结构</h2><p>LDA的输入如下：</p>
+<ul>
+<li>语料库每个文本的单词集（sets of words）。</li>
+</ul>
+<p>LDA的输出包含三部分：</p>
+<ul>
+<li>语料库级别：词汇在不同类别的概率分布</li>
+<li>文档级别：文档中每个词所属的类别（硬）</li>
+<li>文档级别：文档所属类别的概率分布</li>
+</ul>
+<p>这三部分各自的作用如下：</p>
+<ul>
+<li>语料库级别：词汇在不同类别的概率分布——检验主题的一致性，主题的关键词是什么？是否形成了有意义的主题？常用于反推主题标签</li>
+<li>文档级别：文档中每个词所属的类别（硬）——通常不感兴趣</li>
+<li>文档级别：文档所属类别的概率分布——将文本分为多个类别；文档的相关性；研究用户的主题喜好。</li>
+</ul>
+<h2 id="Inference">Inference</h2><p>通常，LDA被视作贝叶斯模型，理由如下：</p>
+<ul>
+<li>做预测的时候考虑到了参数的不确定性</li>
+<li>与MLE相比自带正则</li>
+</ul>
+<h3 id="Gibbs_Sampling">Gibbs Sampling</h3><p><img src="http://img.blog.csdn.net/20170307211950812?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>迭代地，按照条件概率对文本中词汇进行分类（硬）。</p>
+<ol>
+<li>根据语料库级别各个词汇在各个类别的概率、文档级别文档在各个类别的概率，计算文档级别文档中每个词的类别。</li>
+<li>根究文档级别文档中每个词的类别，计算该文档在不同类别下的概率。</li>
+<li>根究文档级别文档中每个词的类别，计算语料库级别各个词汇在各个类别下的概率。</li>
+<li>重复直到达到迭代次数</li>
+</ol>
+<h3 id="Collapsed_Gibbs_Sampling">Collapsed Gibbs Sampling</h3><p>根据LDA的结构，只需要对文档级别每个词属于的类别进行采样即可，不需要采样语料库级别各个词汇在各个类别下的概率，也不需要采样文档级别文档在不同类别下的概率。</p>
+<p>这样做，因为在更小的特征空间上评判不确定性，通常可以取得更好的表现。</p>
+<ol>
+<li>随机对每个文档的词汇的类别进行分配。根据每个文档的词汇类别，计算文档级别该文档不同类别的count，计算语料库级别各个词汇在各个类别下的count。</li>
+<li>选择一个文档，随机选择一个词，将该词的类别归0，对应更改文档级别不同类别的count以及语料库级别不同词在不同类下的count。</li>
+<li>将文档级别不同类别的count视为该文档对不同类别的偏好；将语料库级别该词对应不同类别的count视为该词对不同类别的偏好。将上面两个偏好转化为概率相乘（加上平滑参数）即可得到该词对应不同类别的采样概率，根据采样概率重新分配该词的类别，并对应更改文档级别的类别count、语料库级别不同词汇对应不同类别的count。</li>
+<li>迭代2-3直到到达迭代次数。</li>
+<li>获得文档级别每个词的类别归属后，计算文档级别各个类的概率以及语料库级别不同词汇对应不同类别的概率。</li>
+</ol>
 </span>
       
     </div>
@@ -338,17 +422,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/08/26/电力竞价-广东规则-详解与代码/" rel="next" title="电力竞价(广东规则)详解与代码">
-                <i class="fa fa-chevron-left"></i> 电力竞价(广东规则)详解与代码
+              <a href="/2017/02/27/贝叶斯方法与正则项/" rel="next" title="贝叶斯方法与正则项">
+                <i class="fa fa-chevron-left"></i> 贝叶斯方法与正则项
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/09/01/CDO-CDS与次贷危机/" rel="prev" title="CDO/CDS与次贷危机">
-                CDO/CDS与次贷危机 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -398,8 +478,8 @@
         
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/08/29/售电模拟应用功能简介/"
-           data-title="售电模拟应用功能简介" data-url="http://younggy.com/2016/08/29/售电模拟应用功能简介/">
+      <div class="ds-thread" data-thread-key="2017/03/07/聚类算法简述/"
+           data-title="聚类算法简述" data-url="http://younggy.com/2017/03/07/聚类算法简述/">
       </div>
     
   </div>
@@ -545,7 +625,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#应用功能"><span class="nav-number">1.</span> <span class="nav-text">应用功能</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#应用流程"><span class="nav-number">2.</span> <span class="nav-text">应用流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据输入"><span class="nav-number">3.</span> <span class="nav-text">数据输入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#交易结果"><span class="nav-number">4.</span> <span class="nav-text">交易结果</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#可视化"><span class="nav-number">5.</span> <span class="nav-text">可视化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#核心算法"><span class="nav-number">6.</span> <span class="nav-text">核心算法</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#K-MEANS"><span class="nav-number">1.</span> <span class="nav-text">K-MEANS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#算法"><span class="nav-number">1.1.</span> <span class="nav-text">算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#K-MEANS++"><span class="nav-number">1.2.</span> <span class="nav-text">K-MEANS++</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#评估聚类结果与选择K"><span class="nav-number">1.3.</span> <span class="nav-text">评估聚类结果与选择K</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MapReduce"><span class="nav-number">1.4.</span> <span class="nav-text">MapReduce</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GMM"><span class="nav-number">2.</span> <span class="nav-text">GMM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#算法-1"><span class="nav-number">2.1.</span> <span class="nav-text">算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化"><span class="nav-number">2.2.</span> <span class="nav-text">初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#过拟合"><span class="nav-number">2.3.</span> <span class="nav-text">过拟合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#K-MEANS比较"><span class="nav-number">2.4.</span> <span class="nav-text">K-MEANS比较</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LDA"><span class="nav-number">3.</span> <span class="nav-text">LDA</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#LDA和clustering的区别"><span class="nav-number">3.1.</span> <span class="nav-text">LDA和clustering的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LDA的结构"><span class="nav-number">3.2.</span> <span class="nav-text">LDA的结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Inference"><span class="nav-number">3.3.</span> <span class="nav-text">Inference</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Gibbs_Sampling"><span class="nav-number">3.3.1.</span> <span class="nav-text">Gibbs Sampling</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Collapsed_Gibbs_Sampling"><span class="nav-number">3.3.2.</span> <span class="nav-text">Collapsed Gibbs Sampling</span></a></li></ol></li></ol></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">

@@ -51,22 +51,18 @@
 
 
 
-<meta name="description" content="售电模拟，纸上得来终觉浅，绝知此事要躬行。本文附上了售电模拟应用介绍及其核心算法，供大家共同学习。">
+<meta name="description" content="从贝叶斯角度，正则项等价于引入参数$w$的先验概率分布。常见的L1/L2正则，分别等价于引入先验信息：参数$w$符合均值为0的拉普拉斯分布/高斯分布。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="售电模拟应用功能简介">
-<meta property="og:url" content="http://younggy.com/2016/08/29/售电模拟应用功能简介/index.html">
+<meta property="og:title" content="贝叶斯方法与正则项">
+<meta property="og:url" content="http://younggy.com/2017/02/27/贝叶斯方法与正则项/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="售电模拟，纸上得来终觉浅，绝知此事要躬行。本文附上了售电模拟应用介绍及其核心算法，供大家共同学习。">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/116.jpg">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/111.jpg">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/112.png">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/113.png">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/114.png">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/115.png">
-<meta property="og:updated_time" content="2016-08-29T08:25:45.917Z">
+<meta property="og:description" content="从贝叶斯角度，正则项等价于引入参数$w$的先验概率分布。常见的L1/L2正则，分别等价于引入先验信息：参数$w$符合均值为0的拉普拉斯分布/高斯分布。">
+<meta property="og:image" content="http://img.blog.csdn.net/20170227193643492?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170227193643492?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-02-27T11:41:14.799Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="售电模拟应用功能简介">
-<meta name="twitter:description" content="售电模拟，纸上得来终觉浅，绝知此事要躬行。本文附上了售电模拟应用介绍及其核心算法，供大家共同学习。">
+<meta name="twitter:title" content="贝叶斯方法与正则项">
+<meta name="twitter:description" content="从贝叶斯角度，正则项等价于引入参数$w$的先验概率分布。常见的L1/L2正则，分别等价于引入先验信息：参数$w$符合均值为0的拉普拉斯分布/高斯分布。">
 
 
 
@@ -78,7 +74,7 @@
   };
 </script>
 
-  <title> 售电模拟应用功能简介 | YoungGy </title>
+  <title> 贝叶斯方法与正则项 | YoungGy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -259,7 +255,7 @@
             
             
               
-                售电模拟应用功能简介
+                贝叶斯方法与正则项
               
             
           </h1>
@@ -268,19 +264,34 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2016-08-29T16:14:41+08:00" content="2016-08-29">
-              2016-08-29
+            <time itemprop="dateCreated" datetime="2017-02-27T19:32:21+08:00" content="2017-02-27">
+              2017-02-27
             </time>
           </span>
 
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
           
 
           
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/08/29/售电模拟应用功能简介/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/29/售电模拟应用功能简介/" itemprop="commentsCount"></span>
+                <a href="/2017/02/27/贝叶斯方法与正则项/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/27/贝叶斯方法与正则项/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -299,34 +310,47 @@
       
 
       
-        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/116.jpg" alt="售电模拟图片"></p>
-<p>售电模拟，纸上得来终觉浅，绝知此事要躬行。<br>本文附上了售电模拟应用介绍及其核心算法，供大家共同学习。</p>
+        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20170227193643492?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>从贝叶斯角度，正则项等价于引入参数$w$的先验概率分布。常见的L1/L2正则，分别等价于引入先验信息：参数$w$符合均值为0的拉普拉斯分布/高斯分布。</p>
 <a id="more"></a>
-<h1 id="应用功能">应用功能</h1><p>本应用地址为：<a href="https://younggy.shinyapps.io/pwshinyio/" target="_blank" rel="external">售电模拟应用</a>。</p>
-<p>本应用目前针对售电情况进行模拟分析，参考的售电过程如下图（该图来源于郭卓瑜）：</p>
-<p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/111.jpg" alt="这里写图片描述"></p>
-<h1 id="应用流程">应用流程</h1><p>本应用分为四个tab，分别是：</p>
+<h1 id="贝叶斯方法的参数估计">贝叶斯方法的参数估计</h1><p>贝叶斯方法的参数估计，就是通过最大化后验概率来估计模型的参数。</p>
+<p>假定模型参数为$w$，数据集为$D$，贝叶斯通过最大化后验概率估计模型参数$w$，即：</p>
+<p>$$w = \arg\max_w p(w|D)= \arg\max_w  \frac{p(w) p(D|w) }{P(D)}=\arg\max_w p(w) p(D|w) $$</p>
+<h1 id="后验概率的展开形式">后验概率的展开形式</h1><p>假定如下：</p>
 <ul>
-<li>主页：应用的简单信息</li>
-<li>数据输入：输入数据</li>
-<li>交易结果：查看交易结果</li>
-<li>可视化：对交易结果进行简单的可视化</li>
+<li>样本独立不相关</li>
+<li>模型参数独立不相关</li>
 </ul>
-<p>使用顺序建议为：数据输入-&gt;交易结果-&gt;可视化。</p>
-<p>下面，将具体介绍各个tab及其完成的功能。</p>
-<h1 id="数据输入">数据输入</h1><p>输入数据，包括：</p>
+<p>$$\begin{split}<br>p(w)p(D|w) &amp;=  \prod_{i=1}^K p(w_i) \prod_{i=1}^N p(D_i|w) \\<br>&amp;\leftarrow  \sum_{i=1}^K  \log p(w_i)+ \sum_{i=1}^N \log p(D_i|w)<br>\end{split}$$</p>
+<p>最新的优化问题为：</p>
+<p>$$w = \arg\min_w  -  \sum_{i=1}^K  \log p(w_i)- \sum_{i=1}^N \log p(D_i|w)$$</p>
+<h1 id="参数的先验概率与正则项">参数的先验概率与正则项</h1><p>当参数$w$的先验概率满足高斯分布：</p>
+<p>$$p(w_i) = N(w_i | \mu,\sigma^2) = \frac{1}{\sqrt{2\pi \sigma^2}} e^{-\frac{(w_i-\mu)^2}{2\sigma^2}}$$</p>
+<p>优化问题的左项中，如果$w$满足$N(0,\frac{1}{2\lambda})$：</p>
+<p>$$\begin{split}<br>-\sum_{i=1}^K \log p(w_i) &amp;= - \sum_{i=1}^K \log \frac{1}{\sqrt{2\pi \sigma^2}} +  \sum_{i=1}^K \frac{(w_i-\mu)^2}{2\sigma^2} \\<br>&amp;= const + \sum_{i=1}^K \frac{(w_i-\mu)^2}{2\sigma^2} \\<br>&amp;= const +  \lambda \sum_{i=1}^K w_i^2<br>\end{split}$$</p>
+<p>这时候的优化函数为：</p>
+<p>$$w = \arg\min_w   \lambda \sum_{i=1}^K w_i^2 - \sum_{i=1}^N \log p(D_i|w)$$</p>
+<p>同样地，参数$w$的先验概率满足均值为0的拉普拉斯分布，有：</p>
+<p>$$w = \arg\min_w   \lambda \sum_{i=1}^K |w_i| - \sum_{i=1}^N \log p(D_i|w)$$</p>
+<p>这说明：</p>
 <ul>
-<li>市场竞价方式（目前暂只支持广东竞价）</li>
-<li>市场成交比例（默认80%）</li>
-<li>发电公司的数据（名称，申购量，申购价）</li>
-<li>售电公司的数据（名称，申购量，申购价）</li>
+<li>L2正则，等价于参数$w$的先验分布满足均值为0的正态分布</li>
+<li>L1正则，等价于参数$w$的先验分布满足均值为0的拉普拉斯分布</li>
+<li>拉普拉斯在0附近突出，周围稀疏，对应容易产生稀疏解的模型</li>
 </ul>
-<p>数据输入格式为：<code>a,b,c</code>，用英文逗号隔开即可，然后点击<code>提交</code>即完成了数据输入。</p>
-<p>输入完成后，会在页面提示输入的大致信息，如下图：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/112.png" alt="这里写图片描述"></p>
-<h1 id="交易结果">交易结果</h1><p>输入数据后，可在交易结果tab处查看交易结果，并且支持排序功能，例如按照成交电量、中标价等排序，如下图：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/113.png" alt="这里写图片描述"></p>
-<h1 id="可视化">可视化</h1><p>本tab对整个交易过程进行了简单的可视化分析，并且支持动态查看。</p>
-<p>实例如下图：<br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/114.png" alt="这里写图片描述"><br><img src="http://7xlwwh.com1.z0.glb.clouddn.com/115.png" alt="这里写图片描述"></p>
-<h1 id="核心算法">核心算法</h1><p>核心算法及其代码可见<a href="http://blog.younggy.com/2016/08/26/%E7%94%B5%E5%8A%9B%E7%AB%9E%E4%BB%B7-%E5%B9%BF%E4%B8%9C%E8%A7%84%E5%88%99-%E8%AF%A6%E8%A7%A3%E4%B8%8E%E4%BB%A3%E7%A0%81/#more" target="_blank" rel="external">电力竞价(广东规则)详解与代码</a></p>
+<p><img src="http://img.blog.csdn.net/20170227193643492?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h1 id="模型举例">模型举例</h1><p>以参数$w$的先验概率满足均值为0的高斯分布为例，优化问题为：</p>
+<p>$$w = \arg\min_w   \lambda \sum_{i=1}^K w_i^2 - \sum_{i=1}^N \log p(D_i|w)$$</p>
+<h2 id="逻辑回归">逻辑回归</h2><p>$$\begin{split}<br>-\sum_{i=1}^N \log p(D_i|w) &amp;= - \sum_{i=1}^N \log \theta(y_n w^T x_n) \\<br>&amp;=\sum_{i=1}^N \log (1+\exp(-y_n w^T x_n) )<br>\end{split}$$</p>
+<p>所以有：</p>
+<p>$$w = \arg\min_w   \lambda \sum_{i=1}^K w_i^2 +\sum_{i=1}^N \log (1+\exp(-y_n w^T x_n) )$$</p>
+<p>总结：逻辑回归，通过贝叶斯法最大化后验概率。在数据的概率满足逻辑函数的假设下得到了cross entropy的误差函数；在样本独立、模型参数独立、模型参数满足均值为0的高斯分布的假设下获得了L2正则项。</p>
+<h2 id="线性回归">线性回归</h2><p>线性回归，假设误差满足均值为0的高斯分布，该假设符合一般的规律。</p>
+<p>$$p(D_i|w)  = \frac{1}{\sqrt{2\pi \sigma^2}} e^{-\frac{(w^Tx_i-y_i)^2}{2\sigma^2}}$$</p>
+<p>$$\begin{split}<br>-\sum_{i=1}^N \log p(D_i|w) &amp;= - \sum_{i=1}^N \log  \frac{1}{\sqrt{2\pi \sigma^2}} e^{-\frac{(w^Tx_i-y_i)^2}{2\sigma^2}} \\<br>&amp;\leftarrow \sum_{i=1}^N  (w^Tx_i-y_i)^2<br>\end{split}$$</p>
+<p>所以有：</p>
+<p>$$w = \arg\min_w   \lambda \sum_{i=1}^K w_i^2 +\sum_{i=1}^N  (w^Tx_i-y_i)^2$$</p>
+<p>总结：线性回归，通过贝叶斯法最大化后验概率。在误差为均值0的高斯分布的假设下得到了square error的误差函数；在样本独立、模型参数独立、模型参数满足均值为0的高斯分布的假设下获得了L2正则项。</p>
 </span>
       
     </div>
@@ -338,16 +362,16 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/08/26/电力竞价-广东规则-详解与代码/" rel="next" title="电力竞价(广东规则)详解与代码">
-                <i class="fa fa-chevron-left"></i> 电力竞价(广东规则)详解与代码
+              <a href="/2017/02/27/机器学习中的损失函数/" rel="next" title="机器学习中的损失函数">
+                <i class="fa fa-chevron-left"></i> 机器学习中的损失函数
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/09/01/CDO-CDS与次贷危机/" rel="prev" title="CDO/CDS与次贷危机">
-                CDO/CDS与次贷危机 <i class="fa fa-chevron-right"></i>
+              <a href="/2017/03/07/聚类算法简述/" rel="prev" title="聚类算法简述">
+                聚类算法简述 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -398,8 +422,8 @@
         
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/08/29/售电模拟应用功能简介/"
-           data-title="售电模拟应用功能简介" data-url="http://younggy.com/2016/08/29/售电模拟应用功能简介/">
+      <div class="ds-thread" data-thread-key="2017/02/27/贝叶斯方法与正则项/"
+           data-title="贝叶斯方法与正则项" data-url="http://younggy.com/2017/02/27/贝叶斯方法与正则项/">
       </div>
     
   </div>
@@ -545,7 +569,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#应用功能"><span class="nav-number">1.</span> <span class="nav-text">应用功能</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#应用流程"><span class="nav-number">2.</span> <span class="nav-text">应用流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据输入"><span class="nav-number">3.</span> <span class="nav-text">数据输入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#交易结果"><span class="nav-number">4.</span> <span class="nav-text">交易结果</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#可视化"><span class="nav-number">5.</span> <span class="nav-text">可视化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#核心算法"><span class="nav-number">6.</span> <span class="nav-text">核心算法</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#贝叶斯方法的参数估计"><span class="nav-number">1.</span> <span class="nav-text">贝叶斯方法的参数估计</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#后验概率的展开形式"><span class="nav-number">2.</span> <span class="nav-text">后验概率的展开形式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参数的先验概率与正则项"><span class="nav-number">3.</span> <span class="nav-text">参数的先验概率与正则项</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#模型举例"><span class="nav-number">4.</span> <span class="nav-text">模型举例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#逻辑回归"><span class="nav-number">4.1.</span> <span class="nav-text">逻辑回归</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线性回归"><span class="nav-number">4.2.</span> <span class="nav-text">线性回归</span></a></li></ol></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
