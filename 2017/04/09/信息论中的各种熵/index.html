@@ -51,17 +51,18 @@
 
 
 
-<meta name="description" content="曲线拟合是一个经典的问题,本文将从误差和概率的角度探讨如何解决曲线拟合的问题以及这些方法的异同之处。">
+<meta name="description" content="本文简单介绍了信息论中的各种熵，包括自信息、熵；联合熵、条件熵、互信息；KL散度、交叉熵。并在最后用信息论中的交叉熵推导了逻辑回归，得到了和最大似然法相同的结果。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="曲线拟合误差和概率的几种解释">
-<meta property="og:url" content="http://younggy.com/2016/10/28/曲线拟合误差和概率的几种解释/index.html">
+<meta property="og:title" content="信息论中的各种熵">
+<meta property="og:url" content="http://younggy.com/2017/04/09/信息论中的各种熵/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="曲线拟合是一个经典的问题,本文将从误差和概率的角度探讨如何解决曲线拟合的问题以及这些方法的异同之处。">
-<meta property="og:image" content="http://7xlwwh.com1.z0.glb.clouddn.com/Figure1.17.png?imageView/2/w/400">
-<meta property="og:updated_time" content="2017-02-24T03:08:59.767Z">
+<meta property="og:description" content="本文简单介绍了信息论中的各种熵，包括自信息、熵；联合熵、条件熵、互信息；KL散度、交叉熵。并在最后用信息论中的交叉熵推导了逻辑回归，得到了和最大似然法相同的结果。">
+<meta property="og:image" content="http://img.blog.csdn.net/20170409082528851?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170408103817924?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-04-09T00:27:38.135Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="曲线拟合误差和概率的几种解释">
-<meta name="twitter:description" content="曲线拟合是一个经典的问题,本文将从误差和概率的角度探讨如何解决曲线拟合的问题以及这些方法的异同之处。">
+<meta name="twitter:title" content="信息论中的各种熵">
+<meta name="twitter:description" content="本文简单介绍了信息论中的各种熵，包括自信息、熵；联合熵、条件熵、互信息；KL散度、交叉熵。并在最后用信息论中的交叉熵推导了逻辑回归，得到了和最大似然法相同的结果。">
 
 
 
@@ -73,7 +74,7 @@
   };
 </script>
 
-  <title> 曲线拟合误差和概率的几种解释 | YoungGy </title>
+  <title> 信息论中的各种熵 | YoungGy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -254,7 +255,7 @@
             
             
               
-                曲线拟合误差和概率的几种解释
+                信息论中的各种熵
               
             
           </h1>
@@ -263,8 +264,8 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2016-10-28T16:40:16+08:00" content="2016-10-28">
-              2016-10-28
+            <time itemprop="dateCreated" datetime="2017-04-09T08:26:14+08:00" content="2017-04-09">
+              2017-04-09
             </time>
           </span>
 
@@ -289,8 +290,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/10/28/曲线拟合误差和概率的几种解释/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/28/曲线拟合误差和概率的几种解释/" itemprop="commentsCount"></span>
+                <a href="/2017/04/09/信息论中的各种熵/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/04/09/信息论中的各种熵/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -309,43 +310,49 @@
       
 
       
-        <span itemprop="articleBody"><p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/Figure1.17.png?imageView/2/w/400" alt="这里写图片描述"></p>
-<p>曲线拟合是一个经典的问题,本文将从误差和概率的角度探讨如何解决曲线拟合的问题以及这些方法的异同之处。</p>
+        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20170409082528851?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>本文简单介绍了信息论中的各种熵，包括自信息、熵；联合熵、条件熵、互信息；KL散度、交叉熵。并在最后用信息论中的交叉熵推导了逻辑回归，得到了和最大似然法相同的结果。</p>
 <a id="more"></a>
-<p>曲线拟合是一个经典的问题，将其数学化后是：已知训练数据$\bf{x}$和对应的目标值$\bf{t}$。通过构建参数为$\bf{w}$的模型，当新的$x$出现，对应的$t$是多少。</p>
-<p>本文将从误差和概率的角度探讨如何解决曲线拟合的问题，具体地，将阐述以下概念：</p>
+<h1 id="熵">熵</h1><p>熵是信息的关键度量，通常指一条信息中需要传输或者存储一个信号的平均比特数。熵衡量了预测随机变量的不确定度，不确定性越大熵越大。</p>
+<p>针对随机变量$X$，其信息熵的定义如下：</p>
+<p>$$H(X) =  E[\log_2 (X)] = \sum -p(x) \log_2 (p(x))$$</p>
+<p>信息熵是信源编码中，压缩率的下限。当我们使用少于信息熵的信息量做编码，那么一定有信息的损失。</p>
+<h1 id="联合熵">联合熵</h1><p>联合熵是一集变量之间不确定的衡量手段。</p>
+<p>$$H(X,Y) = \sum \sum -p(x,y) \log(p(x,y))$$</p>
+<h1 id="条件熵">条件熵</h1><p>条件熵描述变量Y在变量X确定的情况下，变量Y的熵还剩多少。</p>
+<p>$$H(Y|X) =  \sum \sum -p(x,y) \log(p(y|x))$$</p>
+<p>联合熵和条件熵的关系是：</p>
+<p>$$H(X,Y) = H(X) +H(Y|X) = H(Y) + H(X|Y) = H(Y,X)$$</p>
+<h1 id="自信息">自信息</h1><p>自信息表示概率空间中与单一事件或离散变量的值相关的信息量的量度。</p>
+<p>$$I(x) = -\log(p(x))$$</p>
+<p>平均的自信息就是信息熵。</p>
+<p>$$H(X) =  E[\log_2 (X)] = \sum -p(x) \log_2 (p(x))$$</p>
+<h1 id="互信息">互信息</h1><p>两个随机变量的互信息，是变量间相互依赖性的量度，不同于相关系数，互信息不限于实值随机变量，其更加一般。</p>
+<p>$$I(X;Y) = \sum\sum -p(x,y) \log(\frac{p(x)p(y)}{p(x,y)})$$</p>
+<p><img src="http://img.blog.csdn.net/20170408103817924?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>$$\begin{split}<br>I(X;Y) &amp;= H(X)-H(X|Y) \\<br>&amp;= H(Y)-H(Y|X) \\<br>&amp;=H(X)+H(Y)-H(X,Y) \\<br>&amp;=H(X,Y)-H(X|Y)-H(Y|X)<br>\end{split}$$</p>
+<p>其意义为，若我们想知道Y包含多少X的信息，在尚未得到 Y之前，我们的不确定性是 H(X)，得到Y后，不确定性是H(X|Y)。所以一旦得到Y后，我们消除了  H(X)-H(X|Y)的不确定量，这就是Y对X的信息量。</p>
+<h1 id="KL散度(信息增益)">KL散度(信息增益)</h1><p>KL散度，又称为相对熵（relative entropy）、信息散度（information divergence）、信息增益（information gain）。</p>
+<p>KL散度是两个概率分布P和Q差别非对称性的度量。KL散度用来度量基于Q的编码来编码来自P的样本平均所需的额外的位元数。典型情况下，P表示数据的真实分布，Q表述数据的模型分布。</p>
+<p>$$D_{KL} (P||Q)= \sum_i P(i) \log \frac{P(i)}{Q(i)}$$</p>
+<h1 id="交叉熵">交叉熵</h1><p>交叉熵衡量了在真实分布是P的情况的情况下，使用分布Q去编码数据，需要的平均比特。</p>
+<p>$$H(p,q) = E_p [-\log q] = H(p) + D_{kl} (p|q)$$</p>
+<p>$$H(p,q) = \sum -p(x)\log(q(x))$$</p>
+<p>交叉熵与逻辑回归的关系如下：</p>
+<p>逻辑回归中：</p>
 <ul>
-<li>误差函数</li>
-<li>正则化</li>
-<li>最大似然估计（MLE）</li>
-<li>最大后验估计（MAP）</li>
-<li>贝叶斯</li>
+<li>$q_{y=1} = \hat{y} = g(wx)$</li>
+<li>$q_{y=0} = 1-\hat{y} = 1-g(wx)$</li>
 </ul>
-<h1 id="误差角度">误差角度</h1><h2 id="误差函数">误差函数</h2><p>直观的解决思路是最小化训练误差，公式如下：</p>
-<p>$$\min_w \frac{1}{2}\sum_{n=1}^N{ y(x_n,\textbf{w}) -t_n}^2$$</p>
-<h2 id="正则化">正则化</h2><p>上面的方法会遇到过拟合的问题，所以可以加上正则化的参数避免过拟合，改进后的公式如下：</p>
-<p>$$\min_w \frac{1}{2}\sum_{n=1}^N{ y(x_n,\textbf{w}) -t_n}^2+\frac{\lambda}{2} \Vert \textbf{w} \Vert ^2$$</p>
-<h1 id="概率角度">概率角度</h1><h2 id="高斯分布假设">高斯分布假设</h2><p>假设每个点都服从均值不一样方差一样的高斯分布，均值为$ y(x_n,\textbf{w})$，方差为$\beta^{-1}$。那么，每个点的的概率分布是：</p>
-<p>$$p(t|x,\textbf{w},\beta) =N(y(x_n,\textbf{w}),\beta^{-1}) $$</p>
-<h2 id="最大似然估计">最大似然估计</h2><p>为了求出上面的概率分布，首先要求出模型$\textbf{w}$的值，假设每个点之间相互独立，那么似然函数为：</p>
-<p>$$p(\textbf{t}|\textbf{x},\textbf{w},\beta) =\prod_{n=1}^N N(t_n|y(x_n,\textbf{w}),\beta^{-1}) $$</p>
-<p>对上式取log，并最大化，得到：</p>
-<p>$$\max_{\textbf{w}} \ln p(\textbf{t}|\textbf{x},\textbf{w},\beta) =  -\frac{\beta}{2}\sum_{n=1}^N{ y(x_n,\textbf{w}) -t_n}^2 + \frac{N}{2}\ln\beta-\frac{N}{2} \ln (2\pi)$$</p>
-<p>计算$\textbf{w}$只和上式右边的第一项有关，可以看到，最大似然的结果等同于误差函数的结果，也就是MLE等同于sum squared error function。</p>
-<h2 id="最大后验估计">最大后验估计</h2><p>根据MLE，我们可以得到模型$\textbf{w}$的参数，并且可以计算出$p(\textbf{t}|\textbf{x},\textbf{w},\beta)$似然函数进而求得对应点的值，可是这样同样存在过拟合的问题，为了解决这个问题，我们引入了先验估计，并结合似然函数计算出了后验估计。</p>
-<p>假设$\textbf{w}$的先验估计如下：<br>$$p(\textbf{w} | \alpha) = N(\textbf{w}|\textbf{0},\alpha^{-1}\textbf{I})$$</p>
-<p>根据后验估计等于似然函数乘以先验估计，也就是</p>
-<p>$$p(\textbf{w}|\textbf{x},\textbf{t},\alpha,\beta)   \propto $p(\textbf{t}|\textbf{x},\textbf{w},\beta)   p(\textbf{w} | \alpha)$$</p>
-<p>同样适用最大似然估计的方法，不过这里不是作用在似然函数上，而是作用在后验分布上，我们得到：</p>
-<p>$$\min_w \frac{\beta}{2}\sum_{n=1}^N{ y(x_n,\textbf{w}) -t_n}^2+\frac{\alpha}{2} \Vert \textbf{w} \Vert ^2$$</p>
-<p>因此可以看到：</p>
+<p>数据的真实分布中：</p>
 <ul>
-<li>最大化似然函数等同于最小化SSE。</li>
-<li>最大化后验分布等同于最小化SSE加上regulation。</li>
+<li>$p_{y=1} = y$</li>
+<li>$p_{y=0} =  1-y$</li>
 </ul>
-<h2 id="贝叶斯">贝叶斯</h2><p>所谓贝叶斯，就是多次重复使用概率中的和规则和积规则。</p>
-<p>为了方便，下文中认为$\alpha,\beta$是固定的，在公式中省略了这两者，公式如下：</p>
-<p>$$p(t|x,\textbf{x,t})  =\int  p(t|x,\textbf{w})  p(\textbf{w}|\textbf{x},\textbf{t}) \textbf{dw}$$</p>
+<p>因此，可以用交叉熵去衡量估计分布q与真实分布p的相似性，交叉熵越小那么越相似。</p>
+<p>$$H(p,q) = \sum -p(x) \log q(x) = -y\log(\hat{y})-(1-y)\log(1-\hat{y})$$</p>
+<p>因此，损失函数为，得到了和最大似然推导相同的结果：</p>
+<p>$$\begin{split}<br>L(w) &amp;= \frac{1}{N} \sum_{n=1}^N H(p_n,q_n) \\<br>&amp;= \frac{1}{N} \sum_{n=1}^N [- y\log(\hat{y})-(1-y)\log(1-\hat{y})] \\<br>&amp;= \frac{1}{N} \sum_{n=1}^N \log(1+\exp(-y_nw x_n))<br>\end{split}$$</p>
 </span>
       
     </div>
@@ -357,17 +364,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/09/19/坦克问题的频率及贝叶斯解释/" rel="next" title="坦克问题的频率及贝叶斯解释">
-                <i class="fa fa-chevron-left"></i> 坦克问题的频率及贝叶斯解释
+              <a href="/2017/03/07/聚类算法简述/" rel="next" title="聚类算法简述">
+                <i class="fa fa-chevron-left"></i> 聚类算法简述
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/02/21/机器为什么可以学习/" rel="prev" title="机器为什么可以学习">
-                机器为什么可以学习 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -417,8 +420,8 @@
         
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/10/28/曲线拟合误差和概率的几种解释/"
-           data-title="曲线拟合误差和概率的几种解释" data-url="http://younggy.com/2016/10/28/曲线拟合误差和概率的几种解释/">
+      <div class="ds-thread" data-thread-key="2017/04/09/信息论中的各种熵/"
+           data-title="信息论中的各种熵" data-url="http://younggy.com/2017/04/09/信息论中的各种熵/">
       </div>
     
   </div>
@@ -564,7 +567,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#误差角度"><span class="nav-number">1.</span> <span class="nav-text">误差角度</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#误差函数"><span class="nav-number">1.1.</span> <span class="nav-text">误差函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正则化"><span class="nav-number">1.2.</span> <span class="nav-text">正则化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#概率角度"><span class="nav-number">2.</span> <span class="nav-text">概率角度</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#高斯分布假设"><span class="nav-number">2.1.</span> <span class="nav-text">高斯分布假设</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最大似然估计"><span class="nav-number">2.2.</span> <span class="nav-text">最大似然估计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最大后验估计"><span class="nav-number">2.3.</span> <span class="nav-text">最大后验估计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#贝叶斯"><span class="nav-number">2.4.</span> <span class="nav-text">贝叶斯</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#熵"><span class="nav-number">1.</span> <span class="nav-text">熵</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#联合熵"><span class="nav-number">2.</span> <span class="nav-text">联合熵</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#条件熵"><span class="nav-number">3.</span> <span class="nav-text">条件熵</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#自信息"><span class="nav-number">4.</span> <span class="nav-text">自信息</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#互信息"><span class="nav-number">5.</span> <span class="nav-text">互信息</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#KL散度(信息增益)"><span class="nav-number">6.</span> <span class="nav-text">KL散度(信息增益)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#交叉熵"><span class="nav-number">7.</span> <span class="nav-text">交叉熵</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
