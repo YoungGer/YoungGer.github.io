@@ -51,18 +51,31 @@
 
 
 
-<meta name="description" content="本文简单介绍了信息论中的各种熵，包括自信息、熵；联合熵、条件熵、互信息；KL散度、交叉熵。并在最后用信息论中的交叉熵推导了逻辑回归，得到了和最大似然法相同的结果。">
+<meta name="description" content="一般的神经网络输入和输出的维度大小都是固定的，针对序列类型（尤其是变长的序列）的输入或输出数据束手无策。RNN通过采用具有记忆的隐含层单元解决了序列数据的训练问题。LSTM属于RNN的改进，解决了RNN中梯度消失爆炸的问题，属于序列数据训练的常用方案。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="信息论中的各种熵">
-<meta property="og:url" content="http://younggy.com/2017/04/09/信息论中的各种熵/index.html">
+<meta property="og:title" content="记忆网络RNN与LSTM">
+<meta property="og:url" content="http://younggy.com/2017/05/09/记忆网络RNN与LSTM/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="本文简单介绍了信息论中的各种熵，包括自信息、熵；联合熵、条件熵、互信息；KL散度、交叉熵。并在最后用信息论中的交叉熵推导了逻辑回归，得到了和最大似然法相同的结果。">
-<meta property="og:image" content="http://img.blog.csdn.net/20170409082528851?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170408103817924?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-04-09T00:27:38.135Z">
+<meta property="og:description" content="一般的神经网络输入和输出的维度大小都是固定的，针对序列类型（尤其是变长的序列）的输入或输出数据束手无策。RNN通过采用具有记忆的隐含层单元解决了序列数据的训练问题。LSTM属于RNN的改进，解决了RNN中梯度消失爆炸的问题，属于序列数据训练的常用方案。">
+<meta property="og:image" content="http://img.blog.csdn.net/20170509233839180?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170509170154747?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170509170205897?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170509201949623?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170509202126299?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170509195700145?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170509195718708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170509195729802?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170509195751364?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170509195803656?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170509195140112?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170509195150159?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170509195202393?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170509200635432?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170509232737782?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-05-09T15:40:48.785Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="信息论中的各种熵">
-<meta name="twitter:description" content="本文简单介绍了信息论中的各种熵，包括自信息、熵；联合熵、条件熵、互信息；KL散度、交叉熵。并在最后用信息论中的交叉熵推导了逻辑回归，得到了和最大似然法相同的结果。">
+<meta name="twitter:title" content="记忆网络RNN与LSTM">
+<meta name="twitter:description" content="一般的神经网络输入和输出的维度大小都是固定的，针对序列类型（尤其是变长的序列）的输入或输出数据束手无策。RNN通过采用具有记忆的隐含层单元解决了序列数据的训练问题。LSTM属于RNN的改进，解决了RNN中梯度消失爆炸的问题，属于序列数据训练的常用方案。">
 
 
 
@@ -74,7 +87,7 @@
   };
 </script>
 
-  <title> 信息论中的各种熵 | YoungGy </title>
+  <title> 记忆网络RNN与LSTM | YoungGy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -255,7 +268,7 @@
             
             
               
-                信息论中的各种熵
+                记忆网络RNN与LSTM
               
             
           </h1>
@@ -264,8 +277,8 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2017-04-09T08:26:14+08:00" content="2017-04-09">
-              2017-04-09
+            <time itemprop="dateCreated" datetime="2017-05-09T23:27:38+08:00" content="2017-05-09">
+              2017-05-09
             </time>
           </span>
 
@@ -274,8 +287,8 @@
               &nbsp; | &nbsp; 分类于
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/数学/" itemprop="url" rel="index">
-                    <span itemprop="name">数学</span>
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
                   </a>
                 </span>
 
@@ -290,8 +303,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2017/04/09/信息论中的各种熵/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/04/09/信息论中的各种熵/" itemprop="commentsCount"></span>
+                <a href="/2017/05/09/记忆网络RNN与LSTM/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/09/记忆网络RNN与LSTM/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -310,49 +323,60 @@
       
 
       
-        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20170409082528851?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>本文简单介绍了信息论中的各种熵，包括自信息、熵；联合熵、条件熵、互信息；KL散度、交叉熵。并在最后用信息论中的交叉熵推导了逻辑回归，得到了和最大似然法相同的结果。</p>
+        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20170509233839180?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>一般的神经网络输入和输出的维度大小都是固定的，针对序列类型（尤其是变长的序列）的输入或输出数据束手无策。RNN通过采用具有记忆的隐含层单元解决了序列数据的训练问题。LSTM属于RNN的改进，解决了RNN中梯度消失爆炸的问题，属于序列数据训练的常用方案。</p>
 <a id="more"></a>
-<h1 id="熵">熵</h1><p>熵是信息的关键度量，通常指一条信息中需要传输或者存储一个信号的平均比特数。熵衡量了预测随机变量的不确定度，不确定性越大熵越大。</p>
-<p>针对随机变量$X$，其信息熵的定义如下：</p>
-<p>$$H(X) =  E[\log_2 (X)] = \sum -p(x) \log_2 (p(x))$$</p>
-<p>信息熵是信源编码中，压缩率的下限。当我们使用少于信息熵的信息量做编码，那么一定有信息的损失。</p>
-<h1 id="联合熵">联合熵</h1><p>联合熵是一集变量之间不确定的衡量手段。</p>
-<p>$$H(X,Y) = \sum \sum -p(x,y) \log(p(x,y))$$</p>
-<h1 id="条件熵">条件熵</h1><p>条件熵描述变量Y在变量X确定的情况下，变量Y的熵还剩多少。</p>
-<p>$$H(Y|X) =  \sum \sum -p(x,y) \log(p(y|x))$$</p>
-<p>联合熵和条件熵的关系是：</p>
-<p>$$H(X,Y) = H(X) +H(Y|X) = H(Y) + H(X|Y) = H(Y,X)$$</p>
-<h1 id="自信息">自信息</h1><p>自信息表示概率空间中与单一事件或离散变量的值相关的信息量的量度。</p>
-<p>$$I(x) = -\log(p(x))$$</p>
-<p>平均的自信息就是信息熵。</p>
-<p>$$H(X) =  E[\log_2 (X)] = \sum -p(x) \log_2 (p(x))$$</p>
-<h1 id="互信息">互信息</h1><p>两个随机变量的互信息，是变量间相互依赖性的量度，不同于相关系数，互信息不限于实值随机变量，其更加一般。</p>
-<p>$$I(X;Y) = \sum\sum -p(x,y) \log(\frac{p(x)p(y)}{p(x,y)})$$</p>
-<p><img src="http://img.blog.csdn.net/20170408103817924?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>$$\begin{split}<br>I(X;Y) &amp;= H(X)-H(X|Y) \\<br>&amp;= H(Y)-H(Y|X) \\<br>&amp;=H(X)+H(Y)-H(X,Y) \\<br>&amp;=H(X,Y)-H(X|Y)-H(Y|X)<br>\end{split}$$</p>
-<p>其意义为，若我们想知道Y包含多少X的信息，在尚未得到 Y之前，我们的不确定性是 H(X)，得到Y后，不确定性是H(X|Y)。所以一旦得到Y后，我们消除了  H(X)-H(X|Y)的不确定量，这就是Y对X的信息量。</p>
-<h1 id="KL散度(信息增益)">KL散度(信息增益)</h1><p>KL散度，又称为相对熵（relative entropy）、信息散度（information divergence）、信息增益（information gain）。</p>
-<p>KL散度是两个概率分布P和Q差别非对称性的度量。KL散度用来度量基于Q的编码来编码来自P的样本平均所需的额外的位元数。典型情况下，P表示数据的真实分布，Q表述数据的模型分布。</p>
-<p>$$D_{KL} (P||Q)= \sum_i P(i) \log \frac{P(i)}{Q(i)}$$</p>
-<h1 id="交叉熵">交叉熵</h1><p>交叉熵衡量了在真实分布是P的情况的情况下，使用分布Q去编码数据，需要的平均比特。</p>
-<p>$$H(p,q) = E_p [-\log q] = H(p) + D_{kl} (p|q)$$</p>
-<p>$$H(p,q) = \sum -p(x)\log(q(x))$$</p>
-<p>交叉熵与逻辑回归的关系如下：</p>
-<p>逻辑回归中：</p>
-<ul>
-<li>$q_{y=1} = \hat{y} = g(wx)$</li>
-<li>$q_{y=0} = 1-\hat{y} = 1-g(wx)$</li>
+<h1 id="RNN">RNN</h1><h2 id="结构">结构</h2><p>传统的神经网络的输入和输出都是确定的，RNN的输入和输出都是不确定的<code>sequence</code>数据。其结构如下：</p>
+<p><img src="http://img.blog.csdn.net/20170509170154747?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170509170205897?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>具体地，RNN有隐含层，隐含层也是记忆层，其状态（权值）会传递到下一个状态中。</p>
+<p>$$\begin{split}<br>h^t &amp;= \sigma(x^tW_{xh} + h^{t-1}W_{hh}) \\<br>y^t &amp;= \sigma(h^tW_{hy})<br>\end{split}$$</p>
+<h2 id="训练">训练</h2><p>训练步骤如下：</p>
+<ol>
+<li>构建损失函数</li>
+<li>求损失函数对权值的梯度</li>
+<li>采用梯度下降法更新权值参数</li>
+</ol>
+<p>关于损失函数，根据需要选择构建即可，下面提供两种常见的损失函数：<br>$$\begin{split}<br>C &amp;= \frac{1}{2}\sum_{n=1}^N ||y^n-{\hat{y}}^n||^2 \\<br>C &amp;= \frac{1}{2}\sum_{n=1}^N -\log y_{r^n}^n<br>\end{split}$$</p>
+<p>关于梯度下降，采用BPTT(Backpropagation through time)算法，该算法的核心是对每一个时间戳，计算该时间戳中权重的梯度，然后更新权重。需要注意的是，不同时间戳同样权重的梯度可能是不一样的，如下图所示都减去，相当于更新同一块内存区域中的权重。</p>
+<p><img src="http://img.blog.csdn.net/20170509201949623?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170509202126299?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="应用">应用</h2><ul>
+<li>多对多：词性标注pos tagging、语音识别、name entity recognition（区分poeple、organizations、places、information extration（区分place of departure、destination、time of departure、time of arrival， other）、机器翻译</li>
+<li>多对一：情感分析</li>
+<li>一对多：caption generation</li>
 </ul>
-<p>数据的真实分布中：</p>
+<p><img src="http://img.blog.csdn.net/20170509195700145?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170509195718708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170509195729802?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170509195751364?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170509195803656?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h1 id="RNN_Variants">RNN Variants</h1><p>RNN的变种大致包含下面3个思路：</p>
 <ul>
-<li>$p_{y=1} = y$</li>
-<li>$p_{y=0} =  1-y$</li>
+<li>增加隐含层的输入参数：例如除了$h^{t-1}, x^t$，还可以包含$y^{t-1}$作为输入。</li>
+<li>增加隐含层的深度</li>
+<li>双向RNN</li>
 </ul>
-<p>因此，可以用交叉熵去衡量估计分布q与真实分布p的相似性，交叉熵越小那么越相似。</p>
-<p>$$H(p,q) = \sum -p(x) \log q(x) = -y\log(\hat{y})-(1-y)\log(1-\hat{y})$$</p>
-<p>因此，损失函数为，得到了和最大似然推导相同的结果：</p>
-<p>$$\begin{split}<br>L(w) &amp;= \frac{1}{N} \sum_{n=1}^N H(p_n,q_n) \\<br>&amp;= \frac{1}{N} \sum_{n=1}^N [- y\log(\hat{y})-(1-y)\log(1-\hat{y})] \\<br>&amp;= \frac{1}{N} \sum_{n=1}^N \log(1+\exp(-y_nw x_n))<br>\end{split}$$</p>
+<p><img src="http://img.blog.csdn.net/20170509195140112?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170509195150159?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170509195202393?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h1 id="LSTM">LSTM</h1><h2 id="结构-1">结构</h2><ul>
+<li>单个时间戳，RNN输入1个x，输出1个y</li>
+<li>单个时间戳，LSTM输入4个x，输出1个y</li>
+</ul>
+<p>相比RNN，LSTM的输入多了3个x，对应3个gate，这3个gate分别是：</p>
+<ul>
+<li>input gate：控制输入</li>
+<li>forget gate：控制cell</li>
+<li>output gate：控制输出</li>
+</ul>
+<p>涉及到的激活函数共5个，其中3个控制gate的（通常用sigmoid函数，模拟gate的开闭状态），1个作用于输入上，一个作用于cell的输出上。</p>
+<p><img src="http://img.blog.csdn.net/20170509200635432?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>LSTM单个时间戳的具体执行如下：</p>
+<ul>
+<li>输入：4个输入$x$，1个cell的状态$c$</li>
+<li>输出：1个输出$a$，1个更新的cell状态$c’$</li>
+</ul>
+<p>$$\begin{split}<br>c’ &amp;= g(z)f(z_i) + cf(z_f) \\<br>a &amp;= h(c’)f(z_o)<br>\end{split}$$</p>
+<h2 id="梯度消失及梯度爆炸">梯度消失及梯度爆炸</h2><p>首先，要明白RNN中梯度消失与梯度爆炸的原因：在时间戳的更新中，cell的状态不断乘以$W_{hh}$。简单起见，视$W_{hh}$为scalar值$w$，那么$y=xw^n$，$\frac{\partial{y}}{\partial{w}}=nxw^{n-1}$。根据$w$的值与1的大小关系，梯度会消失或者爆炸。</p>
+<p>接下来，要明白LSTM如何解决RNN中梯度消失与爆炸的问题。</p>
+<p>RNN中当获取$c’$的梯度后，因为$c’ = cw$，为了backward获得$c$的梯度，要将$c’$的梯度乘以$w$；LSTM中存在梯度的快速通道，获取$c’$的梯度后，因为$c’ = g(z)f(z_i)+cf(z_f)$，当forget gate打开时，$c’ = g(z)f(z_i)+c$。$c’$的梯度可以直接传递给$c$。<br>总结来说，LSTM相比RNN，将$c,c’$的更新关系从乘法变成了加法，因此不用乘以权值系数$w$，$c’$的梯度可以直接传递给$c$，解决了梯度消失和梯度爆炸的问题。</p>
+<p><img src="http://img.blog.csdn.net/20170509232737782?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
 </span>
       
     </div>
@@ -364,17 +388,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/03/07/聚类算法简述/" rel="next" title="聚类算法简述">
-                <i class="fa fa-chevron-left"></i> 聚类算法简述
+              <a href="/2017/04/19/无监督学习之RBM和AutoEncoder/" rel="next" title="无监督学习之RBM和AutoEncoder">
+                <i class="fa fa-chevron-left"></i> 无监督学习之RBM和AutoEncoder
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/04/14/从马尔科夫链到吉布斯采样与PageRank/" rel="prev" title="从马尔科夫链到吉布斯采样与PageRank">
-                从马尔科夫链到吉布斯采样与PageRank <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -424,8 +444,8 @@
         
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2017/04/09/信息论中的各种熵/"
-           data-title="信息论中的各种熵" data-url="http://younggy.com/2017/04/09/信息论中的各种熵/">
+      <div class="ds-thread" data-thread-key="2017/05/09/记忆网络RNN与LSTM/"
+           data-title="记忆网络RNN与LSTM" data-url="http://younggy.com/2017/05/09/记忆网络RNN与LSTM/">
       </div>
     
   </div>
@@ -571,7 +591,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#熵"><span class="nav-number">1.</span> <span class="nav-text">熵</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#联合熵"><span class="nav-number">2.</span> <span class="nav-text">联合熵</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#条件熵"><span class="nav-number">3.</span> <span class="nav-text">条件熵</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#自信息"><span class="nav-number">4.</span> <span class="nav-text">自信息</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#互信息"><span class="nav-number">5.</span> <span class="nav-text">互信息</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#KL散度(信息增益)"><span class="nav-number">6.</span> <span class="nav-text">KL散度(信息增益)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#交叉熵"><span class="nav-number">7.</span> <span class="nav-text">交叉熵</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#RNN"><span class="nav-number">1.</span> <span class="nav-text">RNN</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#结构"><span class="nav-number">1.1.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#训练"><span class="nav-number">1.2.</span> <span class="nav-text">训练</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用"><span class="nav-number">1.3.</span> <span class="nav-text">应用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RNN_Variants"><span class="nav-number">2.</span> <span class="nav-text">RNN Variants</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LSTM"><span class="nav-number">3.</span> <span class="nav-text">LSTM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#结构-1"><span class="nav-number">3.1.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#梯度消失及梯度爆炸"><span class="nav-number">3.2.</span> <span class="nav-text">梯度消失及梯度爆炸</span></a></li></ol></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
