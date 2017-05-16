@@ -72,7 +72,7 @@
 <meta property="og:image" content="http://img.blog.csdn.net/20170509195202393?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
 <meta property="og:image" content="http://img.blog.csdn.net/20170509200635432?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
 <meta property="og:image" content="http://img.blog.csdn.net/20170509232737782?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-05-09T15:40:48.785Z">
+<meta property="og:updated_time" content="2017-05-16T12:44:29.403Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="记忆网络RNN与LSTM">
 <meta name="twitter:description" content="一般的神经网络输入和输出的维度大小都是固定的，针对序列类型（尤其是变长的序列）的输入或输出数据束手无策。RNN通过采用具有记忆的隐含层单元解决了序列数据的训练问题。LSTM属于RNN的改进，解决了RNN中梯度消失爆炸的问题，属于序列数据训练的常用方案。">
@@ -375,7 +375,8 @@
 <p>$$\begin{split}<br>c’ &amp;= g(z)f(z_i) + cf(z_f) \\<br>a &amp;= h(c’)f(z_o)<br>\end{split}$$</p>
 <h2 id="梯度消失及梯度爆炸">梯度消失及梯度爆炸</h2><p>首先，要明白RNN中梯度消失与梯度爆炸的原因：在时间戳的更新中，cell的状态不断乘以$W_{hh}$。简单起见，视$W_{hh}$为scalar值$w$，那么$y=xw^n$，$\frac{\partial{y}}{\partial{w}}=nxw^{n-1}$。根据$w$的值与1的大小关系，梯度会消失或者爆炸。</p>
 <p>接下来，要明白LSTM如何解决RNN中梯度消失与爆炸的问题。</p>
-<p>RNN中当获取$c’$的梯度后，因为$c’ = cw$，为了backward获得$c$的梯度，要将$c’$的梯度乘以$w$；LSTM中存在梯度的快速通道，获取$c’$的梯度后，因为$c’ = g(z)f(z_i)+cf(z_f)$，当forget gate打开时，$c’ = g(z)f(z_i)+c$。$c’$的梯度可以直接传递给$c$。<br>总结来说，LSTM相比RNN，将$c,c’$的更新关系从乘法变成了加法，因此不用乘以权值系数$w$，$c’$的梯度可以直接传递给$c$，解决了梯度消失和梯度爆炸的问题。</p>
+<p>针对梯度消失，RNN中当获取$c’$的梯度后，因为$c’ = cw$，为了backward获得$c$的梯度，要将$c’$的梯度乘以$w$；LSTM中存在梯度的快速通道，获取$c’$的梯度后，因为$c’ = g(z)f(z_i)+cf(z_f)$，当forget gate打开时，$c’ = g(z)f(z_i)+c$。$c’$的梯度可以直接传递给$c$。<br>总结来说，LSTM相比RNN，将$c,c’$的更新关系从乘法变成了加法，因此不用乘以权值系数$w$，$c’$的梯度可以直接传递给$c$，解决了梯度消失和梯度爆炸的问题。</p>
+<p>针对梯度爆炸，即使将$c,c’$的关系由乘法变成了加法，仍然解决不了梯度爆炸。原因便是梯度的路径不止一条，如下图所示，红色的块仍然可能造成梯度爆炸。LSTM解决这个问题的方法是clip，也就是设置梯度最大值，超过最大值的按最大值计。</p>
 <p><img src="http://img.blog.csdn.net/20170509232737782?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
 </span>
       
