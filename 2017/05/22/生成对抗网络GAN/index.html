@@ -1,0 +1,912 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="GAN属于生成模型，使用生成数据分布$P_{G}$去无限逼近数据的真实分布$P_{data}$。衡量两个数据分布的差异有多种度量，例如KL散度等，但是前提是得知道$P_{G}$。GAN利用discriminator巧妙地衡量了$P_{G},P_{data}$的差异性，利用discriminator和generator的不断竞争（minmax）得到了好的generator去生成数据分布$P_{G}$">
+<meta property="og:type" content="article">
+<meta property="og:title" content="生成对抗网络GAN">
+<meta property="og:url" content="http://younggy.com/2017/05/22/生成对抗网络GAN/index.html">
+<meta property="og:site_name" content="YoungGy">
+<meta property="og:description" content="GAN属于生成模型，使用生成数据分布$P_{G}$去无限逼近数据的真实分布$P_{data}$。衡量两个数据分布的差异有多种度量，例如KL散度等，但是前提是得知道$P_{G}$。GAN利用discriminator巧妙地衡量了$P_{G},P_{data}$的差异性，利用discriminator和generator的不断竞争（minmax）得到了好的generator去生成数据分布$P_{G}$">
+<meta property="og:image" content="http://img.blog.csdn.net/20170521224001569?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518103445446?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518103739598?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518103454978?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518105309668?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518105330168?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518115854546?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518120035483?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518141157325?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518141126949?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518143327025?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518141517411?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518143123857?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518143558891?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518152338338?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518153143622?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518153153998?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518153204951?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518153229998?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518153508502?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518153519471?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518153615738?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170518153656364?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-05-22T13:49:56.523Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="生成对抗网络GAN">
+<meta name="twitter:description" content="GAN属于生成模型，使用生成数据分布$P_{G}$去无限逼近数据的真实分布$P_{data}$。衡量两个数据分布的差异有多种度量，例如KL散度等，但是前提是得知道$P_{G}$。GAN利用discriminator巧妙地衡量了$P_{G},P_{data}$的差异性，利用discriminator和generator的不断竞争（minmax）得到了好的generator去生成数据分布$P_{G}$">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post',
+    motion: false
+  };
+</script>
+
+  <title> 生成对抗网络GAN | YoungGy </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?your-analytics-id";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">YoungGy</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">心有猛虎 细嗅蔷薇</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tools">
+          <a href="/tools" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            工具
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'owv-2W-dWzRWk1KttzWi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                生成对抗网络GAN
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-05-22T21:44:24+08:00" content="2017-05-22">
+              2017-05-22
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/05/22/生成对抗网络GAN/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/22/生成对抗网络GAN/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20170521224001569?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>GAN属于生成模型，使用生成数据分布$P_{G}$去无限逼近数据的真实分布$P_{data}$。衡量两个数据分布的差异有多种度量，例如KL散度等，但是前提是得知道$P_{G}$。GAN利用discriminator巧妙地衡量了$P_{G},P_{data}$的差异性，利用discriminator和generator的不断竞争（minmax）得到了好的generator去生成数据分布$P_{G}$。</p>
+<a id="more"></a>
+<h1 id="背景">背景</h1><p>很多时候，我们想输入一类数据，然后让机器学习这一类数据的模式，进而产生该类型新的数据。例如：</p>
+<ul>
+<li>输入唐诗三百首，输出机器写的唐诗</li>
+<li>输入一堆动漫人物的照片，输出机器生成的动漫人物照片</li>
+</ul>
+<p>该问题的核心是原数据有其分布$P_{data}$，机器想要学习新的分布$P_{G}$去无限逼近$P_{data}$。</p>
+<p>一个简单的解决办法是采用异常检测的模型，通过输入大量的正常数据，让机器学习正常数据的内在规律。例如：自编码器模型如下。通过训练数据学习到数据的内在模式code。学习到code后，随机输入新的code便可以产生数据。</p>
+<p><img src="http://img.blog.csdn.net/20170518103445446?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>对于mnist数据，设code为2维，训练之后输入code得到的图片如下：<br><img src="http://img.blog.csdn.net/20170518103739598?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>但是这种情况下，机器学习到的只是这个数据大概长什么样，而不是数据的真实分布。例如下图的两个7，在人看来都是真的图片7，但是机器却不这么认为。<br><img src="http://img.blog.csdn.net/20170518103454978?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h1 id="结构">结构</h1><p>GAN由generator和discriminator两部分组成：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">z -&gt; <span class="type">G</span> -&gt; x' -&gt;  <span class="type">D</span> -&gt; <span class="number">01</span></span><br><span class="line">          x  -&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>generator：输入随机的$z$，输出生成的$x’$</li>
+<li>discriminator：二分类器，输入生成的$x’$和真实的$x$，输出01（是否是真的数据）</li>
+</ul>
+<p>GAN的训练，也包括generator和discriminator两部分：</p>
+<ul>
+<li><p>discriminator的训练，设generator不变，通过调整discriminator的参数让discriminator尽可能区分开$x,x’$。<br><img src="http://img.blog.csdn.net/20170518105309668?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+</li>
+<li><p>generator的训练，设discriminator不变，通过调整generator的参数让discriminator尽可能区分不开$x,x’$。<br><img src="http://img.blog.csdn.net/20170518105330168?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+</li>
+</ul>
+<p>整体来看，generator和discriminator构成了一个网络结构，通过设置loss，保持某一个generator和discriminator参数不变，通过梯度下降更新另外一个的参数即可。</p>
+<h1 id="训练">训练</h1><h2 id="最大似然估计">最大似然估计</h2><p>已知两个分布$P_{data}(x)$和$P_{G}(x;\theta)$，目标是找到$G$的$\theta$使两个分布尽量接近。</p>
+<p>采用最大似然估计，有：</p>
+<p>$$\begin{split}<br>\theta^* &amp;= \arg \max_{\theta} \prod_{i=1}^m P_{G}(x^i;\theta) \\<br>&amp;= \arg \max_{\theta} \sum_{i=1}^m  \log P_{G}(x^i;\theta)  \\<br>&amp;\approx \arg \max_{\theta} E_{x \sim P_{data}(x)} [\log P_{G}(x;\theta) ] \\<br>&amp;= \arg \max_{\theta} \int P_{data}(x) \log P_{G}(x;\theta) dx -  \int P_{data}(x) \log P_{data}(x)dx \\<br>&amp;= \arg \min_{\theta} KL(P_{data}(x) || P_{G}(x;\theta))<br>\end{split}$$</p>
+<p>也就是说，最大似然$P_{G}(x;\theta)$的概率等价于：最小化基于$P_{G}(x;\theta)$的编码来编码$P_{data}(x)$所需的额外位元数。也就是最小化KL散度。</p>
+<p>下面只需要计算出$P_{G}(x;\theta)$，一切问题似乎都解决了。事实确实这样，不过对于不同的$G$，$P_{G}(x;\theta)$计算的难易程度不同。如果$G$是高斯混合模型（GMM）那么很好计算，但是通常数据的分布不是GMM那么简单，需要更复杂的$G$。通常，$G$是神经网络。这样的话，$P_{G}(x;\theta)$的计算便很困难，如下：</p>
+<p>$$P_{G}(x;\theta) = \int P_{prior} (z) I_{[G(z)=x]} dz$$</p>
+<p>这样来看，传统的最大似然是走不通呢，有没有别的出路呢？</p>
+<p>考虑最大似然法真正解决的问题。最大似然就是提供了某种手段，去衡量两个分布$P_{data}(x)$和$P_{G}(x;\theta)$的相近程度。此路不通另寻他路即可。因此便引出了下文的$V(G,D)$。</p>
+<h2 id="V(G,D)取代最大似然估计">V(G,D)取代最大似然估计</h2><p>$V(G,D)$是衡量两个分布$P_{data}(x)$和$P_{G}(x;\theta)$相近程度的一种手段，其不同于最大似然，是通过一个额外的discriminator识别的好坏做评估的。其核心是：discriminator判别数据是真的数据（1）还是采样的数据（0）。如果两个分布很接近，那么discriminator分辨不清，效果比较差；如果两个分布很远，那么discriminator分辨清，效果比较好。</p>
+<p>$$V(G,D) = E_{x \sim P_{data}} [\log D(x)] + E_{x \sim P_{G}} [\log (1-D(x))] $$</p>
+<p>整个训练策略，是先固定$G$选择$D^<em>$去最大化$V(G,D)$ ；然后固定$D^</em>$选择$G$去最大化$V(G,D^*)$。</p>
+<p>$$G^* = \arg \min_{G} \max_{D} V(G,D)$$</p>
+<h2 id="D的训练">D的训练</h2><p>这部分解决的是：对于特定的G，如何训练得到更好的D。</p>
+<p>$$D^* =  \max_{D} V(G,D)$$</p>
+<p>首先，对$V(G,D)$做进一步分解：</p>
+<p>$$\begin{split}<br>V(G,D) &amp;= E_{x \sim P_{data}} [\log D(x)] + E_{x \sim P_{G}} [\log (1-D(x))]  \\<br>&amp;= \int P_{data} \log D(x) dx + \int P_{G} \log (1-D(x)) dx \\<br>&amp;= \int [P_{data}(x) \log D(x) +  P_{G}(x) \log (1-D(x)) ]dx<br>\end{split}$$</p>
+<p>所以有：</p>
+<p>$$D^* = \arg \max_{D} P_{data}(x) \log D(x) +  P_{G}(x) \log (1-D(x)) $$</p>
+<p>对上述式子求导得到：</p>
+<p>$$D^*(x) = \frac{P_{data}(x) }{P_{data}(x) +  P_{G}(x)}$$</p>
+<p>每个$D^<em>(x)$对应的$V(G,D^</em>)$实际上衡量了特定$G$下面两个分布$P_{data}(x)$和$P_{G}差距。<br><img src="http://img.blog.csdn.net/20170518115854546?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>将$D^<em>(x)$代入$V(G,D^</em>)$，有：<br><img src="http://img.blog.csdn.net/20170518120035483?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>所以：固定G优化D的过程，相当于计算两个分布的距离：</p>
+<p>$$\max_{D} V(G,D) = -2\log 2 + 2JSD(P_{data}(x) || P_{G}(x) )$$</p>
+<p>得到两个分布的距离之后，便转化成最小化两个分布的距离的问题，<br>也就是：</p>
+<p>$$G^* = \arg \min_{G} \max_{D} V(G,D)$$</p>
+<h2 id="G的训练">G的训练</h2><p>固定G优化D得到$D^<em>$便得到了两个分布的距离$V(G,D^</em>)$，固定$D^*$优化G，采用梯度下降即可。</p>
+<p><img src="http://img.blog.csdn.net/20170518141157325?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170518141126949?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="算法">算法</h2><p><img src="http://img.blog.csdn.net/20170518143327025?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h1 id="问题">问题</h1><h2 id="G的更新优化不一定朝着最小的方向">G的更新优化不一定朝着最小的方向</h2><p>优化G之后，原来的D对应的就不一定是$\max V(G,D)$最大的$G$了，这样与我们的假设不同。<br>解决办法是：就像梯度更新的时候迈的步子不能太大；更新G的时候迈的步子也不要太大。</p>
+<p><img src="http://img.blog.csdn.net/20170518141517411?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="通过抽样估计分布">通过抽样估计分布</h2><p><img src="http://img.blog.csdn.net/20170518143123857?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="G中的目标函数">G中的目标函数</h2><p>实际训练G的时候，目标函数需要做一些修改，修改的原因是：在刚开始训练的时候，$D$能够很好的区分真实数据与模拟数据，这样$P(G)$中$D(x)$的值比较小。如果采用原来的目标函数，比较小的$D(x)$对应目标函数的斜率比较低，不容易学习。通过改变目标函数，使比较小的$D(x)$对应目标函数的斜率比较高，加快了学习速率，使模型更容易学习。</p>
+<p><img src="http://img.blog.csdn.net/20170518143558891?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="利用D去评估分布差异">利用D去评估分布差异</h2><p>理论上，可以用D去评估分布差异（G的好坏），D越好表明G越差，D越差表明G越好。但是实际中，这样评价的效果不好，不论G的好坏，D都比较好。</p>
+<p><img src="http://img.blog.csdn.net/20170518152338338?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>可能的原因之一：D太强大了。直观的解决办法是让D变弱一些，但是这样得到的D可否真正的计算JS divergence是个问题。<br><img src="http://img.blog.csdn.net/20170518153143622?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>可能的原因之二：数据的本质是高维空间的manifold，很少有重叠。没有重叠的话，js距离永远都是最大值，不容易学习更新。<br><img src="http://img.blog.csdn.net/20170518153153998?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170518153204951?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>通常的解决办法是：给D的输入增加人为的噪声，这样真实数据与人造数据就会有重叠，D不能很好地区分真实数据与人造数据。同时要注意噪声要随时间减少。<br><img src="http://img.blog.csdn.net/20170518153229998?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="mode_collapse">mode collapse</h2><p>mode collapse值的是GAN只学到了数据多个形态中的某一种。<br><img src="http://img.blog.csdn.net/20170518153508502?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170518153519471?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>可能的原因是优化式使GAN趋向如此：</p>
+<p><img src="http://img.blog.csdn.net/20170518153615738?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h1 id="其他GAN">其他GAN</h1><p><img src="http://img.blog.csdn.net/20170518153656364?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/09/记忆网络RNN与LSTM/" rel="next" title="记忆网络RNN与LSTM">
+                <i class="fa fa-chevron-left"></i> 记忆网络RNN与LSTM
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/22/GAN的统一架构与WGAN/" rel="prev" title="GAN的统一架构与WGAN">
+                GAN的统一架构与WGAN <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/05/22/生成对抗网络GAN/"
+           data-title="生成对抗网络GAN" data-url="http://younggy.com/2017/05/22/生成对抗网络GAN/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/uploads/touxiang.jpg" alt="Guangyao Yang" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Guangyao Yang</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Guangyao Yang</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/young_gy" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> CSDN
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YoungGer" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-twitter-url" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i> Twitter
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-weibo-url" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-douban-url" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> DouBan
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/ger-young" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> ZhiHu
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结构"><span class="nav-number">2.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#训练"><span class="nav-number">3.</span> <span class="nav-text">训练</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#最大似然估计"><span class="nav-number">3.1.</span> <span class="nav-text">最大似然估计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#V(G,D)取代最大似然估计"><span class="nav-number">3.2.</span> <span class="nav-text">V(G,D)取代最大似然估计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#D的训练"><span class="nav-number">3.3.</span> <span class="nav-text">D的训练</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#G的训练"><span class="nav-number">3.4.</span> <span class="nav-text">G的训练</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#算法"><span class="nav-number">3.5.</span> <span class="nav-text">算法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#问题"><span class="nav-number">4.</span> <span class="nav-text">问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#G的更新优化不一定朝着最小的方向"><span class="nav-number">4.1.</span> <span class="nav-text">G的更新优化不一定朝着最小的方向</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通过抽样估计分布"><span class="nav-number">4.2.</span> <span class="nav-text">通过抽样估计分布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#G中的目标函数"><span class="nav-number">4.3.</span> <span class="nav-text">G中的目标函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#利用D去评估分布差异"><span class="nav-number">4.4.</span> <span class="nav-text">利用D去评估分布差异</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mode_collapse"><span class="nav-number">4.5.</span> <span class="nav-text">mode collapse</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其他GAN"><span class="nav-number">5.</span> <span class="nav-text">其他GAN</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guangyao Yang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"younggy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+
+  
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/MathJax.js"></script>
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/config/TeX-AMS-MML_HTMLorMML.js"></script>
+  
+
+
+  
+  
+
+</body>
+</html>

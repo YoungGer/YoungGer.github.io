@@ -51,18 +51,36 @@
 
 
 
-<meta name="description" content="从贝叶斯角度，正则项等价于引入参数$w$的先验概率分布。常见的L1/L2正则，分别等价于引入先验信息：参数$w$符合均值为0的拉普拉斯分布/高斯分布。">
+<meta name="description" content="GAN是让机器自动生成$P_G$去接近$P_{data}$。算法的关键是衡量分布$P_G,P_{data}$的差异，不同的衡量办法得到的$V(G,D)$不同，但是所有的衡量方法都可以归纳到一个统一的框架中：利用f-divergence衡量两个分布差异，利用Fenchel Conjugate将两个分布差异的问题转化到GAN的大框架中。而近段异常流行的WGAN，便是将两个分布的差异用Earch Mov">
 <meta property="og:type" content="article">
-<meta property="og:title" content="贝叶斯方法与正则项">
-<meta property="og:url" content="http://younggy.com/2017/02/27/贝叶斯方法与正则项/index.html">
+<meta property="og:title" content="GAN的统一架构与WGAN">
+<meta property="og:url" content="http://younggy.com/2017/05/22/GAN的统一架构与WGAN/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="从贝叶斯角度，正则项等价于引入参数$w$的先验概率分布。常见的L1/L2正则，分别等价于引入先验信息：参数$w$符合均值为0的拉普拉斯分布/高斯分布。">
-<meta property="og:image" content="http://img.blog.csdn.net/20170227193643492?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170227193643492?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-02-27T11:41:14.799Z">
+<meta property="og:description" content="GAN是让机器自动生成$P_G$去接近$P_{data}$。算法的关键是衡量分布$P_G,P_{data}$的差异，不同的衡量办法得到的$V(G,D)$不同，但是所有的衡量方法都可以归纳到一个统一的框架中：利用f-divergence衡量两个分布差异，利用Fenchel Conjugate将两个分布差异的问题转化到GAN的大框架中。而近段异常流行的WGAN，便是将两个分布的差异用Earch Mov">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522205300195?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522195109831?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522200033201?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522200353311?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522200518335?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522201343864?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522201359567?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522202122758?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522202221890?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522202421776?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522202907931?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522203252514?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522204405514?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522203518081?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522203808991?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522204225527?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522204213238?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522205018538?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522205029382?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170522205041319?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-05-22T13:52:26.156Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="贝叶斯方法与正则项">
-<meta name="twitter:description" content="从贝叶斯角度，正则项等价于引入参数$w$的先验概率分布。常见的L1/L2正则，分别等价于引入先验信息：参数$w$符合均值为0的拉普拉斯分布/高斯分布。">
+<meta name="twitter:title" content="GAN的统一架构与WGAN">
+<meta name="twitter:description" content="GAN是让机器自动生成$P_G$去接近$P_{data}$。算法的关键是衡量分布$P_G,P_{data}$的差异，不同的衡量办法得到的$V(G,D)$不同，但是所有的衡量方法都可以归纳到一个统一的框架中：利用f-divergence衡量两个分布差异，利用Fenchel Conjugate将两个分布差异的问题转化到GAN的大框架中。而近段异常流行的WGAN，便是将两个分布的差异用Earch Mov">
 
 
 
@@ -74,7 +92,7 @@
   };
 </script>
 
-  <title> 贝叶斯方法与正则项 | YoungGy </title>
+  <title> GAN的统一架构与WGAN | YoungGy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -255,7 +273,7 @@
             
             
               
-                贝叶斯方法与正则项
+                GAN的统一架构与WGAN
               
             
           </h1>
@@ -264,8 +282,8 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2017-02-27T19:32:21+08:00" content="2017-02-27">
-              2017-02-27
+            <time itemprop="dateCreated" datetime="2017-05-22T21:51:16+08:00" content="2017-05-22">
+              2017-05-22
             </time>
           </span>
 
@@ -290,8 +308,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2017/02/27/贝叶斯方法与正则项/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/27/贝叶斯方法与正则项/" itemprop="commentsCount"></span>
+                <a href="/2017/05/22/GAN的统一架构与WGAN/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/22/GAN的统一架构与WGAN/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -310,47 +328,53 @@
       
 
       
-        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20170227193643492?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>从贝叶斯角度，正则项等价于引入参数$w$的先验概率分布。常见的L1/L2正则，分别等价于引入先验信息：参数$w$符合均值为0的拉普拉斯分布/高斯分布。</p>
+        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20170522205300195?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>GAN是让机器自动生成$P_G$去接近$P_{data}$。算法的关键是衡量分布$P_G,P_{data}$的差异，不同的衡量办法得到的$V(G,D)$不同，但是所有的衡量方法都可以归纳到一个统一的框架中：利用<code>f-divergence</code>衡量两个分布差异，利用<code>Fenchel Conjugate</code>将两个分布差异的问题转化到GAN的大框架中。<br>而近段异常流行的WGAN，便是将两个分布的差异用<code>Earch Mover Distance</code>衡量，然后用<code>weight clipping</code>或<code>gradient penalty</code>优化梯度计算，取得了非常好的效果。</p>
 <a id="more"></a>
-<h1 id="贝叶斯方法的参数估计">贝叶斯方法的参数估计</h1><p>贝叶斯方法的参数估计，就是通过最大化后验概率来估计模型的参数。</p>
-<p>假定模型参数为$w$，数据集为$D$，贝叶斯通过最大化后验概率估计模型参数$w$，即：</p>
-<p>$$w = \arg\max_w p(w|D)= \arg\max_w  \frac{p(w) p(D|w) }{P(D)}=\arg\max_w p(w) p(D|w) $$</p>
-<h1 id="后验概率的展开形式">后验概率的展开形式</h1><p>假定如下：</p>
+<h1 id="原始GAN">原始GAN</h1><p>原始GAN的演算法如下，通过discriminator的loss与js divergence相关联。</p>
+<p><img src="http://img.blog.csdn.net/20170522195109831?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h1 id="统一架构">统一架构</h1><h2 id="f_divergence">f divergence</h2><p>衡量两个分布的差距有多种方法，这些方法基本上都属于同一个架构f divergence。如下，$D_f (P||Q) $通过包含$f$函数的积分评估了两个分布的差异：</p>
+<p>$$D_f (P||Q) = \int_x q(x) f(\frac{p(x)}{q(x)}) dx$$</p>
+<p>$f$函数满足的条件如下（满足这样的条件，$D_f (P||Q)$的最小值当且仅当两个分布完全相同时为0）：</p>
 <ul>
-<li>样本独立不相关</li>
-<li>模型参数独立不相关</li>
+<li>$f$是凸hanshu</li>
+<li>$f(1)=0$</li>
 </ul>
-<p>$$\begin{split}<br>p(w)p(D|w) &amp;=  \prod_{i=1}^K p(w_i) \prod_{i=1}^N p(D_i|w) \\<br>&amp;\leftarrow  \sum_{i=1}^K  \log p(w_i)+ \sum_{i=1}^N \log p(D_i|w)<br>\end{split}$$</p>
-<p>最新的优化问题为：</p>
-<p>$$w = \arg\min_w  -  \sum_{i=1}^K  \log p(w_i)- \sum_{i=1}^N \log p(D_i|w)$$</p>
-<h1 id="参数的先验概率与正则项">参数的先验概率与正则项</h1><p>当参数$w$的先验概率满足高斯分布：</p>
-<p>$$p(w_i) = N(w_i | \mu,\sigma^2) = \frac{1}{\sqrt{2\pi \sigma^2}} e^{-\frac{(w_i-\mu)^2}{2\sigma^2}}$$</p>
-<p>优化问题的左项中，如果$w$满足$N(0,\frac{1}{2\lambda})$：</p>
-<p>$$\begin{split}<br>-\sum_{i=1}^K \log p(w_i) &amp;= - \sum_{i=1}^K \log \frac{1}{\sqrt{2\pi \sigma^2}} +  \sum_{i=1}^K \frac{(w_i-\mu)^2}{2\sigma^2} \\<br>&amp;= const + \sum_{i=1}^K \frac{(w_i-\mu)^2}{2\sigma^2} \\<br>&amp;= const +  \lambda \sum_{i=1}^K w_i^2<br>\end{split}$$</p>
-<p>这时候的优化函数为：</p>
-<p>$$w = \arg\min_w   \lambda \sum_{i=1}^K w_i^2 - \sum_{i=1}^N \log p(D_i|w)$$</p>
-<p>同样地，参数$w$的先验概率满足均值为0的拉普拉斯分布，有：</p>
-<p>$$w = \arg\min_w   \lambda \sum_{i=1}^K |w_i| - \sum_{i=1}^N \log p(D_i|w)$$</p>
-<p>这说明：</p>
-<ul>
-<li>L2正则，等价于参数$w$的先验分布满足均值为0的正态分布</li>
-<li>L1正则，等价于参数$w$的先验分布满足均值为0的拉普拉斯分布</li>
-<li>拉普拉斯在0附近突出，周围稀疏，对应容易产生稀疏解的模型</li>
-</ul>
-<p><img src="http://img.blog.csdn.net/20170227193643492?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<h1 id="模型举例">模型举例</h1><p>以参数$w$的先验概率满足均值为0的高斯分布为例，优化问题为：</p>
-<p>$$w = \arg\min_w   \lambda \sum_{i=1}^K w_i^2 - \sum_{i=1}^N \log p(D_i|w)$$</p>
-<h2 id="逻辑回归">逻辑回归</h2><p>$$\begin{split}<br>-\sum_{i=1}^N \log p(D_i|w) &amp;= - \sum_{i=1}^N \log \theta(y_n w^T x_n) \\<br>&amp;=\sum_{i=1}^N \log (1+\exp(-y_n w^T x_n) )<br>\end{split}$$</p>
-<p>所以有：</p>
-<p>$$w = \arg\min_w   \lambda \sum_{i=1}^K w_i^2 +\sum_{i=1}^N \log (1+\exp(-y_n w^T x_n) )$$</p>
-<p>总结：逻辑回归，通过贝叶斯法最大化后验概率。在数据的概率满足逻辑函数的假设下得到了cross entropy的误差函数；在样本独立、模型参数独立、模型参数满足均值为0的高斯分布的假设下获得了L2正则项。</p>
-<h2 id="线性回归">线性回归</h2><p>线性回归，假设误差满足均值为0的高斯分布，该假设符合一般的规律。</p>
-<p>$$p(D_i|w)  = \frac{1}{\sqrt{2\pi \sigma^2}} e^{-\frac{(w^Tx_i-y_i)^2}{2\sigma^2}}$$</p>
-<p>$$\begin{split}<br>-\sum_{i=1}^N \log p(D_i|w) &amp;= - \sum_{i=1}^N \log  \frac{1}{\sqrt{2\pi \sigma^2}} e^{-\frac{(w^Tx_i-y_i)^2}{2\sigma^2}} \\<br>&amp;\leftarrow \sum_{i=1}^N  (w^Tx_i-y_i)^2<br>\end{split}$$</p>
-<p>所以有：</p>
-<p>$$w = \arg\min_w   \lambda \sum_{i=1}^K w_i^2 +\sum_{i=1}^N  (w^Tx_i-y_i)^2$$</p>
-<p>总结：线性回归，通过贝叶斯法最大化后验概率。在误差为均值0的高斯分布的假设下得到了square error的误差函数；在样本独立、模型参数独立、模型参数满足均值为0的高斯分布的假设下获得了L2正则项。</p>
+<p>不同的f函数会得到不同的divergence，但是都属于f divergence这个大框架中，区别只是f函数的不同。</p>
+<p><img src="http://img.blog.csdn.net/20170522200033201?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="fenchel_conjugate">fenchel conjugate</h2><p>每一个凸函数$f$，都有与其conjugate的函数$f^<em>$，$f^</em>$的定义如下：</p>
+<p><img src="http://img.blog.csdn.net/20170522200353311?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>举例如下：</p>
+<p><img src="http://img.blog.csdn.net/20170522200518335?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="connect_with_gan">connect with gan</h2><p>那么一个问题随之而来：f divergence以及fenchel conjugate与GAN到底有什么联系呢？</p>
+<p>首先，f divergence提供了一种度量两个分布差异的方式；然而，f divergence需要知道pdf，生成分布的pdf不容易得到；这时候通过f的fenchel conjugate对原来的差异公式进行变换，引入额外的变量D（也就是discriminator），转化成找到令值最大的D的问题，最终化成GAN类似的形式。具体化简过程如下：</p>
+<p><img src="http://img.blog.csdn.net/20170522201343864?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170522201359567?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>总的来说，f divergence以及fenchel conjugate的价值在于：构建了两个分布的f divergence，通过fenchel conjugate将divergence转化为$max_D V(G,D)$的问题，自然而然地与GAN关联了起来。</p>
+<h2 id="其他">其他</h2><p>GAN的训练在原始paper中是两次循环，f-divergence的paper中是一次循环。</p>
+<p><img src="http://img.blog.csdn.net/20170522202122758?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>不同的f函数得到的分布差异也不一样，如下：</p>
+<p><img src="http://img.blog.csdn.net/20170522202221890?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>KLD与JSD相比，对多分布的拟合效果较好：</p>
+<p><img src="http://img.blog.csdn.net/20170522202421776?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h1 id="WGAN">WGAN</h1><h2 id="介绍">介绍</h2><p>前面介绍了用f-divergence去度量两个分布的差异，WGAN与传统GAN的区别就是度量分布差异的方式不同。WGAN使用了<code>earth mover&#39;s distance</code>，顾名思义，就是把一个分布变成另外一个分布需要花的力气。<code>earth mover&#39;s distance</code>的定义如下：</p>
+<p><img src="http://img.blog.csdn.net/20170522202907931?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="优势">优势</h2><p>WGAN的优势，主要在于<code>earth mover&#39;s distance</code>。<code>earth mover&#39;s distance</code>相比<code>js divergence</code>的优点是：当两个分布没有接触的时候，不管距离远近，<code>js divergence</code>的度量都是相同的，而<code>earth mover&#39;s distance</code>会考虑到两个分布的距离到底有多远，这样在训练的时候便更容易训练。</p>
+<p>如果不使用WGAN，通常的做法是给分布加噪声，让分布有重叠，这样才更容易去训练。</p>
+<p><img src="http://img.blog.csdn.net/20170522203252514?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>因此，WGAN可以部分解决生成模型的评价问题，可以利用<code>earth mover&#39;s distance</code>来监控模型的好坏（更多处于实际操作方面而非理论loss）。</p>
+<p><img src="http://img.blog.csdn.net/20170522204405514?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="weight_clipping">weight clipping</h2><p>使用<code>earth mover&#39;s distance</code>后，WGAN度量分布差异的公式如下：</p>
+<p><img src="http://img.blog.csdn.net/20170522203518081?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><code>Lipschitz Function</code>限制条件的作用是：一方面给D(x)加一些控制，不让它任意变大变小，否则都变成无穷值就没有意义了；另一方面限制D(x)的增长速度，提供足够的梯度保证，如下图：</p>
+<p><img src="http://img.blog.csdn.net/20170522203808991?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>那么问题来了，如何保证D(x)满足<code>Lipschitz Function</code>限制条件呢？<br>原始的WGAN采用了weight clipping方法，其思路是限制参数的梯度值在一定范围内，这样便通过倒数限制了D(x)的增长速度。这种方法的缺点是c值不好确定。</p>
+<p><img src="http://img.blog.csdn.net/20170522204225527?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>完整的算法如下：<br><img src="http://img.blog.csdn.net/20170522204213238?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="gradient_penalty">gradient penalty</h2><p>之前<code>Lipschitz Function</code>限制条件通过weight clipping解决，这里借助<code>Lipschitz Function</code>的梯度小于等于1的条件，增加过大梯度的惩罚项，具体如下：</p>
+<p><img src="http://img.blog.csdn.net/20170522205018538?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170522205029382?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170522205041319?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
 </span>
       
     </div>
@@ -362,17 +386,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/02/27/机器学习中的损失函数/" rel="next" title="机器学习中的损失函数">
-                <i class="fa fa-chevron-left"></i> 机器学习中的损失函数
+              <a href="/2017/05/22/生成对抗网络GAN/" rel="next" title="生成对抗网络GAN">
+                <i class="fa fa-chevron-left"></i> 生成对抗网络GAN
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/03/07/聚类算法简述/" rel="prev" title="聚类算法简述">
-                聚类算法简述 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -422,8 +442,8 @@
         
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2017/02/27/贝叶斯方法与正则项/"
-           data-title="贝叶斯方法与正则项" data-url="http://younggy.com/2017/02/27/贝叶斯方法与正则项/">
+      <div class="ds-thread" data-thread-key="2017/05/22/GAN的统一架构与WGAN/"
+           data-title="GAN的统一架构与WGAN" data-url="http://younggy.com/2017/05/22/GAN的统一架构与WGAN/">
       </div>
     
   </div>
@@ -569,7 +589,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#贝叶斯方法的参数估计"><span class="nav-number">1.</span> <span class="nav-text">贝叶斯方法的参数估计</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#后验概率的展开形式"><span class="nav-number">2.</span> <span class="nav-text">后验概率的展开形式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参数的先验概率与正则项"><span class="nav-number">3.</span> <span class="nav-text">参数的先验概率与正则项</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#模型举例"><span class="nav-number">4.</span> <span class="nav-text">模型举例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#逻辑回归"><span class="nav-number">4.1.</span> <span class="nav-text">逻辑回归</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线性回归"><span class="nav-number">4.2.</span> <span class="nav-text">线性回归</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#原始GAN"><span class="nav-number">1.</span> <span class="nav-text">原始GAN</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#统一架构"><span class="nav-number">2.</span> <span class="nav-text">统一架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#f_divergence"><span class="nav-number">2.1.</span> <span class="nav-text">f divergence</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fenchel_conjugate"><span class="nav-number">2.2.</span> <span class="nav-text">fenchel conjugate</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#connect_with_gan"><span class="nav-number">2.3.</span> <span class="nav-text">connect with gan</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">2.4.</span> <span class="nav-text">其他</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#WGAN"><span class="nav-number">3.</span> <span class="nav-text">WGAN</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">3.1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优势"><span class="nav-number">3.2.</span> <span class="nav-text">优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#weight_clipping"><span class="nav-number">3.3.</span> <span class="nav-text">weight clipping</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gradient_penalty"><span class="nav-number">3.4.</span> <span class="nav-text">gradient penalty</span></a></li></ol></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
