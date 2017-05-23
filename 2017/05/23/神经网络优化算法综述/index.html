@@ -1,0 +1,940 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="神经网络的训练有不同算法，本文将简要介绍常见的训练算法：adagrad、momentum、nag、rmsprop。同时简要介绍如何进行算法检查。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="神经网络优化算法综述">
+<meta property="og:url" content="http://younggy.com/2017/05/23/神经网络优化算法综述/index.html">
+<meta property="og:site_name" content="YoungGy">
+<meta property="og:description" content="神经网络的训练有不同算法，本文将简要介绍常见的训练算法：adagrad、momentum、nag、rmsprop。同时简要介绍如何进行算法检查。">
+<meta property="og:image" content="http://img.blog.csdn.net/20170523115723166?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170523101055285?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170523101245257?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170523102613492?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170523103104125?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170523105247796?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170523105258201?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170523110941770?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170523111022851?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170523111619243?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170523111630173?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-05-23T04:36:36.628Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="神经网络优化算法综述">
+<meta name="twitter:description" content="神经网络的训练有不同算法，本文将简要介绍常见的训练算法：adagrad、momentum、nag、rmsprop。同时简要介绍如何进行算法检查。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post',
+    motion: false
+  };
+</script>
+
+  <title> 神经网络优化算法综述 | YoungGy </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?your-analytics-id";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">YoungGy</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">心有猛虎 细嗅蔷薇</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tools">
+          <a href="/tools" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            工具
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'owv-2W-dWzRWk1KttzWi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                神经网络优化算法综述
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-05-23T12:35:29+08:00" content="2017-05-23">
+              2017-05-23
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/05/23/神经网络优化算法综述/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/23/神经网络优化算法综述/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20170523115723166?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>神经网络的训练有不同算法，本文将简要介绍常见的训练算法：adagrad、momentum、nag、rmsprop。同时简要介绍如何进行算法检查。</p>
+<a id="more"></a>
+<h1 id="算法检查">算法检查</h1><p>当我们实施了神经网络的梯度算法后，怎么知道我们的算法是否正确。在用于大规模数据之前，需要做两件事：</p>
+<ul>
+<li>gradient check</li>
+<li>sanity check</li>
+</ul>
+<h2 id="gradient_check">gradient check</h2><p>梯度检查，就是检查我们的梯度更新是否正确。具体地，检查分析计算出的梯度与数值梯度是否足够接近。</p>
+<p>$$\frac{df(x)}{dx} = \frac{f(x + h) - f(x)}{h} \hspace{0.1in} \text{(bad, do not use)}$$</p>
+<p>$$\frac{df(x)}{dx} = \frac{f(x + h) - f(x - h)}{2h} \hspace{0.1in} \text{(use instead)}$$</p>
+<p>上面显示了两种数值梯度的计算方法，一般采用下面那一种。因为进行泰勒展开后，上面项的误差是$O(h)$，下面项的误差是$O(h^2)$。</p>
+<p>计算出分析梯度与数值梯度后，需要对两者比较，比较采用相对值如下：</p>
+<p>$$\frac{\mid f’_a - f’_n \mid}{\max(\mid f’_a \mid, \mid f’_n \mid)}$$</p>
+<p>通常来说，1e-4的相对误差对于包含kinks的网络（例如relu）是可以接受的，对大多数网络1e-7的误差是相对较好的。</p>
+<p>梯度检查有几点建议：</p>
+<ul>
+<li>使用双精度</li>
+<li>观察浮点数的范围，不要太小或者太大，以免超出精度限制</li>
+<li>注意目标函数中是否存在kinks（relu），如果存在可以减少测试点的数量</li>
+<li>step不是越小越好，过小会遇到数值问题</li>
+<li>检查的网络状态应该是网络的特征状态，不要在网络初始状态进行检查</li>
+<li>检查的时候不要让正则项过强，否则会影响盖住data loss</li>
+<li>关掉dropout等随机机制，对dropout额外进行检测</li>
+<li>高维数据检测部分维度即可</li>
+</ul>
+<h2 id="sanity_check">sanity check</h2><ul>
+<li>随机化数据，看看loss的计算是否符合预期</li>
+<li>增强正则项，看看loss有没有按照预期增加</li>
+<li>看看算法是否可以在小的数据集上过拟合</li>
+</ul>
+<h2 id="other_check">other check</h2><ul>
+<li><p>更新的大小与原数据大小的比例在1e-3较合适。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># assume parameter vector W and its gradient vector dW</span></span><br><span class="line">param\_scale = np.linalg.norm(W.ravel())</span><br><span class="line">update = -learning\_rate*dW <span class="comment"># simple SGD update</span></span><br><span class="line">update\_scale = np.linalg.norm(update.ravel())</span><br><span class="line">W += update <span class="comment"># the actual update</span></span><br><span class="line"><span class="keyword">print</span> update\_scale / param\_scale <span class="comment"># want ~1e-3</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>监测每层激活函数以及梯度的分布</p>
+</li>
+<li>进行参数可视化</li>
+</ul>
+<h1 id="一阶算法">一阶算法</h1><h2 id="Adagrad">Adagrad</h2><p>在神经网络的训练中，学习率一般随着迭代次数的增长而下降。通常采用学习率的变化公式为：</p>
+<p>$$\eta^t = \frac{\eta}{\sqrt{t+1}}$$</p>
+<p>可是学习率不仅受时间（迭代次数）的影响，也受当前参数或者说当前参数所在状态的影响。Adagrad便用参数之前导数的rms考虑了参数的状态信息。</p>
+<p>令：</p>
+<p>$$\begin{split}<br>g^t &amp;= \frac{\partial C(\theta^t)}{\partial w} \\<br>\eta^t &amp;= \frac{\eta}{\sqrt{t+1}} \\<br>\sigma^t &amp;= \sqrt{\frac{1}{t+1} \sum_{i=0}^t (g^i)^2}<br>\end{split}$$</p>
+<p>只考虑时间变化的梯度下降与adagrad对比如下：</p>
+<p>$$\begin{split}<br>w^{t+1} &amp;\leftarrow w^t - \eta^t  g^t\\<br>w^{t+1} &amp;\leftarrow w^t - \frac{\eta^t}{\sigma^t}  g^t<br>\end{split}$$</p>
+<p>例子如下：</p>
+<p><img src="http://img.blog.csdn.net/20170523101055285?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>adagrad的解释如下：</p>
+<p>$$\begin{split}<br>w^{t+1} &amp;\leftarrow w^t - \eta^t  g^t\\<br>w^{t+1} &amp;\leftarrow w^t - \frac{\eta^t}{\sigma^t}  g^t<br>\end{split}$$</p>
+<p>adagrad考虑了梯度随时间以及参数状态的变化，进一步化简可得到：</p>
+<p><img src="http://img.blog.csdn.net/20170523101245257?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>$$w^{t+1} \leftarrow w^t - \frac{\eta}{ \sum_{i=0}^t (g^i)^2}  g^t$$</p>
+<p>也就是说，在固定的学习率$\eta$下，梯度更新的大小：</p>
+<ul>
+<li>与当前的梯度$g^t$成正比</li>
+<li>与之前的梯度$\sum_{i=0}^t (g^i)^2$成反比</li>
+</ul>
+<p>那么，问题来了：为什么要这么做呢？<br>答案是：gd是一次逼近，adagrad是用历史的导数信息做二次逼近。而$\sum_{i=0}^t (g^i)^2$便表征了二次导数信息。</p>
+<p>二次逼近的效果好于一次逼近不需赘述，二次逼近的更新公式是$x \leftarrow x - \frac{f’(x)}{f’’(x)}$。$f’(x)$较容易获得，可是$f’’(x)$需要计算海森矩阵不易得到。adagrad的优势就在用一次导数去估计二次导数。</p>
+<p>估计的方法是：二次导数越大，那么其对应的一次导数的变化也越大，直观的例子如下：</p>
+<p><img src="http://img.blog.csdn.net/20170523102613492?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>这样做的好处如下图所示，在蓝色箭头部分，一阶导数的值较小，可是按照图中的位置需要更新比较大的距离。这时候考虑二阶导数部分，二阶导数比较小，采用二阶更新办法得到的更新值比较大，满足了我们的要求：</p>
+<p><img src="http://img.blog.csdn.net/20170523103104125?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>总结来说，adagrad的理解有两种方式：</p>
+<ul>
+<li>更新的大小不仅跟时间有关，也跟当前参数空间，参数周围的状态有关</li>
+<li>gd是一阶更新方式，adagrad是二阶更新方式，用历史的梯度信息去近似二阶导数。</li>
+</ul>
+<h2 id="momentum">momentum</h2><p>momentum考虑参数更新时会遇到以下三个问题：</p>
+<ul>
+<li>参数落在plateau，梯度计算值过小，更新过慢</li>
+<li>参数落在鞍点（saddle point），更新值为0</li>
+<li>参数落在局部最小值（local minima），更新值为0</li>
+</ul>
+<p>这些问题，通过momentum都可以解决。momentum相当于给参数更新加了惯性，更新的方向与距离是通过当前的梯度与上一次更新的方向距离联合得到的。</p>
+<p>也就是说：</p>
+<blockquote>
+<p>Movement not just based on gradient, but previous movement.</p>
+</blockquote>
+<p><img src="http://img.blog.csdn.net/20170523105247796?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170523105258201?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="nag">nag</h2><p>nag的全称是Nesterov’s Accelerated Gradient。其是对momentum的改进，区别如下：</p>
+<ul>
+<li>momentum将之前的移动与当前的梯度联合起来计算新的移动</li>
+<li>nag先按照之前的移动，然后在新的位置计算梯度，然后把之前的移动与新的梯度联合计算新的移动</li>
+</ul>
+<p>nag相比momentum的优势在于：其按照原来的移动先移动了一下，并且计算移动后位置的梯度，相当于对周围的状况有了更多的了解，因此能够更准确的确定新的更新方向。</p>
+<p>nag与momentum以及gd对比如下：</p>
+<p><img src="http://img.blog.csdn.net/20170523110941770?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>nag与momentum的原理示意图如下：</p>
+<p><img src="http://img.blog.csdn.net/20170523111022851?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="rmsprop">rmsprop</h2><p>rmsprop是对adagrad的改进，adgrad利用历史的一阶导数信息去近似估计二阶导数，因此对参数周围的状态有了更多的了解，参数可以更新的更好。<br>可是，adgrad利用的历史一阶导数信息的权重是相同的。事实上，我们应该更关心当前的状态，也就是说：在估计二阶导数时应该给更近的一阶导数赋予更大的权重。</p>
+<p><img src="http://img.blog.csdn.net/20170523111619243?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>rmsprop引入衰减系数$\alpha$，公式如下：</p>
+<p><img src="http://img.blog.csdn.net/20170523111630173?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="总结">总结</h2><p>对以上算法简单总结如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Vanilla update</span></span><br><span class="line">x += - learning\_rate * dx</span><br><span class="line"></span><br><span class="line"><span class="comment"># Momentum update</span></span><br><span class="line">v = mu * v - learning\_rate * dx <span class="comment"># integrate velocity</span></span><br><span class="line">x += v <span class="comment"># integrate position</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># nag</span></span><br><span class="line">x\_ahead = x + mu * v</span><br><span class="line"><span class="comment"># evaluate dx\_ahead (the gradient at x\_ahead instead of at x)</span></span><br><span class="line">v = mu * v - learning\_rate * dx\_ahead</span><br><span class="line">x += v</span><br><span class="line"></span><br><span class="line"><span class="comment"># adagrad</span></span><br><span class="line">cache += dx**<span class="number">2</span></span><br><span class="line">x += - learning\_rate * dx / (np.sqrt(cache) + eps)</span><br><span class="line"></span><br><span class="line"><span class="comment"># rmsprop</span></span><br><span class="line">cache = decay\_rate * cache + (<span class="number">1</span> - decay\_rate) * dx**<span class="number">2</span></span><br><span class="line">x += - learning\_rate * dx / (np.sqrt(cache) + eps)</span><br><span class="line"></span><br><span class="line"><span class="comment"># adam, like RMSProp with momentum.</span></span><br><span class="line">m = beta1*m + (<span class="number">1</span>-beta1)*dx</span><br><span class="line">v = beta2*v + (<span class="number">1</span>-beta2)*(dx**<span class="number">2</span>)</span><br><span class="line">x += - learning\_rate * m / (np.sqrt(v) + eps)</span><br></pre></td></tr></table></figure>
+<h1 id="二阶算法">二阶算法</h1><h2 id="牛顿法">牛顿法</h2><p>首先先来回顾下牛顿法：牛顿法可以用来求$f(x)$的零点，求解方法是：</p>
+<p>$$x   \leftarrow x- \frac{f(x)}{f’(x)}$$</p>
+<p>如果要求$f(x)$的极值，那么就是求$f’(x)$的零点，求解方法是：</p>
+<p>$$x   \leftarrow x- \frac{f’(x)}{f’’(x)}$$</p>
+<p>当$x$的维度变高后，引入海森矩阵$H$，有：</p>
+<p>$$x \leftarrow x - [H f(x)]^{-1} \nabla f(x)$$</p>
+<h2 id="拟牛顿法">拟牛顿法</h2><p>牛顿法有个缺点，海森矩阵是非稀疏矩阵，参数太多，其计算量太大。因此拟牛顿法采用一些优化方法去近似计算海森矩阵的逆，大大减少了计算量。</p>
+<p>常用的拟牛顿法有：</p>
+<ul>
+<li>BFGS</li>
+<li>L-BFGS（使用随着时间的梯度信息去近似海森矩阵的逆）</li>
+</ul>
+<p>然而，拟牛顿法在神经网络的训练中用的较少，原因主要是拟牛顿法的训练需要使用全部的数据集。batch的拟牛顿法目前还不成熟。</p>
+<h1 id="参考">参考</h1><ol>
+<li><a href="http://cs231n.github.io/neural-networks-3/#hyper" target="_blank" rel="external">CS231N</a></li>
+<li><a href="http://speech.ee.ntu.edu.tw/~tlkagk/courses\_MLSD15\_2.html" target="_blank" rel="external">MLDS</a></li>
+</ol>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/22/GAN的统一架构与WGAN/" rel="next" title="GAN的统一架构与WGAN">
+                <i class="fa fa-chevron-left"></i> GAN的统一架构与WGAN
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/05/23/神经网络优化算法综述/"
+           data-title="神经网络优化算法综述" data-url="http://younggy.com/2017/05/23/神经网络优化算法综述/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/uploads/touxiang.jpg" alt="Guangyao Yang" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Guangyao Yang</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Guangyao Yang</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/young_gy" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> CSDN
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YoungGer" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-twitter-url" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i> Twitter
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-weibo-url" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-douban-url" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> DouBan
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/ger-young" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> ZhiHu
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#算法检查"><span class="nav-number">1.</span> <span class="nav-text">算法检查</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#gradient_check"><span class="nav-number">1.1.</span> <span class="nav-text">gradient check</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sanity_check"><span class="nav-number">1.2.</span> <span class="nav-text">sanity check</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#other_check"><span class="nav-number">1.3.</span> <span class="nav-text">other check</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#一阶算法"><span class="nav-number">2.</span> <span class="nav-text">一阶算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Adagrad"><span class="nav-number">2.1.</span> <span class="nav-text">Adagrad</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#momentum"><span class="nav-number">2.2.</span> <span class="nav-text">momentum</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nag"><span class="nav-number">2.3.</span> <span class="nav-text">nag</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rmsprop"><span class="nav-number">2.4.</span> <span class="nav-text">rmsprop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">2.5.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二阶算法"><span class="nav-number">3.</span> <span class="nav-text">二阶算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#牛顿法"><span class="nav-number">3.1.</span> <span class="nav-text">牛顿法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拟牛顿法"><span class="nav-number">3.2.</span> <span class="nav-text">拟牛顿法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guangyao Yang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"younggy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+
+  
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/MathJax.js"></script>
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/config/TeX-AMS-MML_HTMLorMML.js"></script>
+  
+
+
+  
+  
+
+</body>
+</html>
