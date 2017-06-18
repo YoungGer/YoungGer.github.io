@@ -72,7 +72,9 @@
 <meta property="og:image" content="http://img.blog.csdn.net/20170509195202393?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
 <meta property="og:image" content="http://img.blog.csdn.net/20170509200635432?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
 <meta property="og:image" content="http://img.blog.csdn.net/20170509232737782?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-05-16T12:44:29.403Z">
+<meta property="og:image" content="http://img.blog.csdn.net/20170618114739004?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170618114749977?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-06-18T12:41:37.461Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="记忆网络RNN与LSTM">
 <meta name="twitter:description" content="一般的神经网络输入和输出的维度大小都是固定的，针对序列类型（尤其是变长的序列）的输入或输出数据束手无策。RNN通过采用具有记忆的隐含层单元解决了序列数据的训练问题。LSTM属于RNN的改进，解决了RNN中梯度消失爆炸的问题，属于序列数据训练的常用方案。">
@@ -378,6 +380,13 @@
 <p>针对梯度消失，RNN中当获取$c’$的梯度后，因为$c’ = cw$，为了backward获得$c$的梯度，要将$c’$的梯度乘以$w$；LSTM中存在梯度的快速通道，获取$c’$的梯度后，因为$c’ = g(z)f(z_i)+cf(z_f)$，当forget gate打开时，$c’ = g(z)f(z_i)+c$。$c’$的梯度可以直接传递给$c$。<br>总结来说，LSTM相比RNN，将$c,c’$的更新关系从乘法变成了加法，因此不用乘以权值系数$w$，$c’$的梯度可以直接传递给$c$，解决了梯度消失和梯度爆炸的问题。</p>
 <p>针对梯度爆炸，即使将$c,c’$的关系由乘法变成了加法，仍然解决不了梯度爆炸。原因便是梯度的路径不止一条，如下图所示，红色的块仍然可能造成梯度爆炸。LSTM解决这个问题的方法是clip，也就是设置梯度最大值，超过最大值的按最大值计。</p>
 <p><img src="http://img.blog.csdn.net/20170509232737782?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h1 id="GRU">GRU</h1><h2 id="结构-2">结构</h2><p>GRU相比LSTM的3个gate，只用了两个gate：</p>
+<ul>
+<li>update gate：$z_t$</li>
+<li>reset gate：$r_t$</li>
+</ul>
+<p><img src="http://img.blog.csdn.net/20170618114739004?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170618114749977?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
 </span>
       
     </div>
@@ -494,7 +503,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-count">31</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -596,7 +605,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#RNN"><span class="nav-number">1.</span> <span class="nav-text">RNN</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#结构"><span class="nav-number">1.1.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#训练"><span class="nav-number">1.2.</span> <span class="nav-text">训练</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用"><span class="nav-number">1.3.</span> <span class="nav-text">应用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RNN_Variants"><span class="nav-number">2.</span> <span class="nav-text">RNN Variants</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LSTM"><span class="nav-number">3.</span> <span class="nav-text">LSTM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#结构-1"><span class="nav-number">3.1.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#梯度消失及梯度爆炸"><span class="nav-number">3.2.</span> <span class="nav-text">梯度消失及梯度爆炸</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#RNN"><span class="nav-number">1.</span> <span class="nav-text">RNN</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#结构"><span class="nav-number">1.1.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#训练"><span class="nav-number">1.2.</span> <span class="nav-text">训练</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用"><span class="nav-number">1.3.</span> <span class="nav-text">应用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RNN_Variants"><span class="nav-number">2.</span> <span class="nav-text">RNN Variants</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LSTM"><span class="nav-number">3.</span> <span class="nav-text">LSTM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#结构-1"><span class="nav-number">3.1.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#梯度消失及梯度爆炸"><span class="nav-number">3.2.</span> <span class="nav-text">梯度消失及梯度爆炸</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GRU"><span class="nav-number">4.</span> <span class="nav-text">GRU</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#结构-2"><span class="nav-number">4.1.</span> <span class="nav-text">结构</span></a></li></ol></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">

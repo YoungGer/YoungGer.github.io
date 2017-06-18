@@ -1,0 +1,911 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="以RNN为代表的语言模型在机器翻译领域已经达到了State of Art的效果，本文将简要介绍语言模型、机器翻译，基于RNN的seq2seq架构及优化方法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于RNN的语言模型与机器翻译NMT">
+<meta property="og:url" content="http://younggy.com/2017/06/18/基于RNN的语言模型与机器翻译NMT/index.html">
+<meta property="og:site_name" content="YoungGy">
+<meta property="og:description" content="以RNN为代表的语言模型在机器翻译领域已经达到了State of Art的效果，本文将简要介绍语言模型、机器翻译，基于RNN的seq2seq架构及优化方法。">
+<meta property="og:image" content="http://img.blog.csdn.net/20170618112342805?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170618105626205?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170618110249091?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170618111631623?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170618111643895?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170618111655217?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170618111707468?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170618112342805?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170618112409743?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170618193933400?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170618193946322?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170618193958885?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170618194009854?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170618195028196?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170618195042969?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-06-18T12:37:18.959Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于RNN的语言模型与机器翻译NMT">
+<meta name="twitter:description" content="以RNN为代表的语言模型在机器翻译领域已经达到了State of Art的效果，本文将简要介绍语言模型、机器翻译，基于RNN的seq2seq架构及优化方法。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post',
+    motion: false
+  };
+</script>
+
+  <title> 基于RNN的语言模型与机器翻译NMT | YoungGy </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?your-analytics-id";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">YoungGy</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">心有猛虎 细嗅蔷薇</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tools">
+          <a href="/tools" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            工具
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'owv-2W-dWzRWk1KttzWi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                基于RNN的语言模型与机器翻译NMT
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-06-18T20:34:33+08:00" content="2017-06-18">
+              2017-06-18
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/06/18/基于RNN的语言模型与机器翻译NMT/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/06/18/基于RNN的语言模型与机器翻译NMT/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20170618112342805?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>以RNN为代表的语言模型在机器翻译领域已经达到了<code>State of Art</code>的效果，本文将简要介绍语言模型、机器翻译，基于RNN的seq2seq架构及优化方法。</p>
+<a id="more"></a>
+<h1 id="语言模型">语言模型</h1><p>语言模型就是计算一序列词出现的概率$P(w_1,w_2,…,w_T)$。  </p>
+<p>语言模型在机器翻译领域的应用有：</p>
+<ul>
+<li>词排序：p(the cat is small) &gt; p(small the is cat)</li>
+<li>词选择：p(walking home after school) &gt; p(walking house after school)</li>
+</ul>
+<h2 id="传统的语言模型">传统的语言模型</h2><p>传统的语言模型通过两点假设，将词序列的联合概率转化为每个词条件概率的连乘形式：</p>
+<ul>
+<li>每个词只和它前面出现的词有关</li>
+<li>每个词只和它前面出现的$k$个词有关</li>
+</ul>
+<p>每个词条件概率的计算通过<code>n-gram</code>的形式，具体如下图。</p>
+<p><img src="http://img.blog.csdn.net/20170618105626205?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>然而，传统语言模型的一大缺点就是，精度的提升需要提高<code>n-gram</code>中的<code>n</code>。提高<code>n</code>的值带来需要内存的指数提高。</p>
+<h2 id="基于RNN的语言模型">基于RNN的语言模型</h2><p>基于RNN的语言模型利用RNN本身输入是序列的特点，在隐含层神经元之上加了全连接层、Softmax层，得到输出词的概率分布。</p>
+<p><img src="http://img.blog.csdn.net/20170618110249091?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>然而，RNN的训练比较困难，通常采用的trick如下：</p>
+<ul>
+<li>gradient clipping</li>
+<li>Initialization（identity matrix） + ReLus</li>
+<li>Class-based word prediction，$p(w_t|h) = p(c_t|h)p(w_t|c_t)$</li>
+<li>采用rmsprop、adma等优化方法</li>
+<li>采用gru、lstm等神经单元</li>
+</ul>
+<h1 id="机器翻译">机器翻译</h1><h2 id="基于统计的机器翻译架构">基于统计的机器翻译架构</h2><p>基于统计的机器翻译架构，简单来说包含两个步骤：</p>
+<ol>
+<li>构建从source到target的alignment。</li>
+<li>根据source到target的alignment获得各种组合，根据language model获得概率最大的组合。</li>
+</ol>
+<p><img src="http://img.blog.csdn.net/20170618111631623?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170618111643895?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170618111655217?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170618111707468?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="基于RNN的seq2seq架构">基于RNN的seq2seq架构</h2><h3 id="seq2seq结构">seq2seq结构</h3><p>基于RNN的seq2seq架构包含encoder和decoder，decoder部分又分train和inference两个过程，具体结构如下面两图所示：</p>
+<p><img src="http://img.blog.csdn.net/20170618112342805?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170618112409743?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h3 id="优化seq2seq">优化seq2seq</h3><ul>
+<li>seq2seq的decoder中，输入信息只有$h_{t-1},x_t$，在这基础上，可以增加新的信息$y_{t-1}, s_{enc}$。</li>
+<li>加深网络结构</li>
+<li>双向RNN，结合了上文和下文信息</li>
+<li>Train input sequence in reverse order for simple optimization problem</li>
+<li>采用gru、lstm</li>
+</ul>
+<h3 id="attention">attention</h3><p>attention机制的核心是将encoder的状态储存起来并供decoder每个step有选择地调用。具体包括以下步骤：</p>
+<ol>
+<li>计算decoder的当前step的state与encoder各个step state的分数。</li>
+<li>将分数正则化。</li>
+<li>依照正则化后的分数将encoder的各个step的state线性组合起来。</li>
+<li>将组合后的state作为decoder当前step的输入，相当于给decoder提供了额外的信息。</li>
+</ol>
+<p><img src="http://img.blog.csdn.net/20170618193933400?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170618193946322?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170618193958885?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170618194009854?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h3 id="search_in_decoder">search in decoder</h3><p>decoder inference的时候对inference序列的选择有以下几种方法：</p>
+<ul>
+<li>Exhaustive Search：穷举每种可能的情况，不实用。</li>
+<li>Ancestral Sampling：按照概率分布抽样，优点是效率高无偏差，缺点是方差大。</li>
+<li>Greedy Search：选择概率最大的抽样，优点是效率高，缺点是不容易找到最佳值。</li>
+<li>Beam Search：常用的采样方法，设置采样为K，第一次迭代出现K个，第二次出现K^2个并在其中在挑选K个。优点是质量好，缺点是计算量大。</li>
+</ul>
+<p><img src="http://img.blog.csdn.net/20170618195028196?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170618195042969?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h1 id="Tensorflow实例">Tensorflow实例</h1><p>下面，介绍基于<code>Tensorflow 1.1</code>的实例代码，代码参考了Udacity DeepLearning NanoDegree的部分示例代码。</p>
+<p>输入部分：</p>
+<ul>
+<li>input: 秩为2的输入数据（翻译源）的Tensor，长度不同的增加PAD。是encoder的输入。</li>
+<li>targets: 秩为2的输出数据（翻译目标）的Tensor，每个序列的结尾增加EOS，长度不同的增加PAD。是decoder的输出。</li>
+</ul>
+<p>构建网络部分代码函数如下：</p>
+<ul>
+<li>model_inputs: 构建网络输入。</li>
+<li>process_decoder_input：对target去除最后一列并在每个序列起始位加上GO，构建decoder的输入dec_input。</li>
+<li>encoding_layer：对input加embedding层，加RNN得到输出enc_output, enc_state。</li>
+<li>decoding_layer_train：得到decoder train过程的输出dec_outputs_train。</li>
+<li>decoding_layer_infer：得到decoder infer过程的输出dec_outputs_infer。</li>
+<li>decoding_layer：对dec_input加embedding层，加RNN得到train和infer的输出dec_outputs_train, dec_outputs_infer。</li>
+<li>seq2seq_model：将encoder和decoder封装到一起。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># prepare input</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">model</span>\<span class="title">_inputs</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">"""</span><br><span class="line">    Create TF Placeholders for input, targets, learning rate, and lengths of source and target sequences.</span><br><span class="line">    :return: Tuple (input, targets, learning rate, keep probability, target sequence length,</span><br><span class="line">    max target sequence length, source sequence length)</span><br><span class="line">    """</span></span><br><span class="line">    <span class="comment"># <span class="doctag">TODO:</span> Implement Function</span></span><br><span class="line">    <span class="comment"># input parameters</span></span><br><span class="line">    input = tf.placeholder(tf.int32, [<span class="keyword">None</span>, <span class="keyword">None</span>], name=<span class="string">"input"</span>)</span><br><span class="line">    targets = tf.placeholder(tf.int32, [<span class="keyword">None</span>, <span class="keyword">None</span>], name=<span class="string">"targets"</span>)</span><br><span class="line">    <span class="comment"># training parameters</span></span><br><span class="line">    learning\_rate = tf.placeholder(tf.float32, name=<span class="string">"learning\_rate"</span>)</span><br><span class="line">    keep\_prob = tf.placeholder(tf.float32, name=<span class="string">"keep\_prob"</span>)</span><br><span class="line">    <span class="comment"># sequence length parameters</span></span><br><span class="line">    target\_sequence\_length = tf.placeholder(tf.int32, [<span class="keyword">None</span>], name=<span class="string">"target\_sequence\_length"</span>)</span><br><span class="line">    max\_target\_sequence\_length = tf.reduce\_max(target\_sequence\_length)</span><br><span class="line">    source\_sequence\_length = tf.placeholder(tf.int32, [<span class="keyword">None</span>], name=<span class="string">"source\_sequence\_length"</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> (input, targets, learning\_rate, keep\_prob, target\_sequence\_length, \</span><br><span class="line">            max\_target\_sequence\_length, source\_sequence\_length)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">process</span>\<span class="title">_decoder</span>\<span class="title">_input</span><span class="params">(target\_data, target\_vocab\_to\_int, batch\_size)</span>:</span></span><br><span class="line">    <span class="string">"""</span><br><span class="line">    Preprocess target data for encoding</span><br><span class="line">    :param target\_data: Target Placehoder</span><br><span class="line">    :param target\_vocab\_to\_int: Dictionary to go from the target words to an id</span><br><span class="line">    :param batch\_size: Batch Size</span><br><span class="line">    :return: Preprocessed target data</span><br><span class="line">    """</span></span><br><span class="line">    x = tf.strided\_slice(target\_data, [<span class="number">0</span>,<span class="number">0</span>], [batch\_size, -<span class="number">1</span>], [<span class="number">1</span>,<span class="number">1</span>])</span><br><span class="line">    y = tf.concat([tf.fill([batch\_size, <span class="number">1</span>], target\_vocab\_to\_int[<span class="string">'&lt;GO&gt;'</span>]), x], <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">return</span> y</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Encoding</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encoding</span>\<span class="title">_layer</span><span class="params">(rnn\_inputs, rnn\_size, num\_layers, keep\_prob, </span><br><span class="line">                   source\_sequence\_length, source\_vocab\_size, </span><br><span class="line">                   encoding\_embedding\_size)</span>:</span></span><br><span class="line">    <span class="string">"""</span><br><span class="line">    Create encoding layer</span><br><span class="line">    :param rnn\_inputs: Inputs for the RNN</span><br><span class="line">    :param rnn\_size: RNN Size</span><br><span class="line">    :param num\_layers: Number of layers</span><br><span class="line">    :param keep\_prob: Dropout keep probability</span><br><span class="line">    :param source\_sequence\_length: a list of the lengths of each sequence in the batch</span><br><span class="line">    :param source\_vocab\_size: vocabulary size of source data</span><br><span class="line">    :param encoding\_embedding\_size: embedding size of source data</span><br><span class="line">    :return: tuple (RNN output, RNN state)</span><br><span class="line">    """</span></span><br><span class="line">    <span class="comment"># <span class="doctag">TODO:</span> Implement Function</span></span><br><span class="line">    <span class="comment"># embedding input</span></span><br><span class="line">    enc\_inputs = tf.contrib.layers.embed\_sequence(rnn\_inputs, source\_vocab\_size, encoding\_embedding\_size)</span><br><span class="line">    <span class="comment"># construcll rnn cell</span></span><br><span class="line">    cell = tf.contrib.rnn.MultiRNNCell([</span><br><span class="line">        tf.contrib.rnn.LSTMCell(rnn\_size) \</span><br><span class="line">        <span class="keyword">for</span> \_ <span class="keyword">in</span> range(num\_layers) ])</span><br><span class="line">    <span class="comment"># rnn forward</span></span><br><span class="line">    enc\_output, enc\_state = tf.nn.dynamic\_rnn(cell, enc\_inputs, sequence\_length=source\_sequence\_length, dtype=tf.float32)</span><br><span class="line">    <span class="keyword">return</span> enc\_output, enc\_state</span><br><span class="line"></span><br><span class="line"><span class="comment"># Decoding</span></span><br><span class="line"><span class="comment">## Decoding Training</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decoding</span>\<span class="title">_layer</span>\<span class="title">_train</span><span class="params">(encoder\_state, dec\_cell, dec\_embed\_input, </span><br><span class="line">                         target\_sequence\_length, max\_summary\_length, </span><br><span class="line">                         output\_layer, keep\_prob)</span>:</span></span><br><span class="line">    <span class="string">"""</span><br><span class="line">    Create a decoding layer for training</span><br><span class="line">    :param encoder\_state: Encoder State</span><br><span class="line">    :param dec\_cell: Decoder RNN Cell</span><br><span class="line">    :param dec\_embed\_input: Decoder embedded input</span><br><span class="line">    :param target\_sequence\_length: The lengths of each sequence in the target batch</span><br><span class="line">    :param max\_summary\_length: The length of the longest sequence in the batch</span><br><span class="line">    :param output\_layer: Function to apply the output layer</span><br><span class="line">    :param keep\_prob: Dropout keep probability</span><br><span class="line">    :return: BasicDecoderOutput containing training logits and sample\_id</span><br><span class="line">    """</span></span><br><span class="line">    helper = tf.contrib.seq2seq.TrainingHelper(dec\_embed\_input, target\_sequence\_length)</span><br><span class="line">    decoder = tf.contrib.seq2seq.BasicDecoder(dec\_cell, helper, encoder\_state, output\_layer=output\_layer)</span><br><span class="line">    dec\_outputs, dec\_state = tf.contrib.seq2seq.dynamic\_decode(decoder, impute\_finished=<span class="keyword">True</span>, maximum\_iterations=max\_summary\_length)</span><br><span class="line">    <span class="keyword">return</span> dec\_outputs</span><br><span class="line"></span><br><span class="line"><span class="comment">## Decoding Inference</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decoding</span>\<span class="title">_layer</span>\<span class="title">_infer</span><span class="params">(encoder\_state, dec\_cell, dec\_embeddings, start\_of\_sequence\_id,</span><br><span class="line">                         end\_of\_sequence\_id, max\_target\_sequence\_length,</span><br><span class="line">                         vocab\_size, output\_layer, batch\_size, keep\_prob)</span>:</span></span><br><span class="line">    <span class="string">"""</span><br><span class="line">    Create a decoding layer for inference</span><br><span class="line">    :param encoder\_state: Encoder state</span><br><span class="line">    :param dec\_cell: Decoder RNN Cell</span><br><span class="line">    :param dec\_embeddings: Decoder embeddings</span><br><span class="line">    :param start\_of\_sequence\_id: GO ID</span><br><span class="line">    :param end\_of\_sequence\_id: EOS Id</span><br><span class="line">    :param max\_target\_sequence\_length: Maximum length of target sequences</span><br><span class="line">    :param vocab\_size: Size of decoder/target vocabulary</span><br><span class="line">    :param decoding\_scope: TenorFlow Variable Scope for decoding</span><br><span class="line">    :param output\_layer: Function to apply the output layer</span><br><span class="line">    :param batch\_size: Batch size</span><br><span class="line">    :param keep\_prob: Dropout keep probability</span><br><span class="line">    :return: BasicDecoderOutput containing inference logits and sample\_id</span><br><span class="line">    """</span></span><br><span class="line">    <span class="comment"># <span class="doctag">TODO:</span> Implement Function </span></span><br><span class="line">    start\_tokens = tf.tile(tf.constant([start\_of\_sequence\_id], dtype=tf.int32), [batch\_size], name=<span class="string">'start\_tokens'</span>)</span><br><span class="line">    helper = tf.contrib.seq2seq.GreedyEmbeddingHelper(dec\_embeddings, </span><br><span class="line">        start\_tokens, end\_of\_sequence\_id)</span><br><span class="line">    decoder = tf.contrib.seq2seq.BasicDecoder(dec\_cell, helper, encoder\_state, output\_layer=output\_layer)</span><br><span class="line">    dec\_outputs, dec\_state = tf.contrib.seq2seq.dynamic\_decode(decoder,impute\_finished=<span class="keyword">True</span>,</span><br><span class="line">                                        maximum\_iterations=max\_target\_sequence\_length)</span><br><span class="line">    <span class="keyword">return</span> dec\_outputs</span><br><span class="line"></span><br><span class="line"><span class="comment">## Decoding Layer</span></span><br><span class="line"><span class="keyword">from</span> tensorflow.python.layers <span class="keyword">import</span> core <span class="keyword">as</span> layers\_core</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decoding</span>\<span class="title">_layer</span><span class="params">(dec\_input, encoder\_state,</span><br><span class="line">                   target\_sequence\_length, max\_target\_sequence\_length,</span><br><span class="line">                   rnn\_size,</span><br><span class="line">                   num\_layers, target\_vocab\_to\_int, target\_vocab\_size,</span><br><span class="line">                   batch\_size, keep\_prob, decoding\_embedding\_size)</span>:</span></span><br><span class="line">    <span class="string">"""</span><br><span class="line">    Create decoding layer</span><br><span class="line">    :param dec\_input: Decoder input</span><br><span class="line">    :param encoder\_state: Encoder state</span><br><span class="line">    :param target\_sequence\_length: The lengths of each sequence in the target batch</span><br><span class="line">    :param max\_target\_sequence\_length: Maximum length of target sequences</span><br><span class="line">    :param rnn\_size: RNN Size</span><br><span class="line">    :param num\_layers: Number of layers</span><br><span class="line">    :param target\_vocab\_to\_int: Dictionary to go from the target words to an id</span><br><span class="line">    :param target\_vocab\_size: Size of target vocabulary</span><br><span class="line">    :param batch\_size: The size of the batch</span><br><span class="line">    :param keep\_prob: Dropout keep probability</span><br><span class="line">    :return: Tuple of (Training BasicDecoderOutput, Inference BasicDecoderOutput)</span><br><span class="line">    """</span></span><br><span class="line">    <span class="comment"># embedding target sequence</span></span><br><span class="line">    dec\_embeddings = tf.Variable(tf.random\_uniform([target\_vocab\_size, decoding\_embedding\_size]))</span><br><span class="line">    dec\_embed\_input = tf.nn.embedding\_lookup(dec\_embeddings, dec\_input)</span><br><span class="line">    <span class="comment"># construct decoder lstm cell</span></span><br><span class="line">    dec\_cell = tf.contrib.rnn.MultiRNNCell([</span><br><span class="line">        tf.contrib.rnn.LSTMCell(rnn\_size) \</span><br><span class="line">        <span class="keyword">for</span> \_ <span class="keyword">in</span> range(num\_layers) ])</span><br><span class="line">    <span class="comment"># create output layer to map the outputs of the decoder to the elements of our vocabulary</span></span><br><span class="line">    output\_layer = layers\_core.Dense(target\_vocab\_size,</span><br><span class="line">                                    kernel\_initializer = tf.truncated\_normal\_initializer(mean = <span class="number">0.0</span>, stddev=<span class="number">0.1</span>))</span><br><span class="line">    <span class="comment"># decoder train</span></span><br><span class="line">    <span class="keyword">with</span> tf.variable\_scope(<span class="string">"decoding"</span>) <span class="keyword">as</span> decoding\_scope:</span><br><span class="line">        dec\_outputs\_train = decoding\_layer\_train(encoder\_state, dec\_cell, dec\_embed\_input, </span><br><span class="line">                             target\_sequence\_length, max\_target\_sequence\_length, </span><br><span class="line">                             output\_layer, keep\_prob)</span><br><span class="line">    <span class="comment"># decoder inference</span></span><br><span class="line">    start\_of\_sequence\_id = target\_vocab\_to\_int[<span class="string">"&lt;GO&gt;"</span>]</span><br><span class="line">    end\_of\_sequence\_id = target\_vocab\_to\_int[<span class="string">"&lt;EOS&gt;"</span>]</span><br><span class="line">    <span class="keyword">with</span> tf.variable\_scope(<span class="string">"decoding"</span>, reuse=<span class="keyword">True</span>) <span class="keyword">as</span> decoding\_scope:</span><br><span class="line">        dec\_outputs\_infer = decoding\_layer\_infer(encoder\_state, dec\_cell, dec\_embeddings, start\_of\_sequence\_id,</span><br><span class="line">                             end\_of\_sequence\_id, max\_target\_sequence\_length,</span><br><span class="line">                             target\_vocab\_size, output\_layer, batch\_size, keep\_prob)</span><br><span class="line">    <span class="comment"># rerturn</span></span><br><span class="line">    <span class="keyword">return</span> dec\_outputs\_train, dec\_outputs\_infer</span><br><span class="line"></span><br><span class="line"><span class="comment"># Seq2seq</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">seq2seq</span>\<span class="title">_model</span><span class="params">(input\_data, target\_data, keep\_prob, batch\_size,</span><br><span class="line">                  source\_sequence\_length, target\_sequence\_length,</span><br><span class="line">                  max\_target\_sentence\_length,</span><br><span class="line">                  source\_vocab\_size, target\_vocab\_size,</span><br><span class="line">                  enc\_embedding\_size, dec\_embedding\_size,</span><br><span class="line">                  rnn\_size, num\_layers, target\_vocab\_to\_int)</span>:</span></span><br><span class="line">    <span class="string">"""</span><br><span class="line">    Build the Sequence-to-Sequence part of the neural network</span><br><span class="line">    :param input\_data: Input placeholder</span><br><span class="line">    :param target\_data: Target placeholder</span><br><span class="line">    :param keep\_prob: Dropout keep probability placeholder</span><br><span class="line">    :param batch\_size: Batch Size</span><br><span class="line">    :param source\_sequence\_length: Sequence Lengths of source sequences in the batch</span><br><span class="line">    :param target\_sequence\_length: Sequence Lengths of target sequences in the batch</span><br><span class="line">    :param source\_vocab\_size: Source vocabulary size</span><br><span class="line">    :param target\_vocab\_size: Target vocabulary size</span><br><span class="line">    :param enc\_embedding\_size: Decoder embedding size</span><br><span class="line">    :param dec\_embedding\_size: Encoder embedding size</span><br><span class="line">    :param rnn\_size: RNN Size</span><br><span class="line">    :param num\_layers: Number of layers</span><br><span class="line">    :param target\_vocab\_to\_int: Dictionary to go from the target words to an id</span><br><span class="line">    :return: Tuple of (Training BasicDecoderOutput, Inference BasicDecoderOutput)</span><br><span class="line">    """</span></span><br><span class="line">    <span class="comment"># <span class="doctag">TODO:</span> Implement Function</span></span><br><span class="line">    <span class="comment"># embedding and encoding</span></span><br><span class="line">    enc\_output, enc\_state = encoding\_layer(input\_data, rnn\_size, num\_layers, keep\_prob, </span><br><span class="line">                   source\_sequence\_length, source\_vocab\_size, </span><br><span class="line">                   enc\_embedding\_size)</span><br><span class="line">    <span class="comment"># process target data</span></span><br><span class="line">    dec\_input = process\_decoder\_input(target\_data, target\_vocab\_to\_int, batch\_size) </span><br><span class="line">    <span class="comment"># embedding and decoding</span></span><br><span class="line">    dec\_outputs\_train, dec\_outputs\_infer = decoding\_layer(dec\_input, enc\_state,</span><br><span class="line">                   target\_sequence\_length, tf.reduce\_max(target\_sequence\_length),</span><br><span class="line">                   rnn\_size,</span><br><span class="line">                   num\_layers, target\_vocab\_to\_int, target\_vocab\_size,</span><br><span class="line">                   batch\_size, keep\_prob, dec\_embedding\_size)</span><br><span class="line">    <span class="keyword">return</span> dec\_outputs\_train, dec\_outputs\_infer</span><br><span class="line"></span><br><span class="line"><span class="comment"># Build Graph</span></span><br><span class="line"><span class="string">"""</span><br><span class="line">DON'T MODIFY ANYTHING IN THIS CELL</span><br><span class="line">"""</span></span><br><span class="line">save\_path = <span class="string">'checkpoints/dev'</span></span><br><span class="line">(source\_int\_text, target\_int\_text), (source\_vocab\_to\_int, target\_vocab\_to\_int), \_ = helper.load\_preprocess()</span><br><span class="line">max\_target\_sentence\_length = max([len(sentence) <span class="keyword">for</span> sentence <span class="keyword">in</span> source\_int\_text])</span><br><span class="line"></span><br><span class="line">train\_graph = tf.Graph()</span><br><span class="line"><span class="keyword">with</span> train\_graph.<span class="keyword">as</span>\_default():</span><br><span class="line">    input\_data, targets, lr, keep\_prob, target\_sequence\_length, max\_target\_sequence\_length, source\_sequence\_length = model\_inputs()</span><br><span class="line"></span><br><span class="line">    <span class="comment">#sequence\_length = tf.placeholder\_with\_default(max\_target\_sentence\_length, None, name='sequence\_length')</span></span><br><span class="line">    input\_shape = tf.shape(input\_data)</span><br><span class="line"></span><br><span class="line">    train\_logits, inference\_logits = seq2seq\_model(tf.reverse(input\_data, [-<span class="number">1</span>]),</span><br><span class="line">                                                   targets,</span><br><span class="line">                                                   keep\_prob,</span><br><span class="line">                                                   batch\_size,</span><br><span class="line">                                                   source\_sequence\_length,</span><br><span class="line">                                                   target\_sequence\_length,</span><br><span class="line">                                                   max\_target\_sequence\_length,</span><br><span class="line">                                                   len(source\_vocab\_to\_int),</span><br><span class="line">                                                   len(target\_vocab\_to\_int),</span><br><span class="line">                                                   encoding\_embedding\_size,</span><br><span class="line">                                                   decoding\_embedding\_size,</span><br><span class="line">                                                   rnn\_size,</span><br><span class="line">                                                   num\_layers,</span><br><span class="line">                                                   target\_vocab\_to\_int)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    training\_logits = tf.identity(train\_logits.rnn\_output, name=<span class="string">'logits'</span>)</span><br><span class="line">    inference\_logits = tf.identity(inference\_logits.sample\_id, name=<span class="string">'predictions'</span>)</span><br><span class="line"></span><br><span class="line">    masks = tf.sequence\_mask(target\_sequence\_length, max\_target\_sequence\_length, dtype=tf.float32, name=<span class="string">'masks'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">with</span> tf.name\_scope(<span class="string">"optimization"</span>):</span><br><span class="line">        <span class="comment"># Loss function</span></span><br><span class="line">        cost = tf.contrib.seq2seq.sequence\_loss(</span><br><span class="line">            training\_logits,</span><br><span class="line">            targets,</span><br><span class="line">            masks)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Optimizer</span></span><br><span class="line">        optimizer = tf.train.AdamOptimizer(lr)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Gradient Clipping</span></span><br><span class="line">        gradients = optimizer.compute\_gradients(cost)</span><br><span class="line">        capped\_gradients = [(tf.clip\_by\_value(grad, -<span class="number">1.</span>, <span class="number">1.</span>), var) <span class="keyword">for</span> grad, var <span class="keyword">in</span> gradients <span class="keyword">if</span> grad <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>]</span><br><span class="line">        train\_op = optimizer.apply\_gradients(capped\_gradients)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Training</span></span><br><span class="line"><span class="string">"""</span><br><span class="line">DON'T MODIFY ANYTHING IN THIS CELL</span><br><span class="line">"""</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get</span>\<span class="title">_accuracy</span><span class="params">(target, logits)</span>:</span></span><br><span class="line">    <span class="string">"""</span><br><span class="line">    Calculate accuracy</span><br><span class="line">    """</span></span><br><span class="line">    max\_seq = max(target.shape[<span class="number">1</span>], logits.shape[<span class="number">1</span>])</span><br><span class="line">    <span class="keyword">if</span> max\_seq - target.shape[<span class="number">1</span>]:</span><br><span class="line">        target = np.pad(</span><br><span class="line">            target,</span><br><span class="line">            [(<span class="number">0</span>,<span class="number">0</span>),(<span class="number">0</span>,max\_seq - target.shape[<span class="number">1</span>])],</span><br><span class="line">            <span class="string">'constant'</span>)</span><br><span class="line">    <span class="keyword">if</span> max\_seq - logits.shape[<span class="number">1</span>]:</span><br><span class="line">        logits = np.pad(</span><br><span class="line">            logits,</span><br><span class="line">            [(<span class="number">0</span>,<span class="number">0</span>),(<span class="number">0</span>,max\_seq - logits.shape[<span class="number">1</span>])],</span><br><span class="line">            <span class="string">'constant'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> np.mean(np.equal(target, logits))</span><br><span class="line"></span><br><span class="line"><span class="comment"># Split data to training and validation sets</span></span><br><span class="line">train\_source = source\_int\_text[batch\_size:]</span><br><span class="line">train\_target = target\_int\_text[batch\_size:]</span><br><span class="line">valid\_source = source\_int\_text[:batch\_size]</span><br><span class="line">valid\_target = target\_int\_text[:batch\_size]</span><br><span class="line">(valid\_sources\_batch, valid\_targets\_batch, valid\_sources\_lengths, valid\_targets\_lengths ) = next(get\_batches(valid\_source,</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.Session(graph=train\_graph) <span class="keyword">as</span> sess:</span><br><span class="line">    sess.run(tf.<span class="keyword">global</span>\_variables\_initializer())</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> epoch\_i <span class="keyword">in</span> range(epochs):</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> batch\_i, (source\_batch, target\_batch, sources\_lengths, targets\_lengths) <span class="keyword">in</span> enumerate(</span><br><span class="line">                get\_batches(train\_source, train\_target, batch\_size,</span><br><span class="line">                            source\_vocab\_to\_int[<span class="string">'&lt;PAD&gt;'</span>],</span><br><span class="line">                            target\_vocab\_to\_int[<span class="string">'&lt;PAD&gt;'</span>])):</span><br><span class="line">            </span><br><span class="line">            \_, loss = sess.run(</span><br><span class="line">                [train\_op, cost],</span><br><span class="line">                &#123;input\_data: source\_batch,</span><br><span class="line">                 targets: target\_batch,</span><br><span class="line">                 lr: learning\_rate,</span><br><span class="line">                 target\_sequence\_length: targets\_lengths,</span><br><span class="line">                 source\_sequence\_length: sources\_lengths,</span><br><span class="line">                 keep\_prob: keep\_probability&#125;)</span><br><span class="line">            </span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> batch\_i % display\_step == <span class="number">0</span> <span class="keyword">and</span> batch\_i &gt; <span class="number">0</span>:</span><br><span class="line"></span><br><span class="line">                </span><br><span class="line">                batch\_train\_logits = sess.run(</span><br><span class="line">                    inference\_logits,</span><br><span class="line">                    &#123;input\_data: source\_batch,</span><br><span class="line">                     source\_sequence\_length: sources\_lengths,</span><br><span class="line">                     target\_sequence\_length: targets\_lengths,</span><br><span class="line">                     keep\_prob: <span class="number">1.0</span>&#125;)</span><br><span class="line"></span><br><span class="line">                </span><br><span class="line">                batch\_valid\_logits = sess.run(</span><br><span class="line">                    inference\_logits,</span><br><span class="line">                    &#123;input\_data: valid\_sources\_batch,</span><br><span class="line">                     source\_sequence\_length: valid\_sources\_lengths,</span><br><span class="line">                     target\_sequence\_length: valid\_targets\_lengths,</span><br><span class="line">                     keep\_prob: <span class="number">1.0</span>&#125;)</span><br><span class="line">                </span><br><span class="line"></span><br><span class="line">                train\_acc = get\_accuracy(target\_batch, batch\_train\_logits)</span><br><span class="line">                </span><br><span class="line"></span><br><span class="line">                valid\_acc = get\_accuracy(valid\_targets\_batch, batch\_valid\_logits)</span><br><span class="line">                </span><br><span class="line"></span><br><span class="line">                print(<span class="string">'Epoch &#123;:&gt;3&#125; Batch &#123;:&gt;4&#125;/&#123;&#125; - Train Accuracy: &#123;:&gt;6.4f&#125;, Validation Accuracy: &#123;:&gt;6.4f&#125;, Loss: &#123;:&gt;6.4f&#125;'</span></span><br><span class="line">                      .format(epoch\_i, batch\_i, len(source\_int\_text) // batch\_size, train\_acc, valid\_acc, loss))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Save Model</span></span><br><span class="line">    saver = tf.train.Saver()</span><br><span class="line">    saver.save(sess, save\_path)</span><br><span class="line">    print(<span class="string">'Model Trained and Saved'</span>)</span><br></pre></td></tr></table></figure></span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/23/神经网络优化算法综述/" rel="next" title="神经网络优化算法综述">
+                <i class="fa fa-chevron-left"></i> 神经网络优化算法综述
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/06/18/基于RNN的语言模型与机器翻译NMT/"
+           data-title="基于RNN的语言模型与机器翻译NMT" data-url="http://younggy.com/2017/06/18/基于RNN的语言模型与机器翻译NMT/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/uploads/touxiang.jpg" alt="Guangyao Yang" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Guangyao Yang</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Guangyao Yang</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">31</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/young_gy" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> CSDN
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YoungGer" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-twitter-url" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i> Twitter
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-weibo-url" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-douban-url" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> DouBan
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/ger-young" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> ZhiHu
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#语言模型"><span class="nav-number">1.</span> <span class="nav-text">语言模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#传统的语言模型"><span class="nav-number">1.1.</span> <span class="nav-text">传统的语言模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于RNN的语言模型"><span class="nav-number">1.2.</span> <span class="nav-text">基于RNN的语言模型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#机器翻译"><span class="nav-number">2.</span> <span class="nav-text">机器翻译</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基于统计的机器翻译架构"><span class="nav-number">2.1.</span> <span class="nav-text">基于统计的机器翻译架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于RNN的seq2seq架构"><span class="nav-number">2.2.</span> <span class="nav-text">基于RNN的seq2seq架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#seq2seq结构"><span class="nav-number">2.2.1.</span> <span class="nav-text">seq2seq结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优化seq2seq"><span class="nav-number">2.2.2.</span> <span class="nav-text">优化seq2seq</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#attention"><span class="nav-number">2.2.3.</span> <span class="nav-text">attention</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#search_in_decoder"><span class="nav-number">2.2.4.</span> <span class="nav-text">search in decoder</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Tensorflow实例"><span class="nav-number">3.</span> <span class="nav-text">Tensorflow实例</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guangyao Yang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"younggy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+
+  
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/MathJax.js"></script>
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/config/TeX-AMS-MML_HTMLorMML.js"></script>
+  
+
+
+  
+  
+
+</body>
+</html>
