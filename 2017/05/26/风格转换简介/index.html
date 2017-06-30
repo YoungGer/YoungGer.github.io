@@ -1,0 +1,881 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="计算机视觉,风格转换," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="风格转换，是把一张图片转化成同内容但包含某风格的新图片。本文将介绍如何让机器学习风格转换，包含两种方法：优化问题求解、转化网络求解。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="风格转换简介">
+<meta property="og:url" content="http://younggy.com/2017/05/26/风格转换简介/index.html">
+<meta property="og:site_name" content="YoungGy">
+<meta property="og:description" content="风格转换，是把一张图片转化成同内容但包含某风格的新图片。本文将介绍如何让机器学习风格转换，包含两种方法：优化问题求解、转化网络求解。">
+<meta property="og:image" content="http://img.blog.csdn.net/20170526225012753?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170525231058589?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170526225012753?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170526145200206?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-06-30T15:38:34.346Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="风格转换简介">
+<meta name="twitter:description" content="风格转换，是把一张图片转化成同内容但包含某风格的新图片。本文将介绍如何让机器学习风格转换，包含两种方法：优化问题求解、转化网络求解。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post',
+    motion: false
+  };
+</script>
+
+  <title> 风格转换简介 | YoungGy </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?your-analytics-id";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">YoungGy</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">心有猛虎 细嗅蔷薇</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tools">
+          <a href="/tools" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            工具
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'owv-2W-dWzRWk1KttzWi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                风格转换简介
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-05-26T23:30:53+08:00" content="2017-05-26">
+              2017-05-26
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/05/26/风格转换简介/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/26/风格转换简介/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>风格转换，是把一张图片转化成同内容但包含某风格的新图片。本文将介绍如何让机器学习风格转换，包含两种方法：优化问题求解、转化网络求解。</p>
+<p><img src="http://img.blog.csdn.net/20170526225012753?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<a id="more"></a>
+<h1 id="风格转换">风格转换</h1><p>风格转换，就是根据现有的风格照片$S$，把当前照片$C$转化成带有$S$风格同时保留$C$内容的照片$T$。</p>
+<p>本文将叙述两种风格转换的思路：</p>
+<ol>
+<li>将风格转换变成优化问题的求解，构建$T,C$之间的损失$L_c$以及$T,S$之间的损失$L_s$，同时增加图片平滑的损失$L_v$。通过求解$\min_T \sum_i L_i$的优化问题求解。</li>
+<li>不直接把目标图片$T$当做求解变量，而是构建一个<code>transform network</code>把内容图片$C$转化成目标图片$T$，以类似1中的方法构建损失函数，通过求解<code>transform network</code>的参数求解该问题。</li>
+</ol>
+<h1 id="优化问题">优化问题</h1><h2 id="综述">综述</h2><p>首先，陈述问题：假设已知风格照片$S$、当前照片$C$，求目标照片$T$，要求带有$S$的风格并且保留$C$的内容。</p>
+<p>下面，确定几个损失函数：</p>
+<ul>
+<li>$L_s$：$T$和$S$风格上的距离</li>
+<li>$L_c$：$T$和$C$内容上的距离</li>
+<li>$L_v$：$T$不平滑的度量</li>
+</ul>
+<p>最后，便是求解优化问题：</p>
+<p>$$\min_{T} \alpha_s L_s(T,S) + \alpha_c L_c(T,C) + \alpha_v L_v(T)$$</p>
+<h2 id="损失函数">损失函数</h2><p>优化问题中$L_s,L_c$是通过预先训练的VGG网络得到。</p>
+<p>首先，简单介绍下VGG网络：它是一种固定的网络结构，其结构如下所示，一般采用D或E结构，通常叫VGG-16和VGG-19：</p>
+<p><img src="http://img.blog.csdn.net/20170525231058589?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>那么，为什么$L_s,L_c$是通过预先训练的VGG网络得到呢？  </p>
+<p>训练后的VGG网络，每一层都对特征进行了抽象，越深得到的特征越具象。所以每一层的特征也就代表了图片不同粒度的抽象，可以根据特征的距离判断图片内容的相似程度。VGG的卷积层得到了<code>feature map</code>，假设其大小是$C<em>H</em>W$。</p>
+<p>假设在层$l$，$T$的<code>feature map</code>是$T^l$，$C$的<code>feature map</code>是$C^l$，那么$L_c$的计算如下：</p>
+<p>$$L_c(T^l, C^l) = || T^l-C^l ||$$</p>
+<p>假设在层$l$，$S$的<code>feature map</code>是$S^l$，$C$的<code>feature map</code>是$C^l$，那么$L_s$的计算如下：</p>
+<p>$$L_s(T^l, S^l) = || G(T^l)-G(S^l) ||$$</p>
+<p>其中，$G$代表<code>gram matrix</code>，$G(S^l)$的含义是先将$S^l$变成$C*(H*W)$的二维矩阵，然后计算$S^l$对自己的协方差$S^l {S^l}^T$。$G(x)$其实表示了$x$ <code>feature map</code>上不同<code>feature</code>的相互作用关系，用其来度量风格。</p>
+<p>至于$L_v$，可以理解成：</p>
+<p>$$L_v(T) = ||T-T_{水平位移1像素}|| + ||T-T_{垂直位移1像素}|| $$</p>
+<h2 id="训练">训练</h2><p>构建好损失函数$L$后，求解如下优化问题即可：</p>
+<p>$$\min_{T} \alpha_s L_s(T,S) + \alpha_c L_c(T,C) + \alpha_v L_v(T)$$</p>
+<p>这里优化问题的求解方法采用<code>L-BFGS</code>（一种伪牛顿法），这样做的目的是得到比gradient descent更快的收敛速度。</p>
+<h2 id="例子">例子</h2><p>本人是詹姆斯的铁杆球迷，对詹姆斯的照片采用不同风格转换后的效果图如下所示。需要说明的是：第二列第一张是未加平滑损失$L_v$的效果图，可以看到存在很多噪点，第二列第二张是加入平滑损失$L_v$的效果图，照片清晰了很多。</p>
+<p><img src="http://img.blog.csdn.net/20170526225012753?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="代码">代码</h2><p> 以下代码参考了<a href="https://github.com/llSourcell/How-to-Generate-Art-Demo" target="_blank" rel="external">Siraj Raval on YouTube
+</a></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Load library</span></span><br><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> print_function</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> keras <span class="keyword">import</span> backend</span><br><span class="line"><span class="keyword">from</span> keras.models <span class="keyword">import</span> Model</span><br><span class="line"><span class="keyword">from</span> keras.applications.vgg16 <span class="keyword">import</span> VGG16</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> scipy.optimize <span class="keyword">import</span> fmin_l_bfgs_b</span><br><span class="line"><span class="keyword">from</span> scipy.misc <span class="keyword">import</span> imsave</span><br><span class="line"></span><br><span class="line"><span class="comment"># Load and preprocess the content and style images</span></span><br><span class="line">height = <span class="number">512</span></span><br><span class="line">width = <span class="number">512</span></span><br><span class="line"></span><br><span class="line">content_image_path = <span class="string">'images/hugo.jpg'</span></span><br><span class="line">content_image = Image.open(content_image_path)</span><br><span class="line">content_image = content_image.resize((height, width))</span><br><span class="line">content_image</span><br><span class="line"></span><br><span class="line">style_image_path = <span class="string">'images/styles/wave.jpg'</span></span><br><span class="line">style_image = Image.open(style_image_path)</span><br><span class="line">style_image = style_image.resize((height, width))</span><br><span class="line">style_image</span><br><span class="line"></span><br><span class="line">content_array = np.asarray(content_image, dtype=<span class="string">'float32'</span>)</span><br><span class="line">content_array = np.expand_dims(content_array, axis=<span class="number">0</span>)</span><br><span class="line">print(content_array.shape)</span><br><span class="line"></span><br><span class="line">style_array = np.asarray(style_image, dtype=<span class="string">'float32'</span>)</span><br><span class="line">style_array = np.expand_dims(style_array, axis=<span class="number">0</span>)</span><br><span class="line">print(style_array.shape)</span><br><span class="line"></span><br><span class="line">content_array[:, :, :, <span class="number">0</span>] -= <span class="number">103.939</span></span><br><span class="line">content_array[:, :, :, <span class="number">1</span>] -= <span class="number">116.779</span></span><br><span class="line">content_array[:, :, :, <span class="number">2</span>] -= <span class="number">123.68</span></span><br><span class="line">content_array = content_array[:, :, :, ::-<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">style_array[:, :, :, <span class="number">0</span>] -= <span class="number">103.939</span></span><br><span class="line">style_array[:, :, :, <span class="number">1</span>] -= <span class="number">116.779</span></span><br><span class="line">style_array[:, :, :, <span class="number">2</span>] -= <span class="number">123.68</span></span><br><span class="line">style_array = style_array[:, :, :, ::-<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">content_image = backend.variable(content_array)</span><br><span class="line">style_image = backend.variable(style_array)</span><br><span class="line">combination_image = backend.placeholder((<span class="number">1</span>, height, width, <span class="number">3</span>))</span><br><span class="line"></span><br><span class="line">input_tensor = backend.concatenate([content_image,</span><br><span class="line">                                    style_image,</span><br><span class="line">                                    combination_image], axis=<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Reuse a model pre-trained for image classification to define loss functions</span></span><br><span class="line">model = VGG16(input_tensor=input_tensor, weights=<span class="string">'imagenet'</span>,</span><br><span class="line">              include_top=<span class="keyword">False</span>)</span><br><span class="line">layers = dict([(layer.name, layer.output) <span class="keyword">for</span> layer <span class="keyword">in</span> model.layers])</span><br><span class="line"></span><br><span class="line">content_weight = <span class="number">0.025</span></span><br><span class="line">style_weight = <span class="number">5.0</span></span><br><span class="line">total_variation_weight = <span class="number">1.0</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Loss</span></span><br><span class="line">loss = backend.variable(<span class="number">0.</span>)</span><br><span class="line"><span class="comment"># The content loss</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">content_loss</span><span class="params">(content, combination)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> backend.sum(backend.square(combination - content))</span><br><span class="line"></span><br><span class="line">layer_features = layers[<span class="string">'block2_conv2'</span>]</span><br><span class="line">content_image_features = layer_features[<span class="number">0</span>, :, :, :]</span><br><span class="line">combination_features = layer_features[<span class="number">2</span>, :, :, :]</span><br><span class="line"></span><br><span class="line">loss += content_weight * content_loss(content_image_features,</span><br><span class="line">                                      combination_features)</span><br><span class="line"><span class="comment"># The style loss</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">gram_matrix</span><span class="params">(x)</span>:</span></span><br><span class="line">    features = backend.batch_flatten(backend.permute_dimensions(x, (<span class="number">2</span>, <span class="number">0</span>, <span class="number">1</span>)))</span><br><span class="line">    gram = backend.dot(features, backend.transpose(features))</span><br><span class="line">    <span class="keyword">return</span> gram</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">style_loss</span><span class="params">(style, combination)</span>:</span></span><br><span class="line">    S = gram_matrix(style)</span><br><span class="line">    C = gram_matrix(combination)</span><br><span class="line">    channels = <span class="number">3</span></span><br><span class="line">    size = height * width</span><br><span class="line">    <span class="keyword">return</span> backend.sum(backend.square(S - C)) / (<span class="number">4.</span> * (channels ** <span class="number">2</span>) * (size ** <span class="number">2</span>))</span><br><span class="line"></span><br><span class="line">feature_layers = [<span class="string">'block1_conv2'</span>, <span class="string">'block2_conv2'</span>,</span><br><span class="line">                  <span class="string">'block3_conv3'</span>, <span class="string">'block4_conv3'</span>,</span><br><span class="line">                  <span class="string">'block5_conv3'</span>]</span><br><span class="line"><span class="keyword">for</span> layer_name <span class="keyword">in</span> feature_layers:</span><br><span class="line">    layer_features = layers[layer_name]</span><br><span class="line">    style_features = layer_features[<span class="number">1</span>, :, :, :]</span><br><span class="line">    combination_features = layer_features[<span class="number">2</span>, :, :, :]</span><br><span class="line">    sl = style_loss(style_features, combination_features)</span><br><span class="line">    loss += (style_weight / len(feature_layers)) * sl</span><br><span class="line"><span class="comment"># The total variation loss</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">total_variation_loss</span><span class="params">(x)</span>:</span></span><br><span class="line">    a = backend.square(x[:, :height-<span class="number">1</span>, :width-<span class="number">1</span>, :] - x[:, <span class="number">1</span>:, :width-<span class="number">1</span>, :])</span><br><span class="line">    b = backend.square(x[:, :height-<span class="number">1</span>, :width-<span class="number">1</span>, :] - x[:, :height-<span class="number">1</span>, <span class="number">1</span>:, :])</span><br><span class="line">    <span class="keyword">return</span> backend.sum(backend.pow(a + b, <span class="number">1.25</span>))</span><br><span class="line"></span><br><span class="line">loss += total_variation_weight * total_variation_loss(combination_image)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define needed gradients and solve the optimisation problem</span></span><br><span class="line">grads = backend.gradients(loss, combination_image)</span><br><span class="line">outputs = [loss]</span><br><span class="line">outputs += grads</span><br><span class="line">f_outputs = backend.function([combination_image], outputs)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">eval_loss_and_grads</span><span class="params">(x)</span>:</span></span><br><span class="line">    x = x.reshape((<span class="number">1</span>, height, width, <span class="number">3</span>))</span><br><span class="line">    outs = f_outputs([x])</span><br><span class="line">    loss_value = outs[<span class="number">0</span>]</span><br><span class="line">    grad_values = outs[<span class="number">1</span>].flatten().astype(<span class="string">'float64'</span>)</span><br><span class="line">    <span class="keyword">return</span> loss_value, grad_values</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Evaluator</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.loss_value = <span class="keyword">None</span></span><br><span class="line">        self.grads_values = <span class="keyword">None</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">loss</span><span class="params">(self, x)</span>:</span></span><br><span class="line">        <span class="keyword">assert</span> self.loss_value <span class="keyword">is</span> <span class="keyword">None</span></span><br><span class="line">        loss_value, grad_values = eval_loss_and_grads(x)</span><br><span class="line">        self.loss_value = loss_value</span><br><span class="line">        self.grad_values = grad_values</span><br><span class="line">        <span class="keyword">return</span> self.loss_value</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">grads</span><span class="params">(self, x)</span>:</span></span><br><span class="line">        <span class="keyword">assert</span> self.loss_value <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span></span><br><span class="line">        grad_values = np.copy(self.grad_values)</span><br><span class="line">        self.loss_value = <span class="keyword">None</span></span><br><span class="line">        self.grad_values = <span class="keyword">None</span></span><br><span class="line">        <span class="keyword">return</span> grad_values</span><br><span class="line"></span><br><span class="line">evaluator = Evaluator()</span><br><span class="line"></span><br><span class="line"><span class="comment"># Train</span></span><br><span class="line">x = np.random.uniform(<span class="number">0</span>, <span class="number">255</span>, (<span class="number">1</span>, height, width, <span class="number">3</span>)) - <span class="number">128.</span></span><br><span class="line"></span><br><span class="line">iterations = <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(iterations):</span><br><span class="line">    print(<span class="string">'Start of iteration'</span>, i)</span><br><span class="line">    start_time = time.time()</span><br><span class="line">    x, min_val, info = fmin_l_bfgs_b(evaluator.loss, x.flatten(),</span><br><span class="line">                                     fprime=evaluator.grads, maxfun=<span class="number">20</span>)</span><br><span class="line">    print(<span class="string">'Current loss value:'</span>, min_val)</span><br><span class="line">    end_time = time.time()</span><br><span class="line">    print(<span class="string">'Iteration %d completed in %ds'</span> % (i, end_time - start_time))</span><br><span class="line"></span><br><span class="line"><span class="comment"># Evaluation</span></span><br><span class="line">x = x.reshape((height, width, <span class="number">3</span>))</span><br><span class="line">x = x[:, :, ::-<span class="number">1</span>]</span><br><span class="line">x[:, :, <span class="number">0</span>] += <span class="number">103.939</span></span><br><span class="line">x[:, :, <span class="number">1</span>] += <span class="number">116.779</span></span><br><span class="line">x[:, :, <span class="number">2</span>] += <span class="number">123.68</span></span><br><span class="line">x = np.clip(x, <span class="number">0</span>, <span class="number">255</span>).astype(<span class="string">'uint8'</span>)</span><br><span class="line"></span><br><span class="line">Image.fromarray(x)</span><br></pre></td></tr></table></figure>
+<h1 id="网络转换">网络转换</h1><h2 id="结构">结构</h2><p>将风格转换当成优化问题求解存在如下问题：</p>
+<ul>
+<li>每来一张新图片，都需要重新求解优化问题。如果需要将大量图片转换成同一风格的话效率会很低</li>
+</ul>
+<p>考虑能否构建一个<code>transformer</code>，将图片$C$转化成目标图片$T$。训练的时候只需要学习<code>transformer</code>的参数。训练完成得到<code>transformer</code>后，当新的图片来到时，直接输入<code>transformer</code>即可得到新的图片，大大提高了效率。</p>
+<p>本节中的风格转换即采用上述构建<code>transformer</code>的方法，利用预训练的VGG得到特征进而得到损失函数，通过调节<code>transformer</code>的参数最小化损失函数。图示如下：</p>
+<p><img src="http://img.blog.csdn.net/20170526145200206?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="训练-1">训练</h2><p>损失函数的定义与优化问题部分相同，这里求解的优化问题是：</p>
+<p>$$\begin{split}<br>\hat{y} &amp;= f_W(x) \\<br>\min_{w} &amp;\alpha_s L_s(\hat{y},y_s) + \alpha_c L_c(\hat{y},y_c) + \alpha_v L_v(\hat{y})<br>\end{split}$$</p>
+<h1 id="参考">参考</h1><ol>
+<li><a href="https://arxiv.org/pdf/1508.06576.pdf" target="_blank" rel="external">A Neural Algorithm of Artistic Style</a></li>
+<li><a href="https://arxiv.org/pdf/1603.08155.pdf" target="_blank" rel="external">Perceptual Losses for Real-Time Style Transfer<br>and Super-Resolution</a></li>
+</ol>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/计算机视觉/" rel="tag">#计算机视觉</a>
+          
+            <a href="/tags/风格转换/" rel="tag">#风格转换</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/23/神经网络优化算法综述/" rel="next" title="神经网络优化算法综述">
+                <i class="fa fa-chevron-left"></i> 神经网络优化算法综述
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/18/基于RNN的语言模型与机器翻译NMT/" rel="prev" title="基于RNN的语言模型与机器翻译NMT">
+                基于RNN的语言模型与机器翻译NMT <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/05/26/风格转换简介/"
+           data-title="风格转换简介" data-url="http://younggy.com/2017/05/26/风格转换简介/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/uploads/touxiang.jpg" alt="Guangyao Yang" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Guangyao Yang</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Guangyao Yang</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">32</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">37</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/young_gy" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> CSDN
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YoungGer" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-twitter-url" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i> Twitter
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-weibo-url" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-douban-url" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> DouBan
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/ger-young" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> ZhiHu
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#风格转换"><span class="nav-number">1.</span> <span class="nav-text">风格转换</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#优化问题"><span class="nav-number">2.</span> <span class="nav-text">优化问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#综述"><span class="nav-number">2.1.</span> <span class="nav-text">综述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#损失函数"><span class="nav-number">2.2.</span> <span class="nav-text">损失函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#训练"><span class="nav-number">2.3.</span> <span class="nav-text">训练</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#例子"><span class="nav-number">2.4.</span> <span class="nav-text">例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码"><span class="nav-number">2.5.</span> <span class="nav-text">代码</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#网络转换"><span class="nav-number">3.</span> <span class="nav-text">网络转换</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#结构"><span class="nav-number">3.1.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#训练-1"><span class="nav-number">3.2.</span> <span class="nav-text">训练</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guangyao Yang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"younggy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+
+  
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/MathJax.js"></script>
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/config/TeX-AMS-MML_HTMLorMML.js"></script>
+  
+
+
+  
+  
+
+</body>
+</html>
