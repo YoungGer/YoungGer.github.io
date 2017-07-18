@@ -1,0 +1,907 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Canny Edge Detector,Hough Transform," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="无人驾驶技术近些年发展迅速。无人车若想实现自动驾驶，从视觉的角度上讲其要先学会观察道路，具体来说，就是检测车道线。包括识别车道线与车的位置关系，是实线还是虚线等。本文将简单介绍车道线检测的基本技术，包括Canny Edges、Hough Transform等。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="无人驾驶之车道线检测简易版">
+<meta property="og:url" content="http://younggy.com/2017/07/18/无人驾驶之车道线检测简易版/index.html">
+<meta property="og:site_name" content="YoungGy">
+<meta property="og:description" content="无人驾驶技术近些年发展迅速。无人车若想实现自动驾驶，从视觉的角度上讲其要先学会观察道路，具体来说，就是检测车道线。包括识别车道线与车的位置关系，是实线还是虚线等。本文将简单介绍车道线检测的基本技术，包括Canny Edges、Hough Transform等。">
+<meta property="og:image" content="http://img.blog.csdn.net/20170715233157754?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170715234103553?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170715234128474?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170715234145195?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170715234204165?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170715234218905?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170715234231365?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170715234248485?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170716101014547?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170716102534907?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170718103146755?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170718103202052?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170718103216379?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170718103229079?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170718105230417?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170718103242369?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170718105526286?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170718105540480?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170718110241899?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170715234248485?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-07-18T05:15:40.137Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="无人驾驶之车道线检测简易版">
+<meta name="twitter:description" content="无人驾驶技术近些年发展迅速。无人车若想实现自动驾驶，从视觉的角度上讲其要先学会观察道路，具体来说，就是检测车道线。包括识别车道线与车的位置关系，是实线还是虚线等。本文将简单介绍车道线检测的基本技术，包括Canny Edges、Hough Transform等。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post',
+    motion: false
+  };
+</script>
+
+  <title> 无人驾驶之车道线检测简易版 | YoungGy </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?your-analytics-id";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">YoungGy</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">心有猛虎 细嗅蔷薇</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tools">
+          <a href="/tools" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            工具
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'owv-2W-dWzRWk1KttzWi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                无人驾驶之车道线检测简易版
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-07-18T13:14:29+08:00" content="2017-07-18">
+              2017-07-18
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/无人驾驶/" itemprop="url" rel="index">
+                    <span itemprop="name">无人驾驶</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/07/18/无人驾驶之车道线检测简易版/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/07/18/无人驾驶之车道线检测简易版/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20170715233157754?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>无人驾驶技术近些年发展迅速。无人车若想实现自动驾驶，从视觉的角度上讲其要先学会观察道路，具体来说，就是检测车道线。包括识别车道线与车的位置关系，是实线还是虚线等。本文将简单介绍车道线检测的基本技术，包括<code>Canny Edges</code>、<code>Hough Transform</code>等。</p>
+<a id="more"></a>
+<h1 id="Pipe_Line">Pipe Line</h1><p>本文进行车道线检测的pipe line如下，主要使用了<code>opencv</code>库：</p>
+<ol>
+<li>RGB to GRAY</li>
+<li>Gauss Blur</li>
+<li>Canny Edges</li>
+<li>Hough Transform</li>
+<li>Dram Lines</li>
+</ol>
+<p>示例如下：</p>
+<p>原始图片：<br><img src="http://img.blog.csdn.net/20170715234103553?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>灰度图片：<br><img src="http://img.blog.csdn.net/20170715234128474?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>高斯模糊图片：<br><img src="http://img.blog.csdn.net/20170715234145195?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>Canny Edges：<br><img src="http://img.blog.csdn.net/20170715234204165?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>多边形截取后的图片：<br><img src="http://img.blog.csdn.net/20170715234218905?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>生成左右两条线：<br><img src="http://img.blog.csdn.net/20170715234231365?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>和原图结合的最终图片：<br><img src="http://img.blog.csdn.net/20170715234248485?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h1 id="Gray">Gray</h1><p>通常的彩色图片是三通道的，简便起见，对其做单通道处理，转化为灰色图像。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> matplotlib.image <span class="keyword">as</span> mpimg</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Read in and grayscale the image</span></span><br><span class="line">image = mpimg.imread(<span class="string">'image.jpg'</span>)</span><br><span class="line">gray = cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)</span><br></pre></td></tr></table></figure>
+<p>转化的经验公式如下，该公式是根据人眼中三种不同的感光细胞的感光强度按比例分配的：<br>$$Y←0.299⋅R+0.587⋅G+0.114⋅B$$</p>
+<p>同时需要注意一点，从RGB到灰度图像本质上是建立了一个映射函数。对于确立好的映射函数，我们总能找到RGB空间中不同的点映射之后得到的点却基本相同。理由也很简单，从3通道到1通道肯定伴随着信息的损失。解决办法是不固定映射函数，根据图片做动态的映射函数。</p>
+<h1 id="Gauss_Blur">Gauss Blur</h1><p>高斯模糊就是用高斯核对图片做卷积操作，大小为5的高斯核如下：</p>
+<p><img src="http://img.blog.csdn.net/20170716101014547?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<ul>
+<li>原理：重新计算图片中每个点的值，计算的时候取该点与周围点的加权平均，权重符合高斯分布。</li>
+<li>作用：降低图片噪声和减少细节（增强图片在不同scale下的structure），并保留边界。同时Gauss FIlter是一种低通滤波器，只允许低频部分通过，限制高频部分（例如像素值剧烈升高或降低的早点）。</li>
+<li>效果：像通过半透明的玻璃看图片一样。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Define a kernel size and apply Gaussian smoothing</span></span><br><span class="line">kernel_size = <span class="number">5</span></span><br><span class="line">blur_gray = cv2.GaussianBlur(gray,(kernel_size, kernel_size),<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+<h1 id="Canny_Edges">Canny Edges</h1><h2 id="高斯模糊">高斯模糊</h2><p>首先，紧接上面的高斯模糊，边缘检测通常对噪声很敏感，所以在边缘检测前要用高斯模糊降噪，这样单独的一个像素噪声在经过高斯平滑后的图像上变得几乎没有任何影响。</p>
+<h2 id="计算梯度">计算梯度</h2><p>边缘检测的本质是计算图片在每个点的梯度（像素值的变化情况），变化值越大表明是边缘的概率越高。  计算梯度的时候使用了卷积，相关计算如下（方向约成【0、45、90、135】之间）：</p>
+<p><img src="http://img.blog.csdn.net/20170716102534907?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="Non-maximum_suppression">Non-maximum suppression</h2><p>计算完梯度后，需要进行thin the edge。方法是将每个像素点的梯度值与梯度方向上的两个点进行比较，当且仅当这个点的梯度值最大才保留，否则舍弃。（例如梯度方向是0度，那么将当前梯度值与左右两边的梯度值进行比较，当且仅当当前梯度值最大才保留）</p>
+<h2 id="Double_threshold">Double threshold</h2><p>进行Non-maximum suppression后，仍然可能有部分误标记的edge，这些误标记的edge可能来自噪音或者颜色的变化。解决的办法是设置两个阈值low_threshold、high_threshold，当前point的梯度gradient与阈值的关系如下：</p>
+<ul>
+<li>gradient &lt; low_threshold：丢弃</li>
+<li>gradient &gt; high_threshold：保留</li>
+<li>low_threshold &lt; gradient &lt; high_threshold: 当且仅当其存在相连点的梯度大于high_threshold才保留</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Define our parameters for Canny and apply</span></span><br><span class="line">low_threshold = <span class="number">50</span></span><br><span class="line">high_threshold = <span class="number">150</span></span><br><span class="line">edges = cv2.Canny(blur_gray, low_threshold, high_threshold)</span><br></pre></td></tr></table></figure>
+<h1 id="ROI(Region_of_Interest)_Based_Edge_Filtering">ROI(Region of Interest) Based Edge Filtering</h1><p>通过Canny进行边缘检测获得边缘后，会发现，获得的边缘不仅包括需要的车道线边缘，同时包括不需要的其他车道以及周围围栏的边缘。去掉这些边缘的办法是确定一个多边形的可视域，只保留可视域部分的边缘信息。其依据是camera相对车是固定的，车相对于车道的相对位置也基本固定，所以车道在camera中基本保持在一个固定区域内。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Next we'll create a masked edges image using cv2.fillPoly()</span></span><br><span class="line">mask = np.zeros_like(edges)   </span><br><span class="line">ignore_mask_color = <span class="number">255</span>   </span><br><span class="line"></span><br><span class="line"><span class="comment"># This time we are defining a four sided polygon to mask</span></span><br><span class="line">imshape = image.shape</span><br><span class="line">vertices = np.array([[(<span class="number">50</span>,imshape[<span class="number">0</span>]),(<span class="number">420</span>, <span class="number">280</span>), (<span class="number">550</span>, <span class="number">280</span>), (<span class="number">950</span>,imshape[<span class="number">0</span>])]], dtype=np.int32)</span><br><span class="line">cv2.fillPoly(mask, vertices, ignore_mask_color)</span><br><span class="line">masked_edges = cv2.bitwise_and(edges, mask)</span><br></pre></td></tr></table></figure>
+<h1 id="Hough_Transform">Hough Transform</h1><h2 id="简介">简介</h2><p>霍夫变换一种特征提取技术，检测具有特定形状的物体，通常是直线、圆、椭圆。</p>
+<p>其原理是将原空间隐射到参数空间，在参数空间进行投票获得所需的图形。</p>
+<h2 id="例子">例子</h2><p>下面以检测图片中的直线为例简单介绍霍夫变换。</p>
+<p>原空间中的直线可以映射到参数空间中的点。C。<br><img src="http://img.blog.csdn.net/20170718103146755?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>原空间中的点可以映射到参数空间中的直线。A。<br><img src="http://img.blog.csdn.net/20170718103202052?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>原空间中的点可以映射到参数空间中的直线，参数空间中直线的交点代表原空间中点的连线。C。<br><img src="http://img.blog.csdn.net/20170718103216379?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>原空间中的直线可以映射到参数空间中的点，参数空间中两个点的连线代表原空间中两个直线的交点。A。<br><img src="http://img.blog.csdn.net/20170718103229079?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>如果用<code>y=kx+b</code>中的k、b作为参数空间中的参数，会遇到竖直线k无穷大的问题，所以采用极坐标表示如下。<br><img src="http://img.blog.csdn.net/20170718105230417?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>采用极坐标后，原空间的点对应参数空间的二次曲线，原空间的直线对应参数参数空间上的点。C。<br><img src="http://img.blog.csdn.net/20170718103242369?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="车道线">车道线</h2><p>无论采用xy坐标还是极坐标，原空间的点都对应参数空间的曲线，原空间的直线都对应着参数空间中曲线的交点。如下图所示，可以根据在参数空间中每个grid相交点的出现次数寻找原空间中的直线。<br><img src="http://img.blog.csdn.net/20170718105526286?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170718105540480?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>Hough变换的代码如下，其参数的含义见注释</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">rho = <span class="number">2</span> <span class="comment"># distance resolution in pixels of the Hough grid</span></span><br><span class="line">theta = np.pi/<span class="number">180</span> <span class="comment"># angular resolution in radians of the Hough grid</span></span><br><span class="line">threshold = <span class="number">15</span>     <span class="comment"># minimum number of votes (intersections in Hough grid cell)</span></span><br><span class="line">min_line_length = <span class="number">40</span> <span class="comment">#minimum number of pixels making up a line</span></span><br><span class="line">max_line_gap = <span class="number">20</span>    <span class="comment"># maximum gap in pixels between connectable line segments</span></span><br><span class="line">line_image = np.copy(image)*<span class="number">0</span> <span class="comment"># creating a blank to draw lines on</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Run Hough on edge detected image</span></span><br><span class="line">lines = cv2.HoughLinesP(edges, rho, theta, threshold, np.array([]), min_line_length, max_line_gap)</span><br></pre></td></tr></table></figure>
+<h1 id="Lane_Extrapolation">Lane Extrapolation</h1><p>通过Hough变换后，得到了很多直线，例如下图：<br><img src="http://img.blog.csdn.net/20170718110241899?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>为了获得左右各一条直线，如下图，还需要额外的工作。<br><img src="http://img.blog.csdn.net/20170715234248485?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>这里介绍一种比较简单的方法：</p>
+<ol>
+<li>将所有直线按照斜率分成左右两部分。</li>
+<li>每部分求平均或者median得到加权的直线参数。</li>
+<li>根据原图片的位置描绘出新参数的直线。</li>
+</ol>
+<h1 id="参考">参考</h1><p>本内容来源于<a href="https://classroom.udacity.com/nanodegrees/nd013" target="_blank" rel="external">Udacity Self-Driving Car Nano Degree</a>，在此感谢Udacity全体工作人员对在线教育的付出。</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Canny-Edge-Detector/" rel="tag">#Canny Edge Detector</a>
+          
+            <a href="/tags/Hough-Transform/" rel="tag">#Hough Transform</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/03/机器翻译之Facebook的CNN与Google的Attention/" rel="next" title="机器翻译之Facebook的CNN与Google的Attention">
+                <i class="fa fa-chevron-left"></i> 机器翻译之Facebook的CNN与Google的Attention
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/07/18/无人驾驶之车道线检测简易版/"
+           data-title="无人驾驶之车道线检测简易版" data-url="http://younggy.com/2017/07/18/无人驾驶之车道线检测简易版/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/uploads/touxiang.jpg" alt="Guangyao Yang" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Guangyao Yang</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Guangyao Yang</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">34</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">40</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/young_gy" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> CSDN
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YoungGer" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-twitter-url" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i> Twitter
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-weibo-url" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-douban-url" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> DouBan
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/ger-young" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> ZhiHu
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Pipe_Line"><span class="nav-number">1.</span> <span class="nav-text">Pipe Line</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Gray"><span class="nav-number">2.</span> <span class="nav-text">Gray</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Gauss_Blur"><span class="nav-number">3.</span> <span class="nav-text">Gauss Blur</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Canny_Edges"><span class="nav-number">4.</span> <span class="nav-text">Canny Edges</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#高斯模糊"><span class="nav-number">4.1.</span> <span class="nav-text">高斯模糊</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#计算梯度"><span class="nav-number">4.2.</span> <span class="nav-text">计算梯度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Non-maximum_suppression"><span class="nav-number">4.3.</span> <span class="nav-text">Non-maximum suppression</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Double_threshold"><span class="nav-number">4.4.</span> <span class="nav-text">Double threshold</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ROI(Region_of_Interest)_Based_Edge_Filtering"><span class="nav-number">5.</span> <span class="nav-text">ROI(Region of Interest) Based Edge Filtering</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Hough_Transform"><span class="nav-number">6.</span> <span class="nav-text">Hough Transform</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">6.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#例子"><span class="nav-number">6.2.</span> <span class="nav-text">例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#车道线"><span class="nav-number">6.3.</span> <span class="nav-text">车道线</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Lane_Extrapolation"><span class="nav-number">7.</span> <span class="nav-text">Lane Extrapolation</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">8.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guangyao Yang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"younggy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+
+  
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/MathJax.js"></script>
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/config/TeX-AMS-MML_HTMLorMML.js"></script>
+  
+
+
+  
+  
+
+</body>
+</html>
