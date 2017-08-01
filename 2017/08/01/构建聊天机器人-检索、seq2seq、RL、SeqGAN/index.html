@@ -1,0 +1,935 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="chatbot,reinforcement learning,seq2seq,seqgan," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="本文将简要介绍聊天机器人的四种构建方法：检索、seq2seq、Reinforcement Learning、seqGAN。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="构建聊天机器人: 检索、seq2seq、RL、SeqGAN">
+<meta property="og:url" content="http://younggy.com/2017/08/01/构建聊天机器人-检索、seq2seq、RL、SeqGAN/index.html">
+<meta property="og:site_name" content="YoungGy">
+<meta property="og:description" content="本文将简要介绍聊天机器人的四种构建方法：检索、seq2seq、Reinforcement Learning、seqGAN。">
+<meta property="og:image" content="http://img.blog.csdn.net/20170801230115796?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170801110526528?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170801110958785?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170801144918972?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170801145022749?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170801152748719?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170801152802834?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170801153208022?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170801221433641?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170801221558780?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170801221720256?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170801221935385?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170801222322654?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170801222550295?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170801222727990?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170801222951597?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170801225134238?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-08-01T15:15:15.009Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="构建聊天机器人: 检索、seq2seq、RL、SeqGAN">
+<meta name="twitter:description" content="本文将简要介绍聊天机器人的四种构建方法：检索、seq2seq、Reinforcement Learning、seqGAN。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post',
+    motion: false
+  };
+</script>
+
+  <title> 构建聊天机器人: 检索、seq2seq、RL、SeqGAN | YoungGy </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?your-analytics-id";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">YoungGy</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">心有猛虎 细嗅蔷薇</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tools">
+          <a href="/tools" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            工具
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'owv-2W-dWzRWk1KttzWi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                构建聊天机器人: 检索、seq2seq、RL、SeqGAN
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-08-01T23:12:08+08:00" content="2017-08-01">
+              2017-08-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/自然语言处理/" itemprop="url" rel="index">
+                    <span itemprop="name">自然语言处理</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/08/01/构建聊天机器人-检索、seq2seq、RL、SeqGAN/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/08/01/构建聊天机器人-检索、seq2seq、RL、SeqGAN/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20170801230115796?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>本文将简要介绍聊天机器人的四种构建方法：<code>检索</code>、<code>seq2seq</code>、<code>Reinforcement Learning</code>、<code>seqGAN</code>。</p>
+<a id="more"></a>
+<h1 id="聊天机器人的现状">聊天机器人的现状</h1><p>聊天机器人从应用领域分为：</p>
+<ul>
+<li>专业型</li>
+<li>通用型</li>
+</ul>
+<p>从技术上分为：</p>
+<ul>
+<li>检索型</li>
+<li>生成型</li>
+</ul>
+<p>目前聊天机器人在专业领域利用检索的效果较好，正朝着通用领域生成型发展。</p>
+<h1 id="检索">检索</h1><p>检索方法的数据库是很多对话的pair，其原理是将query编码成vector，然后在数据库中找最接近的query，然后将最接近的query的回答输出。注意点如下：</p>
+<ul>
+<li>query的编码方式LSI：使用词袋模型或tf-idf对数据库中的query集进行编码得到矩阵$A$，行代表word，列代表document；对矩阵进行SVD分解得到$A = USV^T$，其中$V$表示文档在特征空间的特征向量；当新的query$q$来临时，对其做变换$S^{-1}U^Tq$得到特征空间的向量，然后用余弦相似性计算与数据库中qeury的相似度即可。这种方法的缺点是当新数据越多的时候误差越大，需要重新计算SVD，同时对于同义词、一词多义等语义特征难以把握。</li>
+<li>query的编码方式RNN：可以采用两个RNN。第一个RNN对每句话进行编码到一个向量；第二个RNN对第一个RNN的输出继续编码成一个向量。</li>
+<li>query的编码方式auto-encoder，设定encoder的单元数，encoder前面加embeding等，相当于特征压缩。</li>
+<li>query编码好之后的问题就转变成了一个retrivel的问题，采用KNN即可，同时可采用KD-Tree、LSH优化检索速度。</li>
+</ul>
+<h1 id="seq2seq">seq2seq</h1><p>seq2seq使用两个RNN，一个作为输入的encoder，一个作为输出的decoder。需要注意的大致包含以下几点：</p>
+<ul>
+<li>encoder中可以包含上一句，也可以包含上上一句。如果包含多个句子，可以采用启发式的encoder，训练2 step的RNN。第一个RNN负责对每个句子进行建模，第二个RNN负责对第一层RNN的输出进行建模输出变量。</li>
+<li>decoder每个step可以采用attention</li>
+<li>train的时候loss为$C = \sum C_t$，$C_t = -\log(P(x_t|x_1,…,x_{t-1}))$，最小化loss等价于最大似然$\max P(x|h)$，$h$代表encoder的输入，$x$代表decoder的输出。</li>
+</ul>
+<p><img src="http://img.blog.csdn.net/20170801110526528?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h1 id="RL">RL</h1><h2 id="强化学习的架构设计">强化学习的架构设计</h2><p>强化学习的本质是根据reward，使模型参数朝着reward增长最大的方向移动。<br>强化学习的聊天机器人架构设计如下：</p>
+<p><img src="http://img.blog.csdn.net/20170801110958785?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>其模型本质还是seq2seq，模型参数是$\theta$，模型输入是$h$，输出是$x$，其与seq2seq不同的地方在于模型参数的更新方式：seq2seq按照cross entropy确定损失函数，然后最小化损失函数；DL最大化期望的reward。</p>
+<p>期望reward的计算公式如下：</p>
+<p>$$\begin{split}<br>R_{\theta} &amp;= \sum_{h} P(h)\sum_{x} P_{\theta}(x|h) R(h,x) \\<br>&amp;=E_{h \sim P(h),x \sim P_{\theta}(x|h)} [R(h,x)] \\<br>&amp;=\frac{1}{N} \sum_i R(h^i,x^i)<br>\end{split}$$</p>
+<p>我们的优化目标是：</p>
+<p>$$\theta^* = \arg \max_{\theta} R_{\theta}$$</p>
+<h2 id="Policy_Gradient">Policy Gradient</h2><p>在上一节中，我们得到了目标函数与优化目标，这节中，我们考虑如何求目标函数的梯度$\nabla R_{\theta}$。</p>
+<p>上一节中得到$R_{\theta}$的方式是通过采样，通过采样的方法自然无法计算梯度实现梯度的传递。解决的思路是：将$R_{\theta}$转化成梯度的采样。具体实现如下：</p>
+<p>$$\begin{split}<br>R_{\theta} &amp;= \sum_{h} P(h)\sum_{x} P_{\theta}(x|h) R(h,x) \\<br>&amp;=E_{h \sim P(h),x \sim P_{\theta}(x|h)} [R(h,x)] \\<br>&amp;=\frac{1}{N} \sum_i R(h^i,x^i)<br>\end{split}$$</p>
+<p>$$\begin{split}<br>\nabla R_{\theta} &amp;= \sum_{h} P(h)\sum_{x} \nabla P_{\theta}(x|h) R(h,x) \\<br>&amp;= \sum_{h} P(h)\sum_{x}  P_{\theta}(x|h) \nabla \log{P_{\theta}(x|h)} R(h,x) \\<br>&amp;=E_{h \sim P(h),x \sim P_{\theta}(x|h)} [R(h,x) \nabla \log{P_{\theta}(x|h)}] \\<br>&amp;=\frac{1}{N} \sum_i R(h^i,x^i) \nabla \log{P_{\theta}(x^i|h^i)}<br>\end{split}$$</p>
+<p>$\theta$的更新方式如下：</p>
+<p>$$\theta \leftarrow \theta + \gamma \nabla R_{\theta}$$</p>
+<p>这样更新的物理含义如下：</p>
+<ul>
+<li>当$R(h^i,x^i)$是正的，在更新后，$P_{\theta}(x^i|h^i)$会提高</li>
+<li>当$R(h^i,x^i)$是负的，在更新后，$P_{\theta}(x^i|h^i)$会降低</li>
+</ul>
+<p>采用强化学习的模型与传统的seq2seq对比如下，其区别主要是强化学习对不同的loss用reward当做权重：</p>
+<p><img src="http://img.blog.csdn.net/20170801144918972?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>训练的整体过程如下：</p>
+<p><img src="http://img.blog.csdn.net/20170801145022749?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="Add_Baseline">Add Baseline</h2><p>更新模型参数$\theta$的时候，如果reward都是正的，理想情况下对于单一的$h$，$P_{\theta}(x^i|h)$根据$R(h,x^i)$的大小进行更新，可是采样的$(h,x^i)$不一定能覆盖所有的情况，所以对reward要做baseline的设置。最简单的baseline就是$\frac{1}{N} \sum R(h,x^i)$。</p>
+<p>加入baseline之后的梯度为：</p>
+<p>$$\begin{split}<br>\nabla R_{\theta} &amp;=\frac{1}{N} \sum_i R(h^i,x^i) \nabla  \log{P_{\theta}(x^i|h^i)} \\<br>&amp;\leftarrow \frac{1}{N} \sum_i (R(h^i,x^i)-b) \nabla  \log{P_{\theta}(x^i|h^i)}<br>\end{split}$$</p>
+<p><img src="http://img.blog.csdn.net/20170801152748719?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20170801152802834?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="Reward设计">Reward设计</h2><p>强化学习中，如果有人提供reward那是再好不过的了，不过这样投入的时间精力物力财力都很大，如何设计reward是这里讨论的问题。这里，提供三种reward的设计思路。</p>
+<ul>
+<li>不要成为句点王</li>
+<li>说点新鲜的</li>
+<li>不要前言不对后语</li>
+</ul>
+<p><img src="http://img.blog.csdn.net/20170801153208022?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h1 id="SeqGAN">SeqGAN</h1><h2 id="架构设计">架构设计</h2><p>SeqGAN与传统GAN一样，包括generator、discriminator。不同的是网络是condition的，也就是使用了condition GAN，generator condition的是query（因为RNN网络本身有随机性，所以这里不加随机的输入），discriminator condition的也是query。</p>
+<p><img src="http://img.blog.csdn.net/20170801221433641?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>SeqGAN训练的大致思路与GAN一致，对generator、discriminator分别训练。</p>
+<p><img src="http://img.blog.csdn.net/20170801221558780?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="离散梯度的传导">离散梯度的传导</h2><p>然而，若按上面传统GAN的架构设计，更新generator参数的时候梯度是无法传递的。原因是generator的输出是采样离散的，难以计算梯度进行梯度的反向传播。</p>
+<p><img src="http://img.blog.csdn.net/20170801221720256?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>简单的解决方案是采用WGAN，传递的不是采样离散的值而是分布。SeqGAN的解决方案借鉴了强化学习。</p>
+<h2 id="强化学习">强化学习</h2><p>采用强化学习的思路，将discriminator当做人，将discriminator的输出当做reward。利用policy gradient可以得到generator参数的更新方向（详见之前的强化学习部分），这样便解决了离散采样值梯度更新的问题。</p>
+<p><img src="http://img.blog.csdn.net/20170801221935385?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="Monte_Carlo_Search">Monte Carlo Search</h2><p>使用强化学习，利用policy gradient解决了离散值梯度传递的问题后，还会出现对句子不同长度reward的分配问题。详见下图。这个问题在数据量大并且采样足够的情况不严重，在采样较少的情况较严重。</p>
+<p><img src="http://img.blog.csdn.net/20170801222322654?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>解决这个问题的思路是对每个generator的step都设置reward，具体如下。其中，$Q(h,x)$代表当前genetor出来的相对输入h的好坏，如何度量它是一个问题。</p>
+<p><img src="http://img.blog.csdn.net/20170801222550295?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>解决度量$Q(h,x)$的方法是蒙特卡洛，具体方法如下图。固定已知序列，用generator去生成未知序列，以已知序列为首的未知序列都可以用discriminator计算reward，最后取平均当做已知序列的reward。</p>
+<p><img src="http://img.blog.csdn.net/20170801222727990?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="Teaching_Forcing">Teaching Forcing</h2><p>生成模型的训练通常很难，seqGAN中，初始的generator生成的x效果不好，因此discriminator给的reward很低，这样模型很难训练，因为它一直看到比较低的reward，也就是不好的数据，并不知道好的数据长什么样，自然很难像好的数据学习。</p>
+<p>解决初始训练的思路是训练的时候更多的见到reward高的pair对，具体实施方法有两种：</p>
+<ol>
+<li>按照reward采样，reward越大采样到的比例越高</li>
+<li>增加更多的真实数据去训练</li>
+</ol>
+<p><img src="http://img.blog.csdn.net/20170801222951597?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="评估模型">评估模型</h2><p>这里涉及到如何去评估模型的好坏，传统的方式是BLEU，这里提供一种合成data的新思路。</p>
+<h3 id="BLEU">BLEU</h3><p>BLEU需要提供候选和参考集，采用n-gram计算：候选n-gram在参考集n-gram中出现的最大频数/候选n-gram的总数。需要注意的有两点：</p>
+<ul>
+<li>利用参考集n-gram的最大频数作为上限，防止重复大量n-gram得到较高的得分</li>
+<li>增大短句子的惩罚项，避免短句子得到较高的得分</li>
+</ul>
+<h3 id="Synthetic_data">Synthetic data</h3><p>生成数据的方法，是先用LSTM（可以是random）产生很多pair作为真实数据。generator利用LSTM的数据学习，然后利用generator生成fake的answer，与真实的answer计算negative log likelihoood即可。</p>
+<p><img src="http://img.blog.csdn.net/20170801225134238?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/chatbot/" rel="tag">#chatbot</a>
+          
+            <a href="/tags/reinforcement-learning/" rel="tag">#reinforcement learning</a>
+          
+            <a href="/tags/seq2seq/" rel="tag">#seq2seq</a>
+          
+            <a href="/tags/seqgan/" rel="tag">#seqgan</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/18/无人驾驶之车道线检测简易版/" rel="next" title="无人驾驶之车道线检测简易版">
+                <i class="fa fa-chevron-left"></i> 无人驾驶之车道线检测简易版
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/08/01/构建聊天机器人-检索、seq2seq、RL、SeqGAN/"
+           data-title="构建聊天机器人: 检索、seq2seq、RL、SeqGAN" data-url="http://younggy.com/2017/08/01/构建聊天机器人-检索、seq2seq、RL、SeqGAN/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/uploads/touxiang.jpg" alt="Guangyao Yang" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Guangyao Yang</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Guangyao Yang</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">35</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">44</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/young_gy" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> CSDN
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YoungGer" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-twitter-url" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i> Twitter
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-weibo-url" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-douban-url" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> DouBan
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/ger-young" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> ZhiHu
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#聊天机器人的现状"><span class="nav-number">1.</span> <span class="nav-text">聊天机器人的现状</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#检索"><span class="nav-number">2.</span> <span class="nav-text">检索</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#seq2seq"><span class="nav-number">3.</span> <span class="nav-text">seq2seq</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RL"><span class="nav-number">4.</span> <span class="nav-text">RL</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#强化学习的架构设计"><span class="nav-number">4.1.</span> <span class="nav-text">强化学习的架构设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Policy_Gradient"><span class="nav-number">4.2.</span> <span class="nav-text">Policy Gradient</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Add_Baseline"><span class="nav-number">4.3.</span> <span class="nav-text">Add Baseline</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reward设计"><span class="nav-number">4.4.</span> <span class="nav-text">Reward设计</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SeqGAN"><span class="nav-number">5.</span> <span class="nav-text">SeqGAN</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#架构设计"><span class="nav-number">5.1.</span> <span class="nav-text">架构设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#离散梯度的传导"><span class="nav-number">5.2.</span> <span class="nav-text">离散梯度的传导</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#强化学习"><span class="nav-number">5.3.</span> <span class="nav-text">强化学习</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Monte_Carlo_Search"><span class="nav-number">5.4.</span> <span class="nav-text">Monte Carlo Search</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Teaching_Forcing"><span class="nav-number">5.5.</span> <span class="nav-text">Teaching Forcing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#评估模型"><span class="nav-number">5.6.</span> <span class="nav-text">评估模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#BLEU"><span class="nav-number">5.6.1.</span> <span class="nav-text">BLEU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Synthetic_data"><span class="nav-number">5.6.2.</span> <span class="nav-text">Synthetic data</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guangyao Yang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"younggy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+
+  
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/MathJax.js"></script>
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/config/TeX-AMS-MML_HTMLorMML.js"></script>
+  
+
+
+  
+  
+
+</body>
+</html>
