@@ -35,7 +35,7 @@
 <link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="卡尔曼滤波," />
 
 
 
@@ -51,33 +51,18 @@
 
 
 
-<meta name="description" content="一般的神经网络输入和输出的维度大小都是固定的，针对序列类型（尤其是变长的序列）的输入或输出数据束手无策。RNN通过采用具有记忆的隐含层单元解决了序列数据的训练问题。LSTM属于RNN的改进，解决了RNN中梯度消失爆炸的问题，属于序列数据训练的常用方案。">
+<meta name="description" content="卡尔曼滤波是一种在不确定状况下组合多源信息得到所需状态最优估计的一种方法。本文将简要介绍卡尔曼滤波的原理及推导。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="记忆网络RNN与LSTM">
-<meta property="og:url" content="http://younggy.com/2017/05/09/记忆网络RNN与LSTM/index.html">
+<meta property="og:title" content="卡尔曼滤波简介">
+<meta property="og:url" content="http://younggy.com/2017/11/06/卡尔曼滤波简介/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="一般的神经网络输入和输出的维度大小都是固定的，针对序列类型（尤其是变长的序列）的输入或输出数据束手无策。RNN通过采用具有记忆的隐含层单元解决了序列数据的训练问题。LSTM属于RNN的改进，解决了RNN中梯度消失爆炸的问题，属于序列数据训练的常用方案。">
-<meta property="og:image" content="http://img.blog.csdn.net/20170509233839180?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170509170154747?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170509170205897?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170509201949623?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170509202126299?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170509195700145?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170509195718708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170509195729802?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170509195751364?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170509195803656?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170509195140112?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170509195150159?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170509195202393?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170509200635432?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170509232737782?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170618114739004?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170618114749977?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-06-18T12:41:38.755Z">
+<meta property="og:description" content="卡尔曼滤波是一种在不确定状况下组合多源信息得到所需状态最优估计的一种方法。本文将简要介绍卡尔曼滤波的原理及推导。">
+<meta property="og:image" content="http://img.blog.csdn.net/20171106163052845?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171106160927414?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-11-06T12:11:15.655Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="记忆网络RNN与LSTM">
-<meta name="twitter:description" content="一般的神经网络输入和输出的维度大小都是固定的，针对序列类型（尤其是变长的序列）的输入或输出数据束手无策。RNN通过采用具有记忆的隐含层单元解决了序列数据的训练问题。LSTM属于RNN的改进，解决了RNN中梯度消失爆炸的问题，属于序列数据训练的常用方案。">
+<meta name="twitter:title" content="卡尔曼滤波简介">
+<meta name="twitter:description" content="卡尔曼滤波是一种在不确定状况下组合多源信息得到所需状态最优估计的一种方法。本文将简要介绍卡尔曼滤波的原理及推导。">
 
 
 
@@ -89,7 +74,7 @@
   };
 </script>
 
-  <title> 记忆网络RNN与LSTM | YoungGy </title>
+  <title> 卡尔曼滤波简介 | YoungGy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -270,7 +255,7 @@
             
             
               
-                记忆网络RNN与LSTM
+                卡尔曼滤波简介
               
             
           </h1>
@@ -279,8 +264,8 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2017-05-09T23:27:38+08:00" content="2017-05-09">
-              2017-05-09
+            <time itemprop="dateCreated" datetime="2017-11-06T20:09:18+08:00" content="2017-11-06">
+              2017-11-06
             </time>
           </span>
 
@@ -289,8 +274,8 @@
               &nbsp; | &nbsp; 分类于
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/机器学习/" itemprop="url" rel="index">
-                    <span itemprop="name">机器学习</span>
+                  <a href="/categories/无人驾驶/" itemprop="url" rel="index">
+                    <span itemprop="name">无人驾驶</span>
                   </a>
                 </span>
 
@@ -305,8 +290,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2017/05/09/记忆网络RNN与LSTM/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/09/记忆网络RNN与LSTM/" itemprop="commentsCount"></span>
+                <a href="/2017/11/06/卡尔曼滤波简介/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/11/06/卡尔曼滤波简介/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -325,90 +310,99 @@
       
 
       
-        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20170509233839180?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>一般的神经网络输入和输出的维度大小都是固定的，针对序列类型（尤其是变长的序列）的输入或输出数据束手无策。RNN通过采用具有记忆的隐含层单元解决了序列数据的训练问题。LSTM属于RNN的改进，解决了RNN中梯度消失爆炸的问题，属于序列数据训练的常用方案。</p>
+        <span itemprop="articleBody"><p>卡尔曼滤波是一种在不确定状况下组合多源信息得到所需状态最优估计的一种方法。本文将简要介绍卡尔曼滤波的原理及推导。</p>
+<p><img src="http://img.blog.csdn.net/20171106163052845?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
 <a id="more"></a>
-<h1 id="RNN">RNN</h1><h2 id="结构">结构</h2><p>传统的神经网络的输入和输出都是确定的，RNN的输入和输出都是不确定的<code>sequence</code>数据。其结构如下：</p>
-<p><img src="http://img.blog.csdn.net/20170509170154747?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170509170205897?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>具体地，RNN有隐含层，隐含层也是记忆层，其状态（权值）会传递到下一个状态中。</p>
-<p>$$\begin{split}<br>h^t &amp;= \sigma(x^tW_{xh} + h^{t-1}W_{hh}) \\<br>y^t &amp;= \sigma(h^tW_{hy})<br>\end{split}$$</p>
-<h2 id="训练">训练</h2><p>训练步骤如下：</p>
+<h1 id="什么是卡尔曼滤波">什么是卡尔曼滤波</h1><p>首先定义问题：对于某一系统，知道当前状态$X_t$，存在以下两个问题：</p>
 <ol>
-<li>构建损失函数</li>
-<li>求损失函数对权值的梯度</li>
-<li>采用梯度下降法更新权值参数</li>
+<li>经过时间$\triangle t$后，下个状态$X_{t+1}$如何求出？</li>
+<li>假定已求出$X_{t+1}$，在$t+1$时刻收到传感器的非直接信息$Z_{t+1}$，如何对状态$X_{t+1}$进行更正？</li>
 </ol>
-<p>关于损失函数，根据需要选择构建即可，下面提供两种常见的损失函数：<br>$$\begin{split}<br>C &amp;= \frac{1}{2}\sum_{n=1}^N ||y^n-{\hat{y}}^n||^2 \\<br>C &amp;= \frac{1}{2}\sum_{n=1}^N -\log y_{r^n}^n<br>\end{split}$$</p>
-<p>关于梯度下降，采用BPTT(Backpropagation through time)算法，该算法的核心是对每一个时间戳，计算该时间戳中权重的梯度，然后更新权重。需要注意的是，不同时间戳同样权重的梯度可能是不一样的，如下图所示都减去，相当于更新同一块内存区域中的权重。</p>
-<p><img src="http://img.blog.csdn.net/20170509201949623?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170509202126299?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<h2 id="应用">应用</h2><ul>
-<li>多对多：词性标注pos tagging、语音识别、name entity recognition（区分poeple、organizations、places、information extration（区分place of departure、destination、time of departure、time of arrival， other）、机器翻译</li>
-<li>多对一：情感分析</li>
-<li>一对多：caption generation</li>
+<p>这两个问题正是卡尔曼滤波要解决的问题，形式化两个问题如下：</p>
+<ol>
+<li>预测未来</li>
+<li>修正当下</li>
+</ol>
+<p>下面，将以机器人导航为例，从<strong>预测未来</strong>和<strong>修正当下</strong>两个角度介绍卡尔曼滤波器。</p>
+<h1 id="卡尔曼滤波的原理">卡尔曼滤波的原理</h1><p>问题场景如下：一个机器人，我们想知道它实时的状态$\vec{x}$，同时也想做到<strong>预测未来</strong>和<strong>修正当下</strong>这两件事。</p>
+<p>其状态$x$表示为一维大小为2的向量，元素分别表示位置信息与速度信息：</p>
+<p>$$\vec{x} = \begin{bmatrix}<br>p\\<br>v<br>\end{bmatrix}$$</p>
+<p>可是状态$x$不一定是精准的，其不确定性用协方差表示：</p>
+<p>$$<br>P_k = \begin{bmatrix}<br>\Sigma_{pp} &amp; \Sigma_{pv} \\<br>\Sigma_{vp} &amp; \Sigma_{vv} \\<br>\end{bmatrix}$$</p>
+<h2 id="预测未来">预测未来</h2><h3 id="只考虑自身状态">只考虑自身状态</h3><p>只考虑自身状态的情况下，根据物理公式，可得：</p>
+<p>$$\begin{split}<br>\color{deeppink}{p_k} &amp;= \color{royalblue}{p_{k-1}} + \Delta t &amp;\color{royalblue}{v_{k-1}} \\<br>\color{deeppink}{v_k} &amp;= &amp;\color{royalblue}{v_{k-1}}<br>\end{split}$$</p>
+<p>用矩阵表示如下：</p>
+<p>$$\begin{align}<br>\color{deeppink}{\mathbf{\hat{x}}_k} &amp;= \begin{bmatrix}<br>1 &amp; \Delta t \\<br>0 &amp; 1<br>\end{bmatrix} \color{royalblue}{\mathbf{\hat{x}}_{k-1}} \\<br>&amp;= \mathbf{F}_k \color{royalblue}{\mathbf{\hat{x}}_{k-1}}<br>\end{align}$$</p>
+<p>在状态变化的过程中引入了新的不确定性，根据协方差的乘积公式可得：</p>
+<p>$$\begin{equation}<br>\begin{split}<br>Cov(x) &amp;= \Sigma\\<br>Cov(\color{firebrick}{\mathbf{A}}x) &amp;= \color{firebrick}{\mathbf{A}} \Sigma \color{firebrick}{\mathbf{A}}^T<br>\end{split} \label{covident}<br>\end{equation}$$</p>
+<p>$$\begin{equation}<br>\begin{split}<br>\color{deeppink}{\mathbf{\hat{x}}_k} &amp;= \mathbf{F}_k \color{royalblue}{\mathbf{\hat{x}}_{k-1}} \\<br>\color{deeppink}{\mathbf{P}_k} &amp;= \mathbf{F_k} \color{royalblue}{\mathbf{P}_{k-1}} \mathbf{F}_k^T<br>\end{split}<br>\end{equation}$$</p>
+<h3 id="考虑外部状态">考虑外部状态</h3><p>外部状态，这里以加速度为例，引入变量$\color{darkorange}{a}$ ($\color{darkorange}{\vec{\mathbf{u}_k}}$)。</p>
+<p>$$\begin{split}<br>\color{deeppink}{p_k} &amp;= \color{royalblue}{p_{k-1}} + {\Delta t} &amp;\color{royalblue}{v_{k-1}} + &amp;\frac{1}{2} \color{darkorange}{a} {\Delta t}^2 \\<br>\color{deeppink}{v_k} &amp;= &amp;\color{royalblue}{v_{k-1}} + &amp; \color{darkorange}{a} {\Delta t}<br>\end{split}$$</p>
+<p>$$\begin{equation}<br>\begin{split}<br>\color{deeppink}{\mathbf{\hat{x}}_k} &amp;= \mathbf{F}_k \color{royalblue}{\mathbf{\hat{x}}_{k-1}} + \begin{bmatrix}<br>\frac{\Delta t^2}{2} \\<br>\Delta t<br>\end{bmatrix} \color{darkorange}{a} \\<br>&amp;= \mathbf{F}_k \color{royalblue}{\mathbf{\hat{x}}_{k-1}} + \mathbf{B}_k \color{darkorange}{\vec{\mathbf{u}_k}}<br>\end{split}<br>\end{equation}$$</p>
+<p>同时，环境仍然存在我们无法刻画的误差，以${\color{mediumaquamarine}{\mathbf{Q}_k}}$表示，最终的预测公式如下：</p>
+<p>$$\begin{equation}<br>\begin{split}<br>\color{deeppink}{\mathbf{\hat{x}}_k} &amp;= \mathbf{F}_k \color{royalblue}{\mathbf{\hat{x}}_{k-1}} + \mathbf{B}_k \color{darkorange}{\vec{\mathbf{u}_k}} \\<br>\color{deeppink}{\mathbf{P}_k} &amp;= \mathbf{F_k} \color{royalblue}{\mathbf{P}_{k-1}} \mathbf{F}_k^T + \color{mediumaquamarine}{\mathbf{Q}_k}<br>\end{split}<br>\end{equation}$$</p>
+<p>从上述式子可见：</p>
+<ol>
+<li>$\color{deeppink}{\textbf{新的最优估计}}$是$\color{royalblue} {\textbf{之前最优估计}}$的预测加上$\color{darkorange}{\textbf{已知的外界影响}}$的修正。</li>
+<li>$\color{deeppink}{\textbf{新的不确定度}}$是$\color{royalblue} {\textbf{预测的不确定度}}$加上$\color{mediumaquamarine}{\textbf{环境的不确定度}}$。</li>
+</ol>
+<h2 id="修正当下">修正当下</h2><p>我们已得到$\color{deeppink}{\mathbf{\hat{x}}_k, P_k}$，下面要通过观测到的测量值$\color{yellowgreen}{\vec{\mathbf{z}_k}}$对${\mathbf{\hat{x}}_k, P_k}$进行更新。</p>
+<p>因为$\color{deeppink}{\mathbf{\hat{x}}_k, P_k}$和$\color{yellowgreen}{\vec{\mathbf{z}_k}}$的数据尺度不一定相同，例如$\color{deeppink}{\mathbf{\hat{x}}_k, P_k}$包含了$\color{deeppink}{\textbf{笛卡尔}}$的坐标信息，使用radar得到的$\color{yellowgreen}{\vec{\mathbf{z}_k}}$则包含$\color{yellowgreen}{\textbf{极坐标}}$信息。所以首先应该把两者放在相同的尺度下去比较，尺度转换使用$\mathbf{H}_k$将预测信息转化为测量信息的尺度。</p>
+<p>$$\begin{equation}<br>\begin{aligned}<br>\vec{\mu}_{\text{expected}} &amp;= \mathbf{H}_k \color{deeppink}{\mathbf{\hat{x}}_k} \\<br>\mathbf{\Sigma}_{\text{expected}} &amp;= \mathbf{H}_k \color{deeppink}{\mathbf{P}_k} \mathbf{H}_k^T<br>\end{aligned}<br>\end{equation}$$</p>
+<p>这样一来，便得到测量尺度上的两个分布：</p>
+<ol>
+<li>测量值的分布$\mathcal{N}(x, \color{yellowgreen}{\mu_1}, \color{mediumaquamarine}{\sigma_1})$</li>
+<li>预测值变换后的分布$\mathcal{N}(x, \color{fuchsia}{\mu_0}, \color{deeppink}{\sigma_0}) $</li>
+</ol>
+<p>下面一个问题就是如何用这个两个分布组成新的分布。</p>
+<p>$$\begin{equation}<br>\mathcal{N}(x, \color{fuchsia}{\mu_0}, \color{deeppink}{\sigma_0}) \cdot \mathcal{N}(x, \color{yellowgreen}{\mu_1}, \color{mediumaquamarine}{\sigma_1}) \stackrel{?}{=} \mathcal{N}(x, \color{royalblue}{\mu’}, \color{mediumblue}{\sigma’})<br>\end{equation}$$</p>
+<p><img src="http://img.blog.csdn.net/20171106160927414?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>简单的一维情况如下：</p>
+<p>$$\begin{equation}<br>\color{purple}{\mathbf{k}} = \frac{\sigma_0^2}{\sigma_0^2 + \sigma_1^2}<br>\end{equation}$$</p>
+<p>高维情况下，针对测量值分布$(\color{yellowgreen}{\mu_1}, \color{mediumaquamarine}{\Sigma_1}) = (\color{yellowgreen}{\vec{\mathbf{z}_k}}, \color{mediumaquamarine}{\mathbf{R}_k})$与预测值的变化分布$(\color{fuchsia}{\mu_0}, \color{deeppink}{\Sigma_0}) = (\color{fuchsia}{\mathbf{H}_k \mathbf{\hat{x}}_k}, \color{deeppink}{\mathbf{H}_k \mathbf{P}_k \mathbf{H}_k^T})$组合的高斯分布如下：</p>
+<p>$$\begin{equation}<br>\begin{split}<br>\color{royalblue}{\mathbf{\hat{x}}_k’} &amp;= \color{fuchsia}{\mathbf{\hat{x}}_k} &amp; + &amp; \color{purple}{\mathbf{K}’} ( \color{yellowgreen}{\vec{\mathbf{z}_k}} – \color{fuchsia}{\mathbf{H}_k \mathbf{\hat{x}}_k} ) \\<br>\color{royalblue}{\mathbf{P}_k’} &amp;= \color{deeppink}{\mathbf{P}_k} &amp; – &amp; \color{purple}{\mathbf{K}’} \color{deeppink}{\mathbf{H}_k \mathbf{P}_k}<br>\end{split}<br>\end{equation}$$</p>
+<p>$$\begin{equation}<br>\color{purple}{\mathbf{K}’} = \color{deeppink}{\mathbf{P}_k \mathbf{H}_k^T} ( \color{deeppink}{\mathbf{H}_k \mathbf{P}_k \mathbf{H}_k^T} + \color{mediumaquamarine}{\mathbf{R}_k})^{-1}<br>\end{equation}$$</p>
+<h1 id="总结">总结</h1><h2 id="预测未来-1">预测未来</h2><ul>
+<li>输入：过去的最优状态（$\color{royalblue}{\mathbf{\hat{x}}_{k-1}}$，$\color{royalblue}{\mathbf{P}_{k-1}}$）、外界对过程的影响$\color{darkorange}{\vec{\mathbf{u}_k}}$，环境的不确定度$\color{mediumaquamarine}{\mathbf{Q}_k} $。</li>
+<li>输出：预测的最优状态（$\color{deeppink}{\mathbf{\hat{x}}_{k}}$，$\color{deeppink}{\mathbf{P}_{k}}$）。</li>
+<li>其他：对过程的描述（$ \mathbf{F_k} $，$\mathbf{B_k} $）跟时间有关。</li>
 </ul>
-<p><img src="http://img.blog.csdn.net/20170509195700145?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p><img src="http://img.blog.csdn.net/20170509195718708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170509195729802?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p><img src="http://img.blog.csdn.net/20170509195751364?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p><img src="http://img.blog.csdn.net/20170509195803656?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<h1 id="RNN_Variants">RNN Variants</h1><p>RNN的变种大致包含下面3个思路：</p>
-<ul>
-<li>增加隐含层的输入参数：例如除了$h^{t-1}, x^t$，还可以包含$y^{t-1}$作为输入。</li>
-<li>增加隐含层的深度</li>
-<li>双向RNN</li>
+<p>$$\begin{equation}<br>\begin{split}<br>\color{deeppink}{\mathbf{\hat{x}}_k} &amp;= \mathbf{F}_k \color{royalblue}{\mathbf{\hat{x}}_{k-1}} + \mathbf{B}_k \color{darkorange}{\vec{\mathbf{u}_k}} \\<br>\color{deeppink}{\mathbf{P}_k} &amp;= \mathbf{F_k} \color{royalblue}{\mathbf{P}_{k-1}} \mathbf{F}_k^T + \color{mediumaquamarine}{\mathbf{Q}_k}<br>\end{split}<br>\end{equation}$$</p>
+<h2 id="修正当下-1">修正当下</h2><ul>
+<li>输入：预测的最优状态（$\color{deeppink}{\mathbf{\hat{x}}_{k}}$，$\color{deeppink}{\mathbf{P}_{k}}$），测量的状态分布$ (\color{yellowgreen}{\vec{\mathbf{z}_k}}, \color{mediumaquamarine}{\mathbf{R}_k})$，预测到测量的变换矩阵$\color{deeppink}{\mathbf{H}_k} $。</li>
+<li>输出：经过测量修正的最优状态（$\color{royalblue}{\mathbf{\hat{x}}_{k}’}$，$\color{royalblue}{\mathbf{P}_{k}’}$）。</li>
 </ul>
-<p><img src="http://img.blog.csdn.net/20170509195140112?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170509195150159?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170509195202393?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<h1 id="LSTM">LSTM</h1><h2 id="结构-1">结构</h2><ul>
-<li>单个时间戳，RNN输入1个x，输出1个y</li>
-<li>单个时间戳，LSTM输入4个x，输出1个y</li>
-</ul>
-<p>相比RNN，LSTM的输入多了3个x，对应3个gate，这3个gate分别是：</p>
-<ul>
-<li>input gate：控制输入</li>
-<li>forget gate：控制cell</li>
-<li>output gate：控制输出</li>
-</ul>
-<p>涉及到的激活函数共5个，其中3个控制gate的（通常用sigmoid函数，模拟gate的开闭状态），1个作用于输入上，一个作用于cell的输出上。</p>
-<p><img src="http://img.blog.csdn.net/20170509200635432?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>LSTM单个时间戳的具体执行如下：</p>
-<ul>
-<li>输入：4个输入$x$，1个cell的状态$c$</li>
-<li>输出：1个输出$a$，1个更新的cell状态$c’$</li>
-</ul>
-<p>$$\begin{split}<br>c’ &amp;= g(z)f(z_i) + cf(z_f) \\<br>a &amp;= h(c’)f(z_o)<br>\end{split}$$</p>
-<h2 id="梯度消失及梯度爆炸">梯度消失及梯度爆炸</h2><p>首先，要明白RNN中梯度消失与梯度爆炸的原因：在时间戳的更新中，cell的状态不断乘以$W_{hh}$。简单起见，视$W_{hh}$为scalar值$w$，那么$y=xw^n$，$\frac{\partial{y}}{\partial{w}}=nxw^{n-1}$。根据$w$的值与1的大小关系，梯度会消失或者爆炸。</p>
-<p>接下来，要明白LSTM如何解决RNN中梯度消失与爆炸的问题。</p>
-<p>针对梯度消失，RNN中当获取$c’$的梯度后，因为$c’ = cw$，为了backward获得$c$的梯度，要将$c’$的梯度乘以$w$；LSTM中存在梯度的快速通道，获取$c’$的梯度后，因为$c’ = g(z)f(z_i)+cf(z_f)$，当forget gate打开时，$c’ = g(z)f(z_i)+c$。$c’$的梯度可以直接传递给$c$。<br>总结来说，LSTM相比RNN，将$c,c’$的更新关系从乘法变成了加法，因此不用乘以权值系数$w$，$c’$的梯度可以直接传递给$c$，解决了梯度消失和梯度爆炸的问题。</p>
-<p>针对梯度爆炸，即使将$c,c’$的关系由乘法变成了加法，仍然解决不了梯度爆炸。原因便是梯度的路径不止一条，如下图所示，红色的块仍然可能造成梯度爆炸。LSTM解决这个问题的方法是clip，也就是设置梯度最大值，超过最大值的按最大值计。</p>
-<p><img src="http://img.blog.csdn.net/20170509232737782?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<h1 id="GRU">GRU</h1><h2 id="结构-2">结构</h2><p>GRU相比LSTM的3个gate，只用了两个gate：</p>
-<ul>
-<li>update gate：$z_t$</li>
-<li>reset gate：$r_t$</li>
-</ul>
-<p><img src="http://img.blog.csdn.net/20170618114739004?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p><img src="http://img.blog.csdn.net/20170618114749977?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>$$\begin{equation}<br>\begin{split}<br>\color{royalblue}{\mathbf{\hat{x}}_k’} &amp;= \color{fuchsia}{\mathbf{\hat{x}}_k} &amp; + &amp; \color{purple}{\mathbf{K}’} ( \color{yellowgreen}{\vec{\mathbf{z}_k}} – \color{fuchsia}{\mathbf{H}_k \mathbf{\hat{x}}_k} ) \\<br>\color{royalblue}{\mathbf{P}_k’} &amp;= \color{deeppink}{\mathbf{P}_k} &amp; – &amp; \color{purple}{\mathbf{K}’} \color{deeppink}{\mathbf{H}_k \mathbf{P}_k}<br>\end{split}<br>\end{equation}$$</p>
+<p>$$\begin{equation}<br>\color{purple}{\mathbf{K}’} = \color{deeppink}{\mathbf{P}_k \mathbf{H}_k^T} ( \color{deeppink}{\mathbf{H}_k \mathbf{P}_k \mathbf{H}_k^T} + \color{mediumaquamarine}{\mathbf{R}_k})^{-1}<br>\end{equation}$$</p>
+<p>卡尔曼滤波需要内存少，计算速度快，适合实时性情况与嵌入式设备的需要。</p>
+<h1 id="参考">参考</h1><ol>
+<li><a href="http://www.bzarg.com/p/how-a-kalman-filter-works-in-pictures/" target="_blank" rel="external">How a Kalman filter works, in pictures</a></li>
+<li><a href="http://bilgin.esme.org/BitsAndBytes/KalmanFilterforDummies" target="_blank" rel="external">Kalman Filter For Dummies</a></li>
+</ol>
 </span>
       
     </div>
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/卡尔曼滤波/" rel="tag">#卡尔曼滤波</a>
+          
+        </div>
+      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/04/19/无监督学习之RBM和AutoEncoder/" rel="next" title="无监督学习之RBM和AutoEncoder">
-                <i class="fa fa-chevron-left"></i> 无监督学习之RBM和AutoEncoder
+              <a href="/2017/08/01/构建聊天机器人-检索、seq2seq、RL、SeqGAN/" rel="next" title="构建聊天机器人: 检索、seq2seq、RL、SeqGAN">
+                <i class="fa fa-chevron-left"></i> 构建聊天机器人: 检索、seq2seq、RL、SeqGAN
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/05/22/生成对抗网络GAN/" rel="prev" title="生成对抗网络GAN">
-                生成对抗网络GAN <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -458,8 +452,8 @@
         
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2017/05/09/记忆网络RNN与LSTM/"
-           data-title="记忆网络RNN与LSTM" data-url="http://younggy.com/2017/05/09/记忆网络RNN与LSTM/">
+      <div class="ds-thread" data-thread-key="2017/11/06/卡尔曼滤波简介/"
+           data-title="卡尔曼滤波简介" data-url="http://younggy.com/2017/11/06/卡尔曼滤波简介/">
       </div>
     
   </div>
@@ -605,7 +599,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#RNN"><span class="nav-number">1.</span> <span class="nav-text">RNN</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#结构"><span class="nav-number">1.1.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#训练"><span class="nav-number">1.2.</span> <span class="nav-text">训练</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用"><span class="nav-number">1.3.</span> <span class="nav-text">应用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RNN_Variants"><span class="nav-number">2.</span> <span class="nav-text">RNN Variants</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LSTM"><span class="nav-number">3.</span> <span class="nav-text">LSTM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#结构-1"><span class="nav-number">3.1.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#梯度消失及梯度爆炸"><span class="nav-number">3.2.</span> <span class="nav-text">梯度消失及梯度爆炸</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GRU"><span class="nav-number">4.</span> <span class="nav-text">GRU</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#结构-2"><span class="nav-number">4.1.</span> <span class="nav-text">结构</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是卡尔曼滤波"><span class="nav-number">1.</span> <span class="nav-text">什么是卡尔曼滤波</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#卡尔曼滤波的原理"><span class="nav-number">2.</span> <span class="nav-text">卡尔曼滤波的原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#预测未来"><span class="nav-number">2.1.</span> <span class="nav-text">预测未来</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#只考虑自身状态"><span class="nav-number">2.1.1.</span> <span class="nav-text">只考虑自身状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#考虑外部状态"><span class="nav-number">2.1.2.</span> <span class="nav-text">考虑外部状态</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修正当下"><span class="nav-number">2.2.</span> <span class="nav-text">修正当下</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#预测未来-1"><span class="nav-number">3.1.</span> <span class="nav-text">预测未来</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修正当下-1"><span class="nav-number">3.2.</span> <span class="nav-text">修正当下</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
