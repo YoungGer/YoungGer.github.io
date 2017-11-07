@@ -35,7 +35,7 @@
 <link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="卡尔曼滤波," />
+  <meta name="keywords" content="多传感器融合,扩展卡尔曼滤波," />
 
 
 
@@ -51,18 +51,22 @@
 
 
 
-<meta name="description" content="卡尔曼滤波是一种在不确定状况下组合多源信息得到所需状态最优估计的一种方法。本文将简要介绍卡尔曼滤波的原理及推导。">
+<meta name="description" content="Extended Kalman Filter（扩展卡尔曼滤波）是卡尔曼滤波的非线性版本。在状态转移方程确定的情况下，EKF已经成为了非线性系统状态估计的事实标准。本文将简要介绍EKF，并介绍其在无人驾驶多传感器融合上的应用。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="卡尔曼滤波简介">
-<meta property="og:url" content="http://younggy.com/2017/11/06/卡尔曼滤波简介/index.html">
+<meta property="og:title" content="扩展卡尔曼滤波EKF与多传感器融合">
+<meta property="og:url" content="http://younggy.com/2017/11/07/扩展卡尔曼滤波EKF与多传感器融合/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="卡尔曼滤波是一种在不确定状况下组合多源信息得到所需状态最优估计的一种方法。本文将简要介绍卡尔曼滤波的原理及推导。">
-<meta property="og:image" content="http://img.blog.csdn.net/20171106163052845?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171106160927414?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-11-06T12:11:14.000Z">
+<meta property="og:description" content="Extended Kalman Filter（扩展卡尔曼滤波）是卡尔曼滤波的非线性版本。在状态转移方程确定的情况下，EKF已经成为了非线性系统状态估计的事实标准。本文将简要介绍EKF，并介绍其在无人驾驶多传感器融合上的应用。">
+<meta property="og:image" content="http://img.blog.csdn.net/20171107174334773?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171107153307950?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171107162528050?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171107153255204?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171107174102027?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171107174334773?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-11-07T10:30:15.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="卡尔曼滤波简介">
-<meta name="twitter:description" content="卡尔曼滤波是一种在不确定状况下组合多源信息得到所需状态最优估计的一种方法。本文将简要介绍卡尔曼滤波的原理及推导。">
+<meta name="twitter:title" content="扩展卡尔曼滤波EKF与多传感器融合">
+<meta name="twitter:description" content="Extended Kalman Filter（扩展卡尔曼滤波）是卡尔曼滤波的非线性版本。在状态转移方程确定的情况下，EKF已经成为了非线性系统状态估计的事实标准。本文将简要介绍EKF，并介绍其在无人驾驶多传感器融合上的应用。">
 
 
 
@@ -74,7 +78,7 @@
   };
 </script>
 
-  <title> 卡尔曼滤波简介 | YoungGy </title>
+  <title> 扩展卡尔曼滤波EKF与多传感器融合 | YoungGy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -255,7 +259,7 @@
             
             
               
-                卡尔曼滤波简介
+                扩展卡尔曼滤波EKF与多传感器融合
               
             
           </h1>
@@ -264,8 +268,8 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2017-11-06T20:09:18+08:00" content="2017-11-06">
-              2017-11-06
+            <time itemprop="dateCreated" datetime="2017-11-07T18:11:52+08:00" content="2017-11-07">
+              2017-11-07
             </time>
           </span>
 
@@ -290,8 +294,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2017/11/06/卡尔曼滤波简介/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/11/06/卡尔曼滤波简介/" itemprop="commentsCount"></span>
+                <a href="/2017/11/07/扩展卡尔曼滤波EKF与多传感器融合/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/11/07/扩展卡尔曼滤波EKF与多传感器融合/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -310,75 +314,94 @@
       
 
       
-        <span itemprop="articleBody"><p>卡尔曼滤波是一种在不确定状况下组合多源信息得到所需状态最优估计的一种方法。本文将简要介绍卡尔曼滤波的原理及推导。</p>
-<p><img src="http://img.blog.csdn.net/20171106163052845?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20171107174334773?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>Extended Kalman Filter（扩展卡尔曼滤波）是卡尔曼滤波的非线性版本。在状态转移方程确定的情况下，EKF已经成为了非线性系统状态估计的事实标准。本文将简要介绍EKF，并介绍其在无人驾驶多传感器融合上的应用。</p>
 <a id="more"></a>
-<h1 id="什么是卡尔曼滤波">什么是卡尔曼滤波</h1><p>首先定义问题：对于某一系统，知道当前状态$X_t$，存在以下两个问题：</p>
+<h1 id="KF与EKF">KF与EKF</h1><p>本文假定读者已熟悉KF，若不熟悉请参考<a href="http://blog.csdn.net/young\_gy/article/details/78177291" target="_blank" rel="external">卡尔曼滤波简介</a>。</p>
+<p>KF与EKF的区别如下：</p>
 <ol>
-<li>经过时间$\triangle t$后，下个状态$X_{t+1}$如何求出？</li>
-<li>假定已求出$X_{t+1}$，在$t+1$时刻收到传感器的非直接信息$Z_{t+1}$，如何对状态$X_{t+1}$进行更正？</li>
+<li>预测未来：$x’=Fx+u$用$x’=f(x,u)$代替；其余$F$用$F_j$代替。</li>
+<li>修正当下：将状态映射到测量的$Hx’$用$h(x’)$代替；其余$H$用$H_j$代替。</li>
 </ol>
-<p>这两个问题正是卡尔曼滤波要解决的问题，形式化两个问题如下：</p>
+<p>其中，非线性函数$f(x,u)，h(x’)$用非线性得到了更精准的状态预测值、映射后的测量值；线性变换$F_j，H_j$通过线性变换使得变换后的$x，z$仍满足高斯分布的假设。</p>
+<p>$F_j，H_j$计算方式如下：</p>
+<p>$$\begin{split}<br>F_j &amp;= \frac{\partial f(x, u)}{\partial x} \\<br>b &amp;= \frac{\partial h(x’)}{\partial x}<br>\end{split}$$</p>
+<p><img src="http://img.blog.csdn.net/20171107153307950?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="为什么要用EKF">为什么要用EKF</h2><p>KF的假设之一就是高斯分布的$x$预测后仍服从高斯分布，高斯分布的$x$变换到测量空间后仍服从高斯分布。可是，假如$F、H$是非线性变换，那么上述条件则不成立。</p>
+<h2 id="将非线性系统线性化">将非线性系统线性化</h2><p>既然非线性系统不行，那么很自然的解决思路就是将非线性系统线性化。</p>
+<p>对于一维系统，采用泰勒一阶展开即可得到：</p>
+<p>$$f(x) \approx f(\mu) + \frac{ \partial f(\mu)}{\partial x}(x-\mu)$$</p>
+<p>对于多维系统，仍旧采用泰勒一阶展开即可得到：</p>
+<p>$$T(x) \approx f(a) + (x-a)^T Df(a)$$</p>
+<p>其中，$Df(a)$是Jacobian矩阵。</p>
+<h1 id="多传感器融合">多传感器融合</h1><h2 id="lidar与radar">lidar与radar</h2><p>本文将以汽车跟踪为例，目标是知道汽车时刻的状态$x = (p_x, p_y, v_x, v_y)$。已知的传感器有lidar、radar。</p>
+<ul>
+<li>lidar：笛卡尔坐标系。可检测到位置，没有速度信息。其测量值$z=(p_x, p_y)$。</li>
+<li>radar：极坐标系。可检测到距离，角度，速度信息，但是精度较低。其测量值$z=(\rho, \phi, \dot{\rho})$，图示如下。</li>
+</ul>
+<p><img src="http://img.blog.csdn.net/20171107162528050?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="传感器融合步骤">传感器融合步骤</h2><p><img src="http://img.blog.csdn.net/20171107153255204?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>步骤图如上所示，包括：</p>
 <ol>
+<li>收到第一个测量值，对状态$x$进行初始化。</li>
 <li>预测未来</li>
 <li>修正当下</li>
 </ol>
-<p>下面，将以机器人导航为例，从<strong>预测未来</strong>和<strong>修正当下</strong>两个角度介绍卡尔曼滤波器。</p>
-<h1 id="卡尔曼滤波的原理">卡尔曼滤波的原理</h1><p>问题场景如下：一个机器人，我们想知道它实时的状态$\vec{x}$，同时也想做到<strong>预测未来</strong>和<strong>修正当下</strong>这两件事。</p>
-<p>其状态$x$表示为一维大小为2的向量，元素分别表示位置信息与速度信息：</p>
-<p>$$\vec{x} = \begin{bmatrix}<br>p\\<br>v<br>\end{bmatrix}$$</p>
-<p>可是状态$x$不一定是精准的，其不确定性用协方差表示：</p>
-<p>$$<br>P_k = \begin{bmatrix}<br>\Sigma_{pp} &amp; \Sigma_{pv} \\<br>\Sigma_{vp} &amp; \Sigma_{vv} \\<br>\end{bmatrix}$$</p>
-<h2 id="预测未来">预测未来</h2><h3 id="只考虑自身状态">只考虑自身状态</h3><p>只考虑自身状态的情况下，根据物理公式，可得：</p>
-<p>$$\begin{split}<br>\color{deeppink}{p_k} &amp;= \color{royalblue}{p_{k-1}} + \Delta t &amp;\color{royalblue}{v_{k-1}} \\<br>\color{deeppink}{v_k} &amp;= &amp;\color{royalblue}{v_{k-1}}<br>\end{split}$$</p>
-<p>用矩阵表示如下：</p>
-<p>$$\begin{align}<br>\color{deeppink}{\mathbf{\hat{x}}_k} &amp;= \begin{bmatrix}<br>1 &amp; \Delta t \\<br>0 &amp; 1<br>\end{bmatrix} \color{royalblue}{\mathbf{\hat{x}}_{k-1}} \\<br>&amp;= \mathbf{F}_k \color{royalblue}{\mathbf{\hat{x}}_{k-1}}<br>\end{align}$$</p>
-<p>在状态变化的过程中引入了新的不确定性，根据协方差的乘积公式可得：</p>
-<p>$$\begin{equation}<br>\begin{split}<br>Cov(x) &amp;= \Sigma\\<br>Cov(\color{firebrick}{\mathbf{A}}x) &amp;= \color{firebrick}{\mathbf{A}} \Sigma \color{firebrick}{\mathbf{A}}^T<br>\end{split} \label{covident}<br>\end{equation}$$</p>
-<p>$$\begin{equation}<br>\begin{split}<br>\color{deeppink}{\mathbf{\hat{x}}_k} &amp;= \mathbf{F}_k \color{royalblue}{\mathbf{\hat{x}}_{k-1}} \\<br>\color{deeppink}{\mathbf{P}_k} &amp;= \mathbf{F_k} \color{royalblue}{\mathbf{P}_{k-1}} \mathbf{F}_k^T<br>\end{split}<br>\end{equation}$$</p>
-<h3 id="考虑外部状态">考虑外部状态</h3><p>外部状态，这里以加速度为例，引入变量$\color{darkorange}{a}$ ($\color{darkorange}{\vec{\mathbf{u}_k}}$)。</p>
-<p>$$\begin{split}<br>\color{deeppink}{p_k} &amp;= \color{royalblue}{p_{k-1}} + {\Delta t} &amp;\color{royalblue}{v_{k-1}} + &amp;\frac{1}{2} \color{darkorange}{a} {\Delta t}^2 \\<br>\color{deeppink}{v_k} &amp;= &amp;\color{royalblue}{v_{k-1}} + &amp; \color{darkorange}{a} {\Delta t}<br>\end{split}$$</p>
-<p>$$\begin{equation}<br>\begin{split}<br>\color{deeppink}{\mathbf{\hat{x}}_k} &amp;= \mathbf{F}_k \color{royalblue}{\mathbf{\hat{x}}_{k-1}} + \begin{bmatrix}<br>\frac{\Delta t^2}{2} \\<br>\Delta t<br>\end{bmatrix} \color{darkorange}{a} \\<br>&amp;= \mathbf{F}_k \color{royalblue}{\mathbf{\hat{x}}_{k-1}} + \mathbf{B}_k \color{darkorange}{\vec{\mathbf{u}_k}}<br>\end{split}<br>\end{equation}$$</p>
-<p>同时，环境仍然存在我们无法刻画的误差，以${\color{mediumaquamarine}{\mathbf{Q}_k}}$表示，最终的预测公式如下：</p>
-<p>$$\begin{equation}<br>\begin{split}<br>\color{deeppink}{\mathbf{\hat{x}}_k} &amp;= \mathbf{F}_k \color{royalblue}{\mathbf{\hat{x}}_{k-1}} + \mathbf{B}_k \color{darkorange}{\vec{\mathbf{u}_k}} \\<br>\color{deeppink}{\mathbf{P}_k} &amp;= \mathbf{F_k} \color{royalblue}{\mathbf{P}_{k-1}} \mathbf{F}_k^T + \color{mediumaquamarine}{\mathbf{Q}_k}<br>\end{split}<br>\end{equation}$$</p>
-<p>从上述式子可见：</p>
+<h2 id="初始化">初始化</h2><p>初始化，指在收到第一个测量值后，对状态$x$进行初始化。初始化如下，同时加上对时间的更新。</p>
+<p>对于radar来说，</p>
+<p>$$\left[<br> \begin{matrix}<br>   p_x \\<br>   p_y \\<br>   v_x \\<br>   v_y<br>  \end{matrix}<br>  \right]<br>  = \left[<br> \begin{matrix}<br>   1 &amp; 0 \\<br>   0 &amp; 1 \\<br>   0 &amp; 0 \\<br>   0 &amp; 0<br>  \end{matrix}<br>  \right]  \left[<br> \begin{matrix}<br>   p_x \\<br>   p_y<br>  \end{matrix}<br>  \right] $$</p>
+<p>对于radar来说，</p>
+<p>$$\left[<br> \begin{matrix}<br>   p_x \\<br>   p_y \\<br>   v_x \\<br>   v_y<br>  \end{matrix}<br>  \right]<br>  = \left[<br> \begin{matrix}<br>   \rho \cos{\phi} \\<br>   \rho \sin{\phi} \\<br>    \dot{\rho} \cos{\phi}\\<br>   \dot{\rho} \sin{\phi}<br>  \end{matrix}<br>  \right] $$</p>
+<h2 id="预测未来">预测未来</h2><p>预测主要涉及的公式是：</p>
+<p>$$\begin{split}<br>x’ &amp;= Fx \\<br>P’ &amp;= FPF^T + Q<br>\end{split}$$</p>
+<p>需要求解的有三个变量：$F、P、Q$。</p>
+<hr>
+<p>$F$表明了系统的状态如何改变，这里仅考虑线性系统，F易得：</p>
+<p>$$Fx = \left[<br> \begin{matrix}<br>   1 &amp; 0 &amp; dt &amp; 0 \\<br>   0 &amp; 1 &amp; 0&amp; dt \\<br>   0 &amp; 0 &amp; 1&amp; 0 \\<br>   0 &amp; 0 &amp; 0&amp; 1<br>  \end{matrix}<br>  \right]<br>  \left[<br> \begin{matrix}<br>   p_x \\<br>   p_y \\<br>   v_x \\<br>   v_y<br>  \end{matrix}<br>  \right]$$</p>
+<hr>
+<p>$P$表明了系统状态的不确定性程度，用$x$的协方差表示，这里自己指定为：</p>
+<p>$$P = \left[<br> \begin{matrix}<br>   1 &amp; 0 &amp; 0 &amp; 0 \\<br>   0 &amp; 1 &amp; 0&amp; 0 \\<br>   0 &amp; 0 &amp; 1000&amp; 0 \\<br>   0 &amp; 0 &amp; 0&amp; 1000<br>  \end{matrix}<br>  \right]$$</p>
+<hr>
+<p>$Q$表明了$x’ = Fx$未能刻画的其他外界干扰。本例子使用线性模型，因此加速度变成了干扰项。$x’ = Fx$中未衡量的额外项目$v$为：</p>
+<p>$$v = \left[<br> \begin{matrix}<br>   \frac{a_x dt^2}{2} \\<br>   \frac{a_y dt^2}{2} \\<br>   a_x dt \\<br>   a_y dt<br>  \end{matrix}<br>  \right] =<br>   \left[<br>   \begin{matrix}<br>   \frac{dt^2}{2} &amp; 0 \\<br>   0 &amp; \frac{dt^2}{2} \\<br>   dt &amp; 0 \\<br>   0 &amp; dt<br>  \end{matrix}<br>  \right]<br>    \left[<br>   \begin{matrix}<br>   a_x\\<br>a_y<br>  \end{matrix}<br>  \right] = Ga$$</p>
+<p>$v$服从高斯分布$N(0, Q)$。</p>
+<p>$$\begin{split}<br>Q &amp;= E[v v^T]= E[Gaa^TG^T] = GE[aa^T]G^T \\<br>&amp;=  G\left[<br>   \begin{matrix}<br>   \sigma_{ax}^2 &amp; 0\\<br>0 &amp; \sigma_{ay}^2<br>  \end{matrix}<br>  \right] G^T \\<br>&amp;=  \left[<br> \begin{matrix}<br>   \frac{ {dt}^4}{4} \sigma_{ax}^2 &amp; 0 &amp;  \frac{ {dt}^3}{2} \sigma_{ax}^2  &amp; 0 \\<br>   0 &amp;  \frac{ {dt}^4}{4} \sigma_{ay}^2 &amp; 0 &amp; \frac{ {dt}^3}{2} \sigma_{ay}^2 \\<br>   \frac{ {dt}^3}{2} \sigma_{ax}^2  &amp; 0 &amp; {dt}^2 \sigma_{ax}^2 &amp; 0 \\<br>   0 &amp;    \frac{ {dt}^3}{2} \sigma_{ay}^2  &amp; 0&amp; {dt}^2 \sigma_{ay}^2<br>  \end{matrix}<br>  \right]<br>\end{split}$$</p>
+<h2 id="修正当下">修正当下</h2><h3 id="lidar">lidar</h3><p>lidar使用了KF。修正当下这里牵涉到的公式主要是：</p>
+<p>$$\begin{split}<br>y &amp;= z - Hx \\<br>S &amp;= HPH^T+R \\<br>K &amp;= PH^TS^{-1} \\<br>x’ &amp;= x+Ky \\<br>P’ &amp;= (I-KH)P<br>\end{split}$$</p>
+<p>需要求解的有两个变量：$H、R$。</p>
+<hr>
+<p>$H$表示了状态空间到测量空间的映射。</p>
+<p>$$Hx = \left[<br> \begin{matrix}<br>   1 &amp; 0 &amp; 0 &amp; 0\\<br>   0 &amp; 1 &amp; 0 &amp; 0<br>  \end{matrix}<br>  \right]<br>  \left[<br> \begin{matrix}<br>   p_x \\<br>   p_y \\<br>   v_x \\<br>   v_y<br>  \end{matrix}<br>  \right]<br>  $$</p>
+<hr>
+<p>$R$表示了测量值的不确定度，一般由传感器的厂家提供，这里lidar参考如下：</p>
+<p>$$R_{laser} = \left[<br> \begin{matrix}<br>   0.0225 &amp; 0  \\<br>   0 &amp; 0.0225<br>  \end{matrix}<br>  \right]$$</p>
+<h3 id="radar">radar</h3><p>radar使用了EKF。修正当下这里牵涉到的公式主要是：</p>
+<p>$$\begin{split}<br>y &amp;= z - f(x) \\<br>S &amp;= H_jPH_j^T+R \\<br>K &amp;= PH_j^TS^{-1} \\<br>x’ &amp;= x+Ky \\<br>P’ &amp;= (I-KH_j)P<br>\end{split}$$</p>
+<p>区别与上面lidar的主要有：</p>
 <ol>
-<li>$\color{deeppink}{\textbf{新的最优估计}}$是$\color{royalblue} {\textbf{之前最优估计}}$的预测加上$\color{darkorange}{\textbf{已知的外界影响}}$的修正。</li>
-<li>$\color{deeppink}{\textbf{新的不确定度}}$是$\color{royalblue} {\textbf{预测的不确定度}}$加上$\color{mediumaquamarine}{\textbf{环境的不确定度}}$。</li>
+<li>状态空间到测量空间的非线性映射$f(x)$</li>
+<li>非线性映射线性化后的Jacob矩阵</li>
+<li>radar的$R_{radar}$</li>
 </ol>
-<h2 id="修正当下">修正当下</h2><p>我们已得到$\color{deeppink}{\mathbf{\hat{x}}_k, P_k}$，下面要通过观测到的测量值$\color{yellowgreen}{\vec{\mathbf{z}_k}}$对${\mathbf{\hat{x}}_k, P_k}$进行更新。</p>
-<p>因为$\color{deeppink}{\mathbf{\hat{x}}_k, P_k}$和$\color{yellowgreen}{\vec{\mathbf{z}_k}}$的数据尺度不一定相同，例如$\color{deeppink}{\mathbf{\hat{x}}_k, P_k}$包含了$\color{deeppink}{\textbf{笛卡尔}}$的坐标信息，使用radar得到的$\color{yellowgreen}{\vec{\mathbf{z}_k}}$则包含$\color{yellowgreen}{\textbf{极坐标}}$信息。所以首先应该把两者放在相同的尺度下去比较，尺度转换使用$\mathbf{H}_k$将预测信息转化为测量信息的尺度。</p>
-<p>$$\begin{equation}<br>\begin{aligned}<br>\vec{\mu}_{\text{expected}} &amp;= \mathbf{H}_k \color{deeppink}{\mathbf{\hat{x}}_k} \\<br>\mathbf{\Sigma}_{\text{expected}} &amp;= \mathbf{H}_k \color{deeppink}{\mathbf{P}_k} \mathbf{H}_k^T<br>\end{aligned}<br>\end{equation}$$</p>
-<p>这样一来，便得到测量尺度上的两个分布：</p>
+<hr>
+<p>状态空间到测量空间的非线性映射$f(x)$如下</p>
+<p>$$f(x) = \left[<br> \begin{matrix}<br>   \rho  \\<br>   \phi \\<br>   \dot{\rho}<br>  \end{matrix}<br>  \right] =<br>  \left[<br> \begin{matrix}<br>  \sqrt{p_x^2+p_y^2}  \\<br>   \arctan{\frac{p_y}{p_x}} \\<br>  \frac{p_x v_x + p_y v_y}{\sqrt{p_x^2+p_y^2}  }<br>  \end{matrix}\right]$$</p>
+<hr>
+<p>非线性映射线性化后的Jacob矩阵$H_j$</p>
+<p>$$H_j = \frac{\partial f(x)}{\partial x} =<br> \left[<br> \begin{matrix}<br>   \frac{\partial \rho}{\partial p_x} &amp; \frac{\partial \rho}{\partial p_y} &amp; \frac{\partial \rho}{\partial v_x} &amp; \frac{\partial \rho}{\partial v_y}  \\<br>   \frac{\partial \phi}{\partial p_x} &amp; \frac{\partial \phi}{\partial p_y} &amp; \frac{\partial \phi}{\partial v_x} &amp; \frac{\partial \phi}{\partial v_y}  \\<br>      \frac{\partial \dot{\rho}}{\partial p_x} &amp; \frac{\partial \dot{\rho}}{\partial p_y} &amp; \frac{\partial \dot{\rho}}{\partial v_x} &amp; \frac{\partial \dot{\rho}}{\partial v_y}<br>  \end{matrix}<br>  \right]$$</p>
+<hr>
+<p>$R$表示了测量值的不确定度，一般由传感器的厂家提供，这里radar参考如下：</p>
+<p>$$R_{laser} = \left[<br> \begin{matrix}<br>   0.09 &amp; 0  &amp; 0\\<br>   0 &amp; 0.0009 &amp; 0 \\<br>      0 &amp; 0 &amp; 0.09<br>  \end{matrix}<br>  \right]$$</p>
+<h1 id="传感器融合实例">传感器融合实例</h1><p>多传感器融合的示例如下，需要注意的有：</p>
 <ol>
-<li>测量值的分布$\mathcal{N}(x, \color{yellowgreen}{\mu_1}, \color{mediumaquamarine}{\sigma_1})$</li>
-<li>预测值变换后的分布$\mathcal{N}(x, \color{fuchsia}{\mu_0}, \color{deeppink}{\sigma_0}) $</li>
+<li>lidar和radar的预测部分是完全相同的</li>
+<li>lidar和radar的参数更新部分是不同的，不同的原因是不同传感器收到的测量值是不同的</li>
+<li>当收到lidar或radar的测量值，依次执行预测、更新步骤</li>
+<li>当同时收到lidar和radar的测量值，依次执行预测、更新1、更新2步骤</li>
 </ol>
-<p>下面一个问题就是如何用这个两个分布组成新的分布。</p>
-<p>$$\begin{equation}<br>\mathcal{N}(x, \color{fuchsia}{\mu_0}, \color{deeppink}{\sigma_0}) \cdot \mathcal{N}(x, \color{yellowgreen}{\mu_1}, \color{mediumaquamarine}{\sigma_1}) \stackrel{?}{=} \mathcal{N}(x, \color{royalblue}{\mu’}, \color{mediumblue}{\sigma’})<br>\end{equation}$$</p>
-<p><img src="http://img.blog.csdn.net/20171106160927414?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>简单的一维情况如下：</p>
-<p>$$\begin{equation}<br>\color{purple}{\mathbf{k}} = \frac{\sigma_0^2}{\sigma_0^2 + \sigma_1^2}<br>\end{equation}$$</p>
-<p>高维情况下，针对测量值分布$(\color{yellowgreen}{\mu_1}, \color{mediumaquamarine}{\Sigma_1}) = (\color{yellowgreen}{\vec{\mathbf{z}_k}}, \color{mediumaquamarine}{\mathbf{R}_k})$与预测值的变化分布$(\color{fuchsia}{\mu_0}, \color{deeppink}{\Sigma_0}) = (\color{fuchsia}{\mathbf{H}_k \mathbf{\hat{x}}_k}, \color{deeppink}{\mathbf{H}_k \mathbf{P}_k \mathbf{H}_k^T})$组合的高斯分布如下：</p>
-<p>$$\begin{equation}<br>\begin{split}<br>\color{royalblue}{\mathbf{\hat{x}}_k’} &amp;= \color{fuchsia}{\mathbf{\hat{x}}_k} &amp; + &amp; \color{purple}{\mathbf{K}’} ( \color{yellowgreen}{\vec{\mathbf{z}_k}} – \color{fuchsia}{\mathbf{H}_k \mathbf{\hat{x}}_k} ) \\<br>\color{royalblue}{\mathbf{P}_k’} &amp;= \color{deeppink}{\mathbf{P}_k} &amp; – &amp; \color{purple}{\mathbf{K}’} \color{deeppink}{\mathbf{H}_k \mathbf{P}_k}<br>\end{split}<br>\end{equation}$$</p>
-<p>$$\begin{equation}<br>\color{purple}{\mathbf{K}’} = \color{deeppink}{\mathbf{P}_k \mathbf{H}_k^T} ( \color{deeppink}{\mathbf{H}_k \mathbf{P}_k \mathbf{H}_k^T} + \color{mediumaquamarine}{\mathbf{R}_k})^{-1}<br>\end{equation}$$</p>
-<h1 id="总结">总结</h1><h2 id="预测未来-1">预测未来</h2><ul>
-<li>输入：过去的最优状态（$\color{royalblue}{\mathbf{\hat{x}}_{k-1}}$，$\color{royalblue}{\mathbf{P}_{k-1}}$）、外界对过程的影响$\color{darkorange}{\vec{\mathbf{u}_k}}$，环境的不确定度$\color{mediumaquamarine}{\mathbf{Q}_k} $。</li>
-<li>输出：预测的最优状态（$\color{deeppink}{\mathbf{\hat{x}}_{k}}$，$\color{deeppink}{\mathbf{P}_{k}}$）。</li>
-<li>其他：对过程的描述（$ \mathbf{F_k} $，$\mathbf{B_k} $）跟时间有关。</li>
-</ul>
-<p>$$\begin{equation}<br>\begin{split}<br>\color{deeppink}{\mathbf{\hat{x}}_k} &amp;= \mathbf{F}_k \color{royalblue}{\mathbf{\hat{x}}_{k-1}} + \mathbf{B}_k \color{darkorange}{\vec{\mathbf{u}_k}} \\<br>\color{deeppink}{\mathbf{P}_k} &amp;= \mathbf{F_k} \color{royalblue}{\mathbf{P}_{k-1}} \mathbf{F}_k^T + \color{mediumaquamarine}{\mathbf{Q}_k}<br>\end{split}<br>\end{equation}$$</p>
-<h2 id="修正当下-1">修正当下</h2><ul>
-<li>输入：预测的最优状态（$\color{deeppink}{\mathbf{\hat{x}}_{k}}$，$\color{deeppink}{\mathbf{P}_{k}}$），测量的状态分布$ (\color{yellowgreen}{\vec{\mathbf{z}_k}}, \color{mediumaquamarine}{\mathbf{R}_k})$，预测到测量的变换矩阵$\color{deeppink}{\mathbf{H}_k} $。</li>
-<li>输出：经过测量修正的最优状态（$\color{royalblue}{\mathbf{\hat{x}}_{k}’}$，$\color{royalblue}{\mathbf{P}_{k}’}$）。</li>
-</ul>
-<p>$$\begin{equation}<br>\begin{split}<br>\color{royalblue}{\mathbf{\hat{x}}_k’} &amp;= \color{fuchsia}{\mathbf{\hat{x}}_k} &amp; + &amp; \color{purple}{\mathbf{K}’} ( \color{yellowgreen}{\vec{\mathbf{z}_k}} – \color{fuchsia}{\mathbf{H}_k \mathbf{\hat{x}}_k} ) \\<br>\color{royalblue}{\mathbf{P}_k’} &amp;= \color{deeppink}{\mathbf{P}_k} &amp; – &amp; \color{purple}{\mathbf{K}’} \color{deeppink}{\mathbf{H}_k \mathbf{P}_k}<br>\end{split}<br>\end{equation}$$</p>
-<p>$$\begin{equation}<br>\color{purple}{\mathbf{K}’} = \color{deeppink}{\mathbf{P}_k \mathbf{H}_k^T} ( \color{deeppink}{\mathbf{H}_k \mathbf{P}_k \mathbf{H}_k^T} + \color{mediumaquamarine}{\mathbf{R}_k})^{-1}<br>\end{equation}$$</p>
-<p>卡尔曼滤波需要内存少，计算速度快，适合实时性情况与嵌入式设备的需要。</p>
-<h1 id="参考">参考</h1><ol>
-<li><a href="http://www.bzarg.com/p/how-a-kalman-filter-works-in-pictures/" target="_blank" rel="external">How a Kalman filter works, in pictures</a></li>
-<li><a href="http://bilgin.esme.org/BitsAndBytes/KalmanFilterforDummies" target="_blank" rel="external">Kalman Filter For Dummies</a></li>
-</ol>
+<p><img src="http://img.blog.csdn.net/20171107174102027?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>多传感器融合的效果如下图所示，红点和蓝点分别表示radar和lidar的测量位置，绿点代表了EKF经过多传感器融合后获取到的测量位置，取得了较低的RMSE。</p>
+<p><img src="http://img.blog.csdn.net/20171107174334773?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
 </span>
       
     </div>
@@ -387,7 +410,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/卡尔曼滤波/" rel="tag">#卡尔曼滤波</a>
+            <a href="/tags/多传感器融合/" rel="tag">#多传感器融合</a>
+          
+            <a href="/tags/扩展卡尔曼滤波/" rel="tag">#扩展卡尔曼滤波</a>
           
         </div>
       
@@ -396,17 +421,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/08/01/构建聊天机器人-检索、seq2seq、RL、SeqGAN/" rel="next" title="构建聊天机器人: 检索、seq2seq、RL、SeqGAN">
-                <i class="fa fa-chevron-left"></i> 构建聊天机器人: 检索、seq2seq、RL、SeqGAN
+              <a href="/2017/11/06/卡尔曼滤波简介/" rel="next" title="卡尔曼滤波简介">
+                <i class="fa fa-chevron-left"></i> 卡尔曼滤波简介
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/11/07/扩展卡尔曼滤波EKF与多传感器融合/" rel="prev" title="扩展卡尔曼滤波EKF与多传感器融合">
-                扩展卡尔曼滤波EKF与多传感器融合 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -456,8 +477,8 @@
         
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2017/11/06/卡尔曼滤波简介/"
-           data-title="卡尔曼滤波简介" data-url="http://younggy.com/2017/11/06/卡尔曼滤波简介/">
+      <div class="ds-thread" data-thread-key="2017/11/07/扩展卡尔曼滤波EKF与多传感器融合/"
+           data-title="扩展卡尔曼滤波EKF与多传感器融合" data-url="http://younggy.com/2017/11/07/扩展卡尔曼滤波EKF与多传感器融合/">
       </div>
     
   </div>
@@ -603,7 +624,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是卡尔曼滤波"><span class="nav-number">1.</span> <span class="nav-text">什么是卡尔曼滤波</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#卡尔曼滤波的原理"><span class="nav-number">2.</span> <span class="nav-text">卡尔曼滤波的原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#预测未来"><span class="nav-number">2.1.</span> <span class="nav-text">预测未来</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#只考虑自身状态"><span class="nav-number">2.1.1.</span> <span class="nav-text">只考虑自身状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#考虑外部状态"><span class="nav-number">2.1.2.</span> <span class="nav-text">考虑外部状态</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修正当下"><span class="nav-number">2.2.</span> <span class="nav-text">修正当下</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#预测未来-1"><span class="nav-number">3.1.</span> <span class="nav-text">预测未来</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修正当下-1"><span class="nav-number">3.2.</span> <span class="nav-text">修正当下</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#KF与EKF"><span class="nav-number">1.</span> <span class="nav-text">KF与EKF</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么要用EKF"><span class="nav-number">1.1.</span> <span class="nav-text">为什么要用EKF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#将非线性系统线性化"><span class="nav-number">1.2.</span> <span class="nav-text">将非线性系统线性化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#多传感器融合"><span class="nav-number">2.</span> <span class="nav-text">多传感器融合</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#lidar与radar"><span class="nav-number">2.1.</span> <span class="nav-text">lidar与radar</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#传感器融合步骤"><span class="nav-number">2.2.</span> <span class="nav-text">传感器融合步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化"><span class="nav-number">2.3.</span> <span class="nav-text">初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#预测未来"><span class="nav-number">2.4.</span> <span class="nav-text">预测未来</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修正当下"><span class="nav-number">2.5.</span> <span class="nav-text">修正当下</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#lidar"><span class="nav-number">2.5.1.</span> <span class="nav-text">lidar</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#radar"><span class="nav-number">2.5.2.</span> <span class="nav-text">radar</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#传感器融合实例"><span class="nav-number">3.</span> <span class="nav-text">传感器融合实例</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
