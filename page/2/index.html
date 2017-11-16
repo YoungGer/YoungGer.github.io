@@ -266,6 +266,110 @@
             
               
                 
+                <a class="post-title-link" href="/2017/05/22/GAN的统一架构与WGAN/" itemprop="url">
+                  GAN的统一架构与WGAN
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-05-22T21:51:16+08:00" content="2017-05-22">
+              2017-05-22
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/05/22/GAN的统一架构与WGAN/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/22/GAN的统一架构与WGAN/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <p><img src="http://img.blog.csdn.net/20170522205300195?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>GAN是让机器自动生成$P_G$去接近$P_{data}$。算法的关键是衡量分布$P_G,P_{data}$的差异，不同的衡量办法得到的$V(G,D)$不同，但是所有的衡量方法都可以归纳到一个统一的框架中：利用<code>f-divergence</code>衡量两个分布差异，利用<code>Fenchel Conjugate</code>将两个分布差异的问题转化到GAN的大框架中。<br>而近段异常流行的WGAN，便是将两个分布的差异用<code>Earch Mover Distance</code>衡量，然后用<code>weight clipping</code>或<code>gradient penalty</code>优化梯度计算，取得了非常好的效果。</p>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/05/22/GAN的统一架构与WGAN/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2017/05/22/生成对抗网络GAN/" itemprop="url">
                   生成对抗网络GAN
                 </a>
@@ -1181,95 +1285,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/02/21/机器为什么可以学习/" itemprop="url">
-                  机器为什么可以学习
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2017-02-21T15:50:39+08:00" content="2017-02-21">
-              2017-02-21
-            </time>
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2017/02/21/机器为什么可以学习/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/21/机器为什么可以学习/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <p><img src="http://7xlwwh.com1.z0.glb.clouddn.com/timg.jpg?imageView/2/w/400" alt="这里写图片描述"></p>
-<p>机器学习、人工智能炙手可热，但是机器到底为什么可以学习呢？本文将从霍夫丁不等式讲到VC维，探究机器学习的原因所在。</p>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/02/21/机器为什么可以学习/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
 
   </section>
 
@@ -1316,7 +1331,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">37</span>
+              <span class="site-state-item-count">38</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

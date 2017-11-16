@@ -35,7 +35,7 @@
 <link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="卡尔曼滤波," />
 
 
 
@@ -51,18 +51,31 @@
 
 
 
-<meta name="description" content="本文简单介绍了信息论中的各种熵，包括自信息、熵；联合熵、条件熵、互信息；KL散度、交叉熵。并在最后用信息论中的交叉熵推导了逻辑回归，得到了和最大似然法相同的结果。">
+<meta name="description" content="非线性系统状态估计是一大难点。KF（Kalman Filter）只适用于线性系统。EKF（Extended Kalman Filter）利用泰勒展开将非线性系统线性化。可是，EKF在强非线性系统下的误差很大。本文将介绍一种新型的滤波算法UKF（Unscented Kalman Filter），其计算精度相比EKF更高并省略了Jacobian矩阵的计算。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="信息论中的各种熵">
-<meta property="og:url" content="http://younggy.com/2017/04/09/信息论中的各种熵/index.html">
+<meta property="og:title" content="无损卡尔曼滤波UKF与多传感器融合">
+<meta property="og:url" content="http://younggy.com/2017/11/16/无损卡尔曼滤波UKF与多传感器融合/index.html">
 <meta property="og:site_name" content="YoungGy">
-<meta property="og:description" content="本文简单介绍了信息论中的各种熵，包括自信息、熵；联合熵、条件熵、互信息；KL散度、交叉熵。并在最后用信息论中的交叉熵推导了逻辑回归，得到了和最大似然法相同的结果。">
-<meta property="og:image" content="http://img.blog.csdn.net/20170409082528851?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170408103817924?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-04-09T00:27:38.000Z">
+<meta property="og:description" content="非线性系统状态估计是一大难点。KF（Kalman Filter）只适用于线性系统。EKF（Extended Kalman Filter）利用泰勒展开将非线性系统线性化。可是，EKF在强非线性系统下的误差很大。本文将介绍一种新型的滤波算法UKF（Unscented Kalman Filter），其计算精度相比EKF更高并省略了Jacobian矩阵的计算。">
+<meta property="og:image" content="http://img.blog.csdn.net/20171116160751254?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171115171407148?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171116151027005?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171116152732257?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171116152807722?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171116154732899?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171116160751254?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171116162135507?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171116162825000?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171116162848363?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171116163044517?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171116163100207?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171116163117197?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171116163953886?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171116164022642?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-11-16T08:56:26.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="信息论中的各种熵">
-<meta name="twitter:description" content="本文简单介绍了信息论中的各种熵，包括自信息、熵；联合熵、条件熵、互信息；KL散度、交叉熵。并在最后用信息论中的交叉熵推导了逻辑回归，得到了和最大似然法相同的结果。">
+<meta name="twitter:title" content="无损卡尔曼滤波UKF与多传感器融合">
+<meta name="twitter:description" content="非线性系统状态估计是一大难点。KF（Kalman Filter）只适用于线性系统。EKF（Extended Kalman Filter）利用泰勒展开将非线性系统线性化。可是，EKF在强非线性系统下的误差很大。本文将介绍一种新型的滤波算法UKF（Unscented Kalman Filter），其计算精度相比EKF更高并省略了Jacobian矩阵的计算。">
 
 
 
@@ -74,7 +87,7 @@
   };
 </script>
 
-  <title> 信息论中的各种熵 | YoungGy </title>
+  <title> 无损卡尔曼滤波UKF与多传感器融合 | YoungGy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -255,7 +268,7 @@
             
             
               
-                信息论中的各种熵
+                无损卡尔曼滤波UKF与多传感器融合
               
             
           </h1>
@@ -264,8 +277,8 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2017-04-09T08:26:14+08:00" content="2017-04-09">
-              2017-04-09
+            <time itemprop="dateCreated" datetime="2017-11-16T16:52:07+08:00" content="2017-11-16">
+              2017-11-16
             </time>
           </span>
 
@@ -274,8 +287,8 @@
               &nbsp; | &nbsp; 分类于
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/数学/" itemprop="url" rel="index">
-                    <span itemprop="name">数学</span>
+                  <a href="/categories/无人驾驶/" itemprop="url" rel="index">
+                    <span itemprop="name">无人驾驶</span>
                   </a>
                 </span>
 
@@ -290,8 +303,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2017/04/09/信息论中的各种熵/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/04/09/信息论中的各种熵/" itemprop="commentsCount"></span>
+                <a href="/2017/11/16/无损卡尔曼滤波UKF与多传感器融合/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/11/16/无损卡尔曼滤波UKF与多传感器融合/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -310,71 +323,152 @@
       
 
       
-        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20170409082528851?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>本文简单介绍了信息论中的各种熵，包括自信息、熵；联合熵、条件熵、互信息；KL散度、交叉熵。并在最后用信息论中的交叉熵推导了逻辑回归，得到了和最大似然法相同的结果。</p>
+        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20171116160751254?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>非线性系统状态估计是一大难点。KF（Kalman Filter）只适用于线性系统。EKF（Extended Kalman Filter）利用泰勒展开将非线性系统线性化。可是，EKF在强非线性系统下的误差很大。本文将介绍一种新型的滤波算法UKF（Unscented Kalman Filter），其计算精度相比EKF更高并省略了Jacobian矩阵的计算。</p>
 <a id="more"></a>
-<h1 id="熵">熵</h1><p>熵是信息的关键度量，通常指一条信息中需要传输或者存储一个信号的平均比特数。熵衡量了预测随机变量的不确定度，不确定性越大熵越大。</p>
-<p>针对随机变量$X$，其信息熵的定义如下：</p>
-<p>$$H(X) =  E[\log_2 (X)] = \sum -p(x) \log_2 (p(x))$$</p>
-<p>信息熵是信源编码中，压缩率的下限。当我们使用少于信息熵的信息量做编码，那么一定有信息的损失。</p>
-<h1 id="联合熵">联合熵</h1><p>联合熵是一集变量之间不确定的衡量手段。</p>
-<p>$$H(X,Y) = \sum \sum -p(x,y) \log(p(x,y))$$</p>
-<h1 id="条件熵">条件熵</h1><p>条件熵描述变量Y在变量X确定的情况下，变量Y的熵还剩多少。</p>
-<p>$$H(Y|X) =  \sum \sum -p(x,y) \log(p(y|x))$$</p>
-<p>联合熵和条件熵的关系是：</p>
-<p>$$H(X,Y) = H(X) +H(Y|X) = H(Y) + H(X|Y) = H(Y,X)$$</p>
-<h1 id="自信息">自信息</h1><p>自信息表示概率空间中与单一事件或离散变量的值相关的信息量的量度。</p>
-<p>$$I(x) = -\log(p(x))$$</p>
-<p>平均的自信息就是信息熵。</p>
-<p>$$H(X) =  E[\log_2 (X)] = \sum -p(x) \log_2 (p(x))$$</p>
-<h1 id="互信息">互信息</h1><p>两个随机变量的互信息，是变量间相互依赖性的量度，不同于相关系数，互信息不限于实值随机变量，其更加一般。</p>
-<p>$$I(X;Y) = \sum\sum -p(x,y) \log(\frac{p(x)p(y)}{p(x,y)})$$</p>
-<p><img src="http://img.blog.csdn.net/20170408103817924?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>$$\begin{split}<br>I(X;Y) &amp;= H(X)-H(X|Y) \\<br>&amp;= H(Y)-H(Y|X) \\<br>&amp;=H(X)+H(Y)-H(X,Y) \\<br>&amp;=H(X,Y)-H(X|Y)-H(Y|X)<br>\end{split}$$</p>
-<p>其意义为，若我们想知道Y包含多少X的信息，在尚未得到 Y之前，我们的不确定性是 H(X)，得到Y后，不确定性是H(X|Y)。所以一旦得到Y后，我们消除了  H(X)-H(X|Y)的不确定量，这就是Y对X的信息量。</p>
-<h1 id="KL散度(信息增益)">KL散度(信息增益)</h1><p>KL散度，又称为相对熵（relative entropy）、信息散度（information divergence）、信息增益（information gain）。</p>
-<p>KL散度是两个概率分布P和Q差别非对称性的度量。KL散度用来度量基于Q的编码来编码来自P的样本平均所需的额外的位元数。典型情况下，P表示数据的真实分布，Q表述数据的模型分布。</p>
-<p>$$D_{KL} (P||Q)= \sum_i P(i) \log \frac{P(i)}{Q(i)}$$</p>
-<h1 id="交叉熵">交叉熵</h1><p>交叉熵衡量了在真实分布是P的情况的情况下，使用分布Q去编码数据，需要的平均比特。</p>
-<p>$$H(p,q) = E_p [-\log q] = H(p) + D_{kl} (p|q)$$</p>
-<p>$$H(p,q) = \sum -p(x)\log(q(x))$$</p>
-<p>交叉熵与逻辑回归的关系如下：</p>
-<p>逻辑回归中：</p>
+<h1 id="Why_UKF">Why UKF</h1><p><img src="http://img.blog.csdn.net/20171115171407148?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>本博客在之前两篇介绍了<a href="http://blog.csdn.net/young\_gy/article/details/78177291" target="_blank" rel="external">KF</a>和<a href="http://blog.csdn.net/young\_gy/article/details/78468153" target="_blank" rel="external">EKF</a>。那么，为什么还需要UKF呢，原因见下表：</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>缺点</th>
+<th>UKF对缺点改进</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KF</td>
+<td>只适用于线性系统</td>
+<td>适用于非线性系统</td>
+</tr>
+<tr>
+<td>EKF</td>
+<td>线性化忽略了高阶项导致强非线性系统误差大；线性化处理需要计算Jacobian矩阵</td>
+<td>对非线性的概率分布近似，没有线性化忽略高阶项； 不需要计算Jacobian矩阵</td>
+</tr>
+</tbody>
+</table>
+<h1 id="UKF简述">UKF简述</h1><h2 id="原理概述">原理概述</h2><p>首先，回顾下UKF需要解决的问题，已知系统的状态及其方差$x_k,P_k$。如果经过非线性函数$x_{k+1} = f(x_k)$后，新的状态和方差如何求解。</p>
+<p>EKF提供的方法是将非线性函数$f(x)$作泰勒一阶展开，利用Jacobian矩阵$H_j$近似将$f(x)$线性化为$H_j x$。这种方法一方面在强非线性系统下误差大，另一方面Jacobian矩阵的计算着实令人头疼。</p>
+<p>UKF认为每一个状态$x_k,P_k$都可以用几个Sigma点（关键点）$X_{sig}$表示。当作用于非线性函数$f(x)$时，只需要将Sigma点$X_{sig}$作用于非线性函数$f(x)$得到$f(X_{sig})$即可。通过得到的$f(X_{sig})$可以计算新的状态$x_{k+1},P_{k+1}$。</p>
+<p><img src="http://img.blog.csdn.net/20171116151027005?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>通过上面的介绍，我们知道UKF只是将非线性函数映射通过关键点映射来实现，那么出现几个问题：</p>
+<ol>
+<li>关键点怎么找</li>
+<li>找到关键点后如何求出新的状态$x_{k+1},P_{k+1}$</li>
+</ol>
+<h2 id="关键点怎么找">关键点怎么找</h2><p>关键点的意义在于能够充分刻画原状态的分布情况，其经验公式如下图所示，需要注意的是：</p>
 <ul>
-<li>$q_{y=1} = \hat{y} = g(wx)$</li>
-<li>$q_{y=0} = 1-\hat{y} = 1-g(wx)$</li>
+<li>$n_x$代表$x_{k|k}$的大小</li>
+<li>$\lambda$代表关键点的散开情况，一般采用经验值$\lambda=3-n_x$</li>
 </ul>
-<p>数据的真实分布中：</p>
+<p><img src="http://img.blog.csdn.net/20171116152732257?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="找到关键点后如何求出新的状态">找到关键点后如何求出新的状态</h2><p>新状态的求解公式如下图所示，需要注意的是：</p>
 <ul>
-<li>$p_{y=1} = y$</li>
-<li>$p_{y=0} =  1-y$</li>
+<li>$X_{k+1|k}$代表Sigma点集合，$X_{k+1|k,i}$代表Sigma点集合中的第$i$个点</li>
+<li>$n_a$代表$x_{k+1|k}$增广后的大小</li>
+<li>$n_{\sigma}$代表Sigma点集合的大小，一般$n_{\sigma} = 1+2n_a$</li>
+<li>权重$w_i$在$i==0$时$w_0=\frac{\lambda}{\lambda+n_a}$，在$i!=0$时$w_0=\frac{1}{2 (\lambda+n_a)}$</li>
 </ul>
-<p>因此，可以用交叉熵去衡量估计分布q与真实分布p的相似性，交叉熵越小那么越相似。</p>
-<p>$$H(p,q) = \sum -p(x) \log q(x) = -y\log(\hat{y})-(1-y)\log(1-\hat{y})$$</p>
-<p>因此，损失函数为，得到了和最大似然推导相同的结果：</p>
-<p>$$\begin{split}<br>L(w) &amp;= \frac{1}{N} \sum_{n=1}^N H(p_n,q_n) \\<br>&amp;= \frac{1}{N} \sum_{n=1}^N [- y\log(\hat{y})-(1-y)\log(1-\hat{y})] \\<br>&amp;= \frac{1}{N} \sum_{n=1}^N \log(1+\exp(-y_nw x_n))<br>\end{split}$$</p>
+<p><img src="http://img.blog.csdn.net/20171116152807722?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h1 id="多传感器融合">多传感器融合</h1><p>下面，将通过lidar、radar跟踪小车的例子，讲解UKF如何应用于小车状态跟踪。相关传感器信息及大体步骤可见<a href="http://blog.csdn.net/young\_gy/article/details/78468153" target="_blank" rel="external">扩展卡尔曼滤波EKF与多传感器融合</a>。</p>
+<h2 id="CTRV模型">CTRV模型</h2><p><a href="http://blog.csdn.net/young\_gy/article/details/78468153" target="_blank" rel="external">EKF</a>文章中使用了CV（constant velocity）模型，本文将使用CTRV（constant turn rate and  velocity magnitude）模型。其状态变量如下图所示。</p>
+<p><img src="http://img.blog.csdn.net/20171116154732899?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>因假定turn rate、velocity不变，其Process noise包含加速度与角加速度为：</p>
+<p>$$\nu_k = \begin{bmatrix} \nu_{a,k} \\<br>\nu_{\ddot{\psi},k}  \end{bmatrix} $$</p>
+<p>利用$\dot{x}$及其对时间的积分$x_{k+1}=\int \dot{x} dt$可得Process模型为：</p>
+<p>$$x_{k+1}=x_k+\begin{bmatrix}<br>\frac{v_k}{\dot{\psi_k}} (sin(\psi_k+\dot{\psi_k} \Delta t)-sin(\psi_k)) \\<br>\frac{v_k}{\dot{\psi_k}} (-cos(\psi_k+\dot{\psi_k} \Delta t)+cos(\psi_k)) \\<br>0 \\<br>\dot{\psi_k} \Delta t \\<br>0<br>\end{bmatrix} $$</p>
+<p>考虑Process noise为：</p>
+<p>$$x_{k+1}=x_k+\begin{bmatrix}<br>\frac{v_k}{\dot{\psi_k}} (sin(\psi_k+\dot{\psi_k} \Delta t)-sin(\psi_k)) \\<br>\frac{v_k}{\dot{\psi_k}} (-cos(\psi_k+\dot{\psi_k} \Delta t)+cos(\psi_k)) \\<br>0 \\<br>\dot{\psi_k} \Delta t \\<br>0<br>\end{bmatrix} +  \begin{bmatrix}<br>\frac{1}{2} \nu_{a,k} \cos(\psi_k) \Delta t^2 \\<br>\frac{1}{2} \nu_{a,k} \sin(\psi_k) \Delta t^2  \\<br>\nu_{a,k}  \Delta t  \\<br>\frac{1}{2} \nu_{\ddot{\psi},k}\Delta t^2  \\<br>\nu_{\ddot{\psi},k}  \Delta t<br>\end{bmatrix} $$</p>
+<h2 id="RoadMap">RoadMap</h2><p><img src="http://img.blog.csdn.net/20171116160751254?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>UKF的RoadMap如上图所示，核心思想在前部分已介绍过，其算法是：</p>
+<ol>
+<li>初始化系统状态$x_k, P_k$</li>
+<li>根据状态$x_k, P_k$生成Sigma点$X_k$</li>
+<li>根据process model预测未来的Sigma点$X_{k+1|k}$</li>
+<li>根据预测的Sigma点$X_{k+1|k}$生成状态预测$x_{k+1|k}, P_{k+1|k}$</li>
+<li>当测量值到来时，将预测的Sigma点$X_{k+1|k}$转换成预测测量值$Z_{k+1|k}$</li>
+<li>根据预测测量值$Z_{k+1|k}$与真实测量值$z_{k+1}$的差值更新得到系统状态$x_{k+1|k+1}, P_{k+1|k+1}$</li>
+</ol>
+<p>同时，有几个部分需要强调下。</p>
+<ol>
+<li>数据增广</li>
+<li>Update State</li>
+<li>Noise Level与NIS</li>
+</ol>
+<h2 id="数据增广">数据增广</h2><p><img src="http://img.blog.csdn.net/20171116162135507?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>如上图，在process预测时需要对$x_k$进行增广，原因是process模型中包含了噪声的非线性关系$f(x_k,\nu_k)$。反之，在measurement model中因为噪声是线性关系的所以不需要进行数据增广。</p>
+<p>增广后$x，P$变化如下，</p>
+<p>$$x = \begin{bmatrix} p_x \\<br>p_y \\<br>v \\<br>\psi \\<br>\dot{\psi}<br>\end{bmatrix} \Rightarrow x_a=<br>\begin{bmatrix} p_x \\<br>p_y \\<br>v \\<br>\psi \\<br>\dot{\psi} \\<br>\nu_a \\<br>\nu_{\ddot\psi}<br>\end{bmatrix} $$</p>
+<p>$$P_a=\begin{bmatrix}<br>P &amp; 0\\<br>0 &amp; Q<br>\end{bmatrix}<br>Q=\begin{bmatrix}<br>\nu_a^2 &amp; 0\\<br>0 &amp; \nu_{\ddot{\psi}}^2<br>\end{bmatrix}$$</p>
+<h2 id="Update_State">Update State</h2><p>State的更新公式如下图所示：</p>
+<p><img src="http://img.blog.csdn.net/20171116162825000?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20171116162848363?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="Noise_Level与NIS">Noise Level与NIS</h2><p>UKF中牵涉的噪音有两类：</p>
+<ul>
+<li>Process Noise：$\nu_a,\nu_{\ddot{\psi}}$，需要自己设定</li>
+<li>Measurement Noise：lidar、radar的噪音水平，由厂家提供</li>
+</ul>
+<p>自己设定调整的方法有NIS，NIS的分布服从chi-square分布，调整合适的噪音水平使其符合规定的chi-square分布即可。</p>
+<p><img src="http://img.blog.csdn.net/20171116163044517?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20171116163100207?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20171116163117197?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="示例">示例</h2><p>本文采用与<a href="http://blog.csdn.net/young\_gy/article/details/78468153" target="_blank" rel="external">扩展卡尔曼滤波EKF与多传感器融合</a>相同的数据集，结果如下。</p>
+<p>NIS验证结果如下：</p>
+<p><img src="http://img.blog.csdn.net/20171116163953886?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>总体跟踪情况如下：</p>
+<p><img src="http://img.blog.csdn.net/20171116164022642?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>UKF与EKF的RMSE对比如下，UKF明显占优：</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>X</th>
+<th>Y</th>
+<th>VX</th>
+<th>VY</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EKF</td>
+<td>0.0973</td>
+<td>0.0855</td>
+<td>0.4513</td>
+<td>0.4399</td>
+</tr>
+<tr>
+<td>UKF</td>
+<td>0.0661</td>
+<td>0.0827</td>
+<td>0.3323</td>
+<td>0.2146</td>
+</tr>
+</tbody>
+</table>
+<p>相关代码可参考：<a href="https://github.com/YoungGer/Udacity-SelfDrivingCar-NanoDegree/tree/master/CarND-Unscented-Kalman-Filter-Project" target="_blank" rel="external">YoungGer的Github</a></p>
 </span>
       
     </div>
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/卡尔曼滤波/" rel="tag">#卡尔曼滤波</a>
+          
+        </div>
+      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/03/07/聚类算法简述/" rel="next" title="聚类算法简述">
-                <i class="fa fa-chevron-left"></i> 聚类算法简述
+              <a href="/2017/11/07/扩展卡尔曼滤波EKF与多传感器融合/" rel="next" title="扩展卡尔曼滤波EKF与多传感器融合">
+                <i class="fa fa-chevron-left"></i> 扩展卡尔曼滤波EKF与多传感器融合
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/04/14/从马尔科夫链到吉布斯采样与PageRank/" rel="prev" title="从马尔科夫链到吉布斯采样与PageRank">
-                从马尔科夫链到吉布斯采样与PageRank <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -424,8 +518,8 @@
         
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2017/04/09/信息论中的各种熵/"
-           data-title="信息论中的各种熵" data-url="http://younggy.com/2017/04/09/信息论中的各种熵/">
+      <div class="ds-thread" data-thread-key="2017/11/16/无损卡尔曼滤波UKF与多传感器融合/"
+           data-title="无损卡尔曼滤波UKF与多传感器融合" data-url="http://younggy.com/2017/11/16/无损卡尔曼滤波UKF与多传感器融合/">
       </div>
     
   </div>
@@ -571,7 +665,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#熵"><span class="nav-number">1.</span> <span class="nav-text">熵</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#联合熵"><span class="nav-number">2.</span> <span class="nav-text">联合熵</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#条件熵"><span class="nav-number">3.</span> <span class="nav-text">条件熵</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#自信息"><span class="nav-number">4.</span> <span class="nav-text">自信息</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#互信息"><span class="nav-number">5.</span> <span class="nav-text">互信息</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#KL散度(信息增益)"><span class="nav-number">6.</span> <span class="nav-text">KL散度(信息增益)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#交叉熵"><span class="nav-number">7.</span> <span class="nav-text">交叉熵</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Why_UKF"><span class="nav-number">1.</span> <span class="nav-text">Why UKF</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#UKF简述"><span class="nav-number">2.</span> <span class="nav-text">UKF简述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#原理概述"><span class="nav-number">2.1.</span> <span class="nav-text">原理概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关键点怎么找"><span class="nav-number">2.2.</span> <span class="nav-text">关键点怎么找</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#找到关键点后如何求出新的状态"><span class="nav-number">2.3.</span> <span class="nav-text">找到关键点后如何求出新的状态</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#多传感器融合"><span class="nav-number">3.</span> <span class="nav-text">多传感器融合</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CTRV模型"><span class="nav-number">3.1.</span> <span class="nav-text">CTRV模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RoadMap"><span class="nav-number">3.2.</span> <span class="nav-text">RoadMap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据增广"><span class="nav-number">3.3.</span> <span class="nav-text">数据增广</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Update_State"><span class="nav-number">3.4.</span> <span class="nav-text">Update State</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Noise_Level与NIS"><span class="nav-number">3.5.</span> <span class="nav-text">Noise Level与NIS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例"><span class="nav-number">3.6.</span> <span class="nav-text">示例</span></a></li></ol></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
