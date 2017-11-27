@@ -35,7 +35,7 @@
 <link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="强化学习," />
+  <meta name="keywords" content="DQN,Q-table,强化学习," />
 
 
 
@@ -63,7 +63,7 @@
 <meta property="og:image" content="http://img.blog.csdn.net/20170620120111481?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
 <meta property="og:image" content="http://img.blog.csdn.net/20170620120124841?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
 <meta property="og:image" content="http://img.blog.csdn.net/20170620164751795?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-06-30T15:40:02.000Z">
+<meta property="og:updated_time" content="2017-11-27T06:30:00.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="强化学习之Q-Learning简介">
 <meta name="twitter:description" content="强化学习在alphago中大放异彩，本文将简要介绍强化学习的一种q-learning。先从最简单的q-table下手，然后针对state过多的问题引入q-network，最后通过两个例子加深对q-learning的理解。">
@@ -314,7 +314,7 @@
       
 
       
-        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20170620115607588?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20170620115607588?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" width="500" alt="图片名称" align="center"></p>
 <p>强化学习在alphago中大放异彩，本文将简要介绍强化学习的一种q-learning。先从最简单的q-table下手，然后针对state过多的问题引入q-network，最后通过两个例子加深对q-learning的理解。</p>
 <a id="more"></a>
 <h1 id="强化学习">强化学习</h1><p>强化学习通常包括两个实体<code>agent</code>和<code>environment</code>。两个实体的交互如下，在<code>environment</code>的<code>state</code> $s_t$下，<code>agent</code>采取<code>action</code> $a_t$进而得到<code>reward</code> $r_{t}$ 并进入<code>state</code> $s_{t+1}$。</p>
@@ -363,6 +363,10 @@
     <footer class="post-footer">
       
         <div class="post-tags">
+          
+            <a href="/tags/DQN/" rel="tag">#DQN</a>
+          
+            <a href="/tags/Q-table/" rel="tag">#Q-table</a>
           
             <a href="/tags/强化学习/" rel="tag">#强化学习</a>
           
@@ -478,21 +482,21 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">38</span>
+              <span class="site-state-item-count">39</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-count">9</span>
               <span class="site-state-item-name">分类</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">47</span>
+              <span class="site-state-item-count">84</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>

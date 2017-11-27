@@ -1,0 +1,884 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Bayes Filter,定位," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="无人驾驶需要精确的定位。本文将简要介绍无人驾驶定位的相关方法，重点介绍贝叶斯滤波框架进行递归的状态估计。同时附上一维马尔科夫定位的实例及代码。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="无人驾驶定位与贝叶斯滤波">
+<meta property="og:url" content="http://younggy.com/2017/11/27/无人驾驶定位与贝叶斯滤波/index.html">
+<meta property="og:site_name" content="YoungGy">
+<meta property="og:description" content="无人驾驶需要精确的定位。本文将简要介绍无人驾驶定位的相关方法，重点介绍贝叶斯滤波框架进行递归的状态估计。同时附上一维马尔科夫定位的实例及代码。">
+<meta property="og:image" content="http://img.blog.csdn.net/20171127140524415?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171127135106653?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171127135122668?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171127135143959?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171127135158523?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171127134840365?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-11-27T06:53:09.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="无人驾驶定位与贝叶斯滤波">
+<meta name="twitter:description" content="无人驾驶需要精确的定位。本文将简要介绍无人驾驶定位的相关方法，重点介绍贝叶斯滤波框架进行递归的状态估计。同时附上一维马尔科夫定位的实例及代码。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post',
+    motion: false
+  };
+</script>
+
+  <title> 无人驾驶定位与贝叶斯滤波 | YoungGy </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?your-analytics-id";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">YoungGy</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">心有猛虎 细嗅蔷薇</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tools">
+          <a href="/tools" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            工具
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'owv-2W-dWzRWk1KttzWi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                无人驾驶定位与贝叶斯滤波
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-11-27T14:20:06+08:00" content="2017-11-27">
+              2017-11-27
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/无人驾驶/" itemprop="url" rel="index">
+                    <span itemprop="name">无人驾驶</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/11/27/无人驾驶定位与贝叶斯滤波/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/11/27/无人驾驶定位与贝叶斯滤波/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20171127140524415?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" width="400" alt="图片名称" align="center"></p>
+<p>无人驾驶需要精确的定位。本文将简要介绍无人驾驶定位的相关方法，重点介绍贝叶斯滤波框架进行递归的状态估计。同时附上一维马尔科夫定位的实例及代码。</p>
+<a id="more"></a>
+<h1 id="无人驾驶定位">无人驾驶定位</h1><p>定位是指在空间中确定自己的位置。</p>
+<p>传统的定位方法有GPS（Global Positioning System），但是GPS的误差较大且不稳定（m级）。无人驾驶对定位精度要求较高需要达到cm级的误差，因此需要多传感器融合定位。</p>
+<h1 id="定位的数学问题之贝叶斯滤波">定位的数学问题之贝叶斯滤波</h1><p>定位的目标：记汽车的位置为$x$，定位即是求解$P(x)$。</p>
+<p>那么，为了确定汽车的位置，我们有哪些数据呢？</p>
+<ul>
+<li>地图数据$m$，包含地图上标志物的位置信息</li>
+<li>观测数据$z$，包含汽车感知到的标志物与汽车的相对位置信息</li>
+<li>控制数据$u$，包含汽车的油门转弯等控制信息</li>
+</ul>
+<p>定位本身是一种位置不确定性的度量，我们的目标是尽量减少这种不确定性。那么，上面的数据信息是如何帮助我们减少不确定性的呢？</p>
+<ul>
+<li>Sense：$P(x|z)  \propto P(x) P(z|x)$</li>
+<li>Move：$P(x_{t+1}) = \sum P(x_t) P(x_{t+1}|x_t)$</li>
+</ul>
+<p>贝叶斯滤波是一种使用递归进行状态估计的框架。其交替利用Move阶段的prediction和Sense阶段的update，便可以对汽车的位置$P(x)$做更精准的描述。</p>
+<h1 id="一维马尔科夫定位">一维马尔科夫定位</h1><p>一维马尔科夫定位、卡尔曼滤波、粒子滤波都属于贝叶斯滤波的一种，这里将简要介绍一维马尔科夫定位。</p>
+<h2 id="数据">数据</h2><p>这里使用的数据包含以下三种，目的是要获得汽车在$t$时刻位置的置信为$bel(x_t)$。</p>
+<ul>
+<li>地图数据$m$，包含地图上标志物的位置信息</li>
+<li>观测数据$z$，包含汽车感知到的标志物与汽车的相对位置信息</li>
+<li>控制数据$u$，包含汽车的油门转弯等控制信息</li>
+</ul>
+<p><img src="http://img.blog.csdn.net/20171127135106653?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20171127135122668?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20171127135143959?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20171127135158523?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="动机">动机</h2><p>记汽车在$t$时刻位置的置信为$bel(x_t)$，有</p>
+<p>$$bel(x_t) = P(x_t| z_{1:t}, u_{1:t}, m)$$</p>
+<p>这里额外提一下，如果求$P(x_t, m| z_{1:t}, u_{1:t})$，那么则从定位问题变成SLAM（simultaneous location and mapping）问题。</p>
+<p>容易看到，随着$t$的增大，估计$bel(x_t)$需要的数据越来越大。我们的目标是：</p>
+<ol>
+<li>减少估计所用的数据量</li>
+<li>需要的数据不随时间增加</li>
+</ol>
+<p>也就是：</p>
+<p>$$bel(x_t) = f(bel(x_{t-1}), z_t, u_t, m )$$</p>
+<p>根据贝叶斯公式，可得：</p>
+<p>$$\begin{split}<br>bel(x_t) &amp;=  P(x_t| z_{1:t}, u_{1:t}, m) \\<br>&amp;=  P(x_t| z_t, z_{1:t-1}, u_{1:t}, m) \\<br>&amp;= \frac{P(x_t| z_{1:t-1}, u_{1:t}, m)  P(z_t| x_t, z_{1:t-1}, u_{1:t}, m) }{P(z_t| z_{1:t-1}, u_{1:t}, m) }<br>\end{split}$$</p>
+<p>上面的公式主要包含两部分，下面将对这两部分分别求解：</p>
+<ol>
+<li>motion model（prediction）：$P(x_t| z_{1:t-1}, u_{1:t}, m)$</li>
+<li>observation model（likelihood）：$P(z_t| x_t, z_{1:t-1}, u_{1:t},m)$</li>
+</ol>
+<h2 id="Motion_Model">Motion Model</h2><p>根据马尔科夫假设，可得：</p>
+<p>$$\begin{split}P(x_t| z_{1:t-1}, u_{1:t}, m) &amp;=\int P(x_{t-1}| z_{1:t-1}, u_{1:t}, m) P(x_t| x_{t-1}, z_{1:t-1}, u_{1:t}, m) d x_{t-1} \\<br>&amp;= \int P(x_{t-1}| z_{1:t-1}, u_{1:t-1}, m) P(x_t| x_{t-1}, u_t, m) d x_{t-1} \\<br>&amp;=\sum_i bel(x_{t-1}^i) P(x_t| x_{t-1}^i, u_t)<br>\end{split}$$</p>
+<p>$P(x_t| x_{t-1}^i, u_t)$被称为transition model，其满足：</p>
+<p>$$P(x_t| x_{t-1}^i, u_t) \sim N(x_t -x_{t-1}^i : u_t, \sigma_{u_t})$$</p>
+<h2 id="Observation_Model">Observation Model</h2><p>根据马尔科夫假设，可得：</p>
+<p>$$\begin{split}<br>P(z_t| x_t, z_{1:t-1}, u_{1:t},m) &amp;= P(z_t| x_t,  m) \\<br>&amp;= P(z_t^1,z_t^2,…z_t^k | x_t,  m)  \\<br>&amp;= \prod_k P(z_t^k | x_t,  m)<br>\end{split}$$</p>
+<p>其中，</p>
+<p>$$P(z_t^k | x_t,  m) \sim N(z_t^k: {z_t^k}^* , \sigma_{z_k})$$</p>
+<p><img src="http://img.blog.csdn.net/20171127134840365?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="代码实例">代码实例</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> bayesianFilter::process\_measurement(<span class="keyword">const</span> MeasurementPackage &amp;measurements,</span><br><span class="line">                                             <span class="keyword">const</span> <span class="built_in">map</span> &amp;<span class="built_in">map</span>\_1d,</span><br><span class="line">                                         help\_functions &amp;helpers)&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/******************************************************************************</span><br><span class="line">     *  Set init belief of state vector:</span><br><span class="line">     ******************************************************************************/</span></span><br><span class="line">    <span class="keyword">if</span>(!is\_initialized\_)&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//run over map:</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> l=<span class="number">0</span>; l&lt; <span class="built_in">map</span>\_1d.landmark\_list.size(); ++l)&#123;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//define landmark:</span></span><br><span class="line">            <span class="built_in">map</span>::single\_landmark\_s landmark\_temp;</span><br><span class="line">            <span class="comment">//get landmark from map:</span></span><br><span class="line">            landmark\_temp = <span class="built_in">map</span>\_1d.landmark\_list[l];</span><br><span class="line"></span><br><span class="line">            <span class="comment">//check, if landmark position is in the range of state vector x:</span></span><br><span class="line">            <span class="keyword">if</span>(landmark\_temp.x\_f &gt; <span class="number">0</span> &amp;&amp; landmark\_temp.x\_f &lt; bel\_x\_init.size() )&#123;</span><br><span class="line"></span><br><span class="line">                <span class="comment">//cast float to int:</span></span><br><span class="line">                <span class="keyword">int</span> position\_x = <span class="keyword">int</span>(landmark\_temp.x\_f) ;</span><br><span class="line">                <span class="comment">//set belief to 1:</span></span><br><span class="line">                bel\_x\_init[position\_x]   = <span class="number">1.0f</span>;</span><br><span class="line">                bel\_x\_init[position\_x-<span class="number">1</span>] = <span class="number">1.0f</span>;</span><br><span class="line">                bel\_x\_init[position\_x+<span class="number">1</span>] = <span class="number">1.0f</span>;</span><br><span class="line"></span><br><span class="line">            &#125; <span class="comment">//end if</span></span><br><span class="line">        &#125;<span class="comment">//end for</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//normalize belief at time 0:</span></span><br><span class="line">    bel\_x\_init = helpers.normalize\_vector(bel\_x\_init);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//set initial flag to true:</span></span><br><span class="line">    is\_initialized\_ = <span class="literal">true</span> ;</span><br><span class="line">    </span><br><span class="line">    &#125;<span class="comment">//end if</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/******************************************************************************</span><br><span class="line">     *  motion model and observation update</span><br><span class="line">    ******************************************************************************/</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt;<span class="string">"--&gt;motion model for state x ! \n"</span> &lt;&lt; <span class="built_in">std</span>::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//get current observations and control information:</span></span><br><span class="line">    MeasurementPackage::control\_s     controls = measurements.control\_s\_;</span><br><span class="line">    MeasurementPackage::observation\_s observations = measurements.observation\_s\_;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//run over the whole state (index represents the pose in x!):</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> i=<span class="number">0</span>; i&lt; bel\_x.size(); ++i)&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">float</span> pose\_i = <span class="keyword">float</span>(i) ;</span><br><span class="line">        <span class="comment">/**************************************************************************</span><br><span class="line">         *  posterior for motion model</span><br><span class="line">        **************************************************************************/</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// motion posterior:</span></span><br><span class="line">        <span class="keyword">float</span> posterior\_motion = <span class="number">0.0f</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//loop over state space x\_t-1 (convolution):</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> j=<span class="number">0</span>; j&lt; bel\_x.size(); ++j)&#123;</span><br><span class="line">            <span class="keyword">float</span> pose\_j = <span class="keyword">float</span>(j) ;</span><br><span class="line">            </span><br><span class="line">            </span><br><span class="line">            <span class="keyword">float</span> distance\_ij = pose\_i-pose\_j;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//transition probabilities:</span></span><br><span class="line">            <span class="keyword">float</span> transition\_prob = helpers.normpdf(distance\_ij,</span><br><span class="line">                                                    controls.delta\_x\_f,</span><br><span class="line">                                                    control\_std) ;</span><br><span class="line">            <span class="comment">//motion model:</span></span><br><span class="line">            posterior\_motion += transition\_prob*bel\_x\_init[j];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**************************************************************************</span><br><span class="line">         *  observation update:</span><br><span class="line">        **************************************************************************/</span></span><br><span class="line">            </span><br><span class="line">        <span class="comment">//define pseudo observation vector:</span></span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; pseudo\_ranges ;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//define maximum distance:</span></span><br><span class="line">        <span class="keyword">float</span> distance\_max = <span class="number">100</span>;</span><br><span class="line">            </span><br><span class="line">        <span class="comment">//loop over number of landmarks and estimate pseudo ranges:</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> l=<span class="number">0</span>; l&lt; <span class="built_in">map</span>\_1d.landmark\_list.size(); ++l)&#123;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//estimate pseudo range for each single landmark </span></span><br><span class="line">            <span class="comment">//and the current state position pose\_i:</span></span><br><span class="line">            <span class="keyword">float</span> range\_l = <span class="built_in">map</span>\_1d.landmark\_list[l].x\_f - pose\_i;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">//check, if distances are positive: </span></span><br><span class="line">            <span class="keyword">if</span>(range\_l &gt; <span class="number">0.0f</span>)</span><br><span class="line">            pseudo\_ranges.push\_back(range\_l) ;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//sort pseudo range vector:</span></span><br><span class="line">        sort(pseudo\_ranges.begin(), pseudo\_ranges.end());</span><br><span class="line"></span><br><span class="line">        <span class="comment">//define observation posterior:</span></span><br><span class="line">        <span class="keyword">float</span> posterior\_obs = <span class="number">1.0f</span> ;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//run over current observation vector:</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> z=<span class="number">0</span>; z&lt; observations.distance\_f.size(); ++z)&#123;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//define min distance:</span></span><br><span class="line">            <span class="keyword">float</span> pseudo\_range\_min;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//check, if distance vector exists:</span></span><br><span class="line">            <span class="keyword">if</span>(pseudo\_ranges.size() &gt; <span class="number">0</span>)&#123;</span><br><span class="line"></span><br><span class="line">                <span class="comment">//set min distance:</span></span><br><span class="line">                pseudo\_range\_min = pseudo\_ranges[<span class="number">0</span>];</span><br><span class="line">                <span class="comment">//remove this entry from pseudo\_ranges-vector:</span></span><br><span class="line">                pseudo\_ranges.erase(pseudo\_ranges.begin());</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//no or negative distances: set min distance to maximum distance:</span></span><br><span class="line">            <span class="keyword">else</span>&#123;</span><br><span class="line">                pseudo\_range\_min = distance\_max ;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//estimate the posterior for observation model: </span></span><br><span class="line">            posterior\_obs*= helpers.normpdf(observations.distance\_f[z], </span><br><span class="line">                                            pseudo\_range\_min,</span><br><span class="line">                                            observation\_std); </span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">/**************************************************************************</span><br><span class="line">         *  finalize bayesian localization filter:</span><br><span class="line">         *************************************************************************/</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment">//update = observation\_update* motion\_model</span></span><br><span class="line">        bel\_x[i] = posterior\_obs*posterior\_motion ;</span><br><span class="line"></span><br><span class="line">    &#125;; </span><br><span class="line"></span><br><span class="line">    <span class="comment">//normalize:</span></span><br><span class="line">    bel\_x = helpers.normalize\_vector(bel\_x);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//set bel\_x to belief\_init:</span></span><br><span class="line">    bel\_x\_init = bel\_x;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Bayes-Filter/" rel="tag">#Bayes Filter</a>
+          
+            <a href="/tags/定位/" rel="tag">#定位</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/16/无损卡尔曼滤波UKF与多传感器融合/" rel="next" title="无损卡尔曼滤波UKF与多传感器融合">
+                <i class="fa fa-chevron-left"></i> 无损卡尔曼滤波UKF与多传感器融合
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/11/27/无人驾驶定位与贝叶斯滤波/"
+           data-title="无人驾驶定位与贝叶斯滤波" data-url="http://younggy.com/2017/11/27/无人驾驶定位与贝叶斯滤波/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/uploads/touxiang.jpg" alt="Guangyao Yang" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Guangyao Yang</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Guangyao Yang</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">39</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">84</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/young_gy" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> CSDN
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YoungGer" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-twitter-url" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i> Twitter
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-weibo-url" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-douban-url" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> DouBan
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/ger-young" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> ZhiHu
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#无人驾驶定位"><span class="nav-number">1.</span> <span class="nav-text">无人驾驶定位</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#定位的数学问题之贝叶斯滤波"><span class="nav-number">2.</span> <span class="nav-text">定位的数学问题之贝叶斯滤波</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#一维马尔科夫定位"><span class="nav-number">3.</span> <span class="nav-text">一维马尔科夫定位</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据"><span class="nav-number">3.1.</span> <span class="nav-text">数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动机"><span class="nav-number">3.2.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Motion_Model"><span class="nav-number">3.3.</span> <span class="nav-text">Motion Model</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Observation_Model"><span class="nav-number">3.4.</span> <span class="nav-text">Observation Model</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码实例"><span class="nav-number">3.5.</span> <span class="nav-text">代码实例</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guangyao Yang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"younggy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+
+  
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/MathJax.js"></script>
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/config/TeX-AMS-MML_HTMLorMML.js"></script>
+  
+
+
+  
+  
+
+</body>
+</html>
