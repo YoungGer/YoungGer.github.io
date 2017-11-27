@@ -1,0 +1,890 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="粒子滤波," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="粒子滤波基于蒙特卡洛方法，用后验概率中随机抽取的粒子集对目标概率密度函数进行近似。本文将简要介绍如何用粒子滤波进行定位并附上相关代码实例。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="粒子滤波简介">
+<meta property="og:url" content="http://younggy.com/2017/11/27/粒子滤波简介/index.html">
+<meta property="og:site_name" content="YoungGy">
+<meta property="og:description" content="粒子滤波基于蒙特卡洛方法，用后验概率中随机抽取的粒子集对目标概率密度函数进行近似。本文将简要介绍如何用粒子滤波进行定位并附上相关代码实例。">
+<meta property="og:image" content="http://img.blog.csdn.net/20171127212221725?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171127154510155?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171127154725826?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171127160450446?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171127160859162?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171127160919551?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171127162519752?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171127162311301?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171127201933214?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-11-27T13:37:53.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="粒子滤波简介">
+<meta name="twitter:description" content="粒子滤波基于蒙特卡洛方法，用后验概率中随机抽取的粒子集对目标概率密度函数进行近似。本文将简要介绍如何用粒子滤波进行定位并附上相关代码实例。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post',
+    motion: false
+  };
+</script>
+
+  <title> 粒子滤波简介 | YoungGy </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?your-analytics-id";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">YoungGy</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">心有猛虎 细嗅蔷薇</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tools">
+          <a href="/tools" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            工具
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'owv-2W-dWzRWk1KttzWi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                粒子滤波简介
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-11-27T21:33:49+08:00" content="2017-11-27">
+              2017-11-27
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/无人驾驶/" itemprop="url" rel="index">
+                    <span itemprop="name">无人驾驶</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/11/27/粒子滤波简介/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/11/27/粒子滤波简介/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20171127212221725?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" width="300" alt="图片名称" align="center"></p>
+<p>粒子滤波基于蒙特卡洛方法，用后验概率中随机抽取的粒子集对目标概率密度函数进行近似。本文将简要介绍如何用粒子滤波进行定位并附上相关代码实例。</p>
+<a id="more"></a>
+<h1 id="粒子滤波概述">粒子滤波概述</h1><p>粒子滤波，和卡尔曼滤波、一维马尔科夫定位都是贝叶斯滤波的一种方法。其最大特点是原理与实现特别简单。</p>
+<p>其核心思想是：用很多个粒子代表定位物体，每个粒子有权重$w$代表该粒子位置的可信度。在prediction阶段，根据物体的控制信息$u$（速度、转角等）与motion model预测出每个粒子下个时刻的位置；在update阶段，根据物体的观测值$z$与地图值$z_l$计算出每个粒子的权重$w$；在resample阶段，根据粒子的$w$重新采样粒子。这样，粒子的位置会越来越趋近真实的物体位置。</p>
+<p>其步骤图如下，包含下面几个步骤：</p>
+<ol>
+<li>初始化：用gps初始化粒子群的位置</li>
+<li>prediction：根据motion model与物体的控制信息$u$预测下个时刻粒子群中粒子的位置</li>
+<li>update：根据物体的观测值$z$与地图值$z_l$计算出每个粒子的权重$w$</li>
+<li>resample：根据粒子的$w$重新采样粒子</li>
+</ol>
+<p><img src="http://img.blog.csdn.net/20171127154510155?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>其伪代码如下：</p>
+<p><img src="http://img.blog.csdn.net/20171127154725826?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>下面，将分阶段具体介绍粒子滤波。</p>
+<h1 id="Motion_Model">Motion Model</h1><p>在介绍粒子滤波之前，需要对定位的物体进行建模，我们定位的物体是汽车，使用的模型是<code>Bicycle Model</code>。</p>
+<p><img src="http://img.blog.csdn.net/20171127160450446?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><code>Bicycle Model</code>假定汽车的四个轮子可以简化成一个轮子，类似自行车故得此名。</p>
+<h1 id="初始化">初始化</h1><p>初始化较为简单，根据GPS信息对每个粒子初始化即可，需要注意的是初始化的时候需要考虑到GPS的定位误差。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> ParticleFilter::init(<span class="keyword">double</span> x, <span class="keyword">double</span> y, <span class="keyword">double</span> theta, <span class="keyword">double</span> <span class="built_in">std</span>[]) &#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Set the number of particles. Initialize all particles to first position (based on estimates of</span></span><br><span class="line">    <span class="comment">//   x, y, theta and their uncertainties from GPS) and all weights to 1.</span></span><br><span class="line">    <span class="comment">// Add random Gaussian noise to each particle.</span></span><br><span class="line">    <span class="comment">// <span class="doctag">NOTE:</span> Consult particle_filter.h for more information about this method (and others in this file).</span></span><br><span class="line">    <span class="built_in">cout</span>&lt;&lt;<span class="string">"Init Start"</span>&lt;&lt;endl;</span><br><span class="line"></span><br><span class="line">    num_particles = <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/*******************************************************</span><br><span class="line">     * Set particles</span><br><span class="line">     ******************************************************/</span></span><br><span class="line">    <span class="keyword">double</span> std_x = <span class="built_in">std</span>[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">double</span> std_y = <span class="built_in">std</span>[<span class="number">1</span>];</span><br><span class="line">    <span class="keyword">double</span> std_theta = <span class="built_in">std</span>[<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// set random engine</span></span><br><span class="line">    normal_distribution&lt;<span class="keyword">double</span>&gt; dist_x(x, std_x);</span><br><span class="line">    normal_distribution&lt;<span class="keyword">double</span>&gt; dist_y(y, std_y);</span><br><span class="line">    normal_distribution&lt;<span class="keyword">double</span>&gt; dist_theta(theta, std_theta);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; num_particles; ++i) &#123;</span><br><span class="line">        Particle curr_particle;</span><br><span class="line">        curr_particle.id = i;</span><br><span class="line">        curr_particle.x = dist_x(gen);</span><br><span class="line">        curr_particle.y = dist_y(gen);</span><br><span class="line">        curr_particle.theta = dist_theta(gen);</span><br><span class="line">        curr_particle.weight = <span class="number">1.0</span>;</span><br><span class="line">        particles.push_back(curr_particle);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/******************************************************</span><br><span class="line">     * Set others</span><br><span class="line">     ******************************************************/</span></span><br><span class="line">    weights.assign(num_particles, <span class="number">1.0</span>);</span><br><span class="line">    is_initialized = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">cout</span>&lt;&lt;<span class="string">"Weights Size: "</span>&lt;&lt;weights.size()&lt;&lt;endl;</span><br><span class="line">    <span class="built_in">cout</span>&lt;&lt;<span class="string">"Particles Size: "</span>&lt;&lt;particles.size()&lt;&lt;endl;</span><br><span class="line">    <span class="built_in">cout</span>&lt;&lt;<span class="string">"Init Finished"</span>&lt;&lt;endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Prediction">Prediction</h1><p>Prediction阶段，即：</p>
+<p>$$x_{t+1} = f(x_t, u_t) $$</p>
+<p>此处根据yaw_rate是否为0分为两种情况，分别是：</p>
+<p><img src="http://img.blog.csdn.net/20171127160859162?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20171127160919551?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>代码如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> ParticleFilter::prediction(<span class="keyword">double</span> <span class="keyword">delta_t</span>, <span class="keyword">double</span> std_pos[], <span class="keyword">double</span> velocity, <span class="keyword">double</span> yaw_rate) &#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add measurements to each particle and add random Gaussian noise.</span></span><br><span class="line">    <span class="comment">// <span class="doctag">NOTE:</span> When adding noise you may find std::normal_distribution and std::default_random_engine useful.</span></span><br><span class="line">    <span class="comment">//  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution</span></span><br><span class="line">    <span class="comment">//  http://www.cplusplus.com/reference/random/default_random_engine/</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">double</span> std_x = std_pos[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">double</span> std_y = std_pos[<span class="number">1</span>];</span><br><span class="line">    <span class="keyword">double</span> std_theta = std_pos[<span class="number">2</span>];</span><br><span class="line">    normal_distribution&lt;<span class="keyword">double</span>&gt; dist_x(<span class="number">0</span>, std_x);</span><br><span class="line">    normal_distribution&lt;<span class="keyword">double</span>&gt; dist_y(<span class="number">0</span>, std_y);</span><br><span class="line">    normal_distribution&lt;<span class="keyword">double</span>&gt; dist_theta(<span class="number">0</span>, std_theta);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; num_particles; ++i) &#123;</span><br><span class="line">        <span class="comment">// main</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">fabs</span>(yaw_rate)&gt;<span class="number">0.001</span>)&#123;</span><br><span class="line">            <span class="keyword">double</span> theta0 = particles[i].theta;</span><br><span class="line">            particles[i].x += velocity/yaw_rate * ( <span class="built_in">sin</span>(theta0+yaw_rate*<span class="keyword">delta_t</span>) - <span class="built_in">sin</span>(theta0) );</span><br><span class="line">            particles[i].y += velocity/yaw_rate * ( -<span class="built_in">cos</span>(theta0+yaw_rate*<span class="keyword">delta_t</span>) + <span class="built_in">cos</span>(theta0) );</span><br><span class="line">            particles[i].theta += yaw_rate * <span class="keyword">delta_t</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            particles[i].x += <span class="function">velocity * delta_t * <span class="title">cos</span><span class="params">(particles[i].theta)</span></span>;</span><br><span class="line">            particles[i].y += <span class="function">velocity * delta_t * <span class="title">sin</span><span class="params">(particles[i].theta)</span></span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// add random noise</span></span><br><span class="line">        particles[i].x += dist_x(gen);</span><br><span class="line">        particles[i].y += dist_y(gen);</span><br><span class="line">        particles[i].theta += dist_theta(gen);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Update">Update</h1><p>更新粒子权重的依据是粒子的观测值与地图标志物相似度的高低，越高的话该粒子的权重越大。可是，该过程存在如下问题：</p>
+<ol>
+<li>粒子观测值的坐标系是以粒子为中心的，粒子前进方向为x轴的坐标系，不同与地图标志物的坐标系。需要统一到地图坐标系。</li>
+<li>地图的标志物太多，只需要考虑粒子传感器范围内的标志物即可。</li>
+<li>粒子观测值与地图标志物需要建立一一匹配的关系。</li>
+<li>更新粒子的权重。</li>
+</ol>
+<p>下面，将针对每点分开介绍。</p>
+<h2 id="坐标变换">坐标变换</h2><p>坐标变换，需要求解的问题如下：</p>
+<p>$$(x_{map},y_{map}) = f(x_{particle}, y_{particle}, \theta_{particle}, x_{obs}, y_{obs})$$</p>
+<p>在求解该问题之前，引入坐标变换的相关公式：</p>
+<p><img src="http://img.blog.csdn.net/20171127162519752?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>对于上图中的坐标$x,y$到坐标$x’, y’$，其变换公式如下：</p>
+<p>$$\begin{split}<br>x’ &amp;= x\cos(\theta) +y\sin(\theta) \\<br>y’ &amp;= -x\sin(\theta) +y\cos(\theta)<br>\end{split}$$</p>
+<p>对于粒子滤波器中的坐标变换，需要将小车的观测值变换到地图坐标系下粒子的观测值。</p>
+<p>记粒子的方向顺时针离水平位置的角度是$\theta$，那么从粒子的坐标系到地图的坐标系变换的角度为$- \theta$，所以有：</p>
+<p>$$\begin{split}<br>x’ &amp;= x\cos(\theta) - y\sin(\theta) \\<br>y’ &amp;= x\sin(\theta) +y\cos(\theta)<br>\end{split}$$</p>
+<p>经过上述公式变换后的坐标是以粒子为圆心，在地图坐标系下的坐标，考虑到粒子的坐标，经过平移变换后可得：</p>
+<p>$$\begin{split}<br>x’ &amp;= x\cos(\theta) - y\sin(\theta) + x_p\\<br>y’ &amp;= x\sin(\theta) +y\cos(\theta) + y_p<br>\end{split}$$</p>
+<p><img src="http://img.blog.csdn.net/20171127162311301?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>以上图为例，OBS1变换后的坐标为：(6，3)。</p>
+<h2 id="选择传感器范围内的标识物">选择传感器范围内的标识物</h2><p>获得粒子在地图坐标系下的观测值后，需要对地图中的标志物进行筛选，筛选的标准是标志物到粒子的距离需要小于传感器的感受距离。</p>
+<h2 id="Association">Association</h2><p>经过上面对观测值的坐标变换以及传感器范围内的筛选，对于每个粒子可以获得其观测标志物在地图坐标系下的坐标值以及地图标志物本身的坐标值，下一个问题就是怎么将这两项坐标值两两匹配。</p>
+<p>比较简单的方法是，对于每个观测值，选择离其最近的标志物进行匹配即可。该方法的优缺点如下：</p>
+<p><img src="http://img.blog.csdn.net/20171127201933214?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h2 id="Update-1">Update</h2><p>对观测值与地图真实的标志物两两匹配后，下一个阶段是计算匹配是否可信，也就是对每个粒子计算其权重$w$。</p>
+<p>一个粒子可能包含多个观测值，每个观测值服从以匹配标志物为中心的多元高斯分布。具体地：</p>
+<p>$$P(x,y) = \frac{1}{2\pi \sigma_x \sigma_y} \exp^{-(\frac{(x-\mu_x)^2}{2\sigma_x^2}+\frac{(y-\mu_y)^2}{2\sigma_y^2})}$$</p>
+<p>$$w = \prod P(x,y)$$</p>
+<h2 id="代码">代码</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> ParticleFilter::dataAssociation(<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;LandmarkObs&gt; predicted, <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;LandmarkObs&gt;&amp; observations) &#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Find the predicted measurement that is closest to each observed measurement and assign the</span></span><br><span class="line">    <span class="comment">//   observed measurement to this particular landmark.</span></span><br><span class="line">    <span class="comment">// <span class="doctag">NOTE:</span> this method will NOT be called by the grading code. But you will probably find it useful to</span></span><br><span class="line">    <span class="comment">//   implement this method and use it as a helper during the updateWeights phase.</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">double</span> BIG_NUMBER = <span class="number">1.0e99</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; observations.size(); i++) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> current_j, id_j;</span><br><span class="line">        <span class="keyword">double</span> current_smallest_error = BIG_NUMBER;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; predicted.size(); j++) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">const</span> <span class="keyword">double</span> dx = predicted[j].x - observations[i].x;</span><br><span class="line">            <span class="keyword">const</span> <span class="keyword">double</span> dy = predicted[j].y - observations[i].y;</span><br><span class="line">            <span class="keyword">const</span> <span class="keyword">int</span> id_j = predicted[j].id;</span><br><span class="line">            <span class="keyword">const</span> <span class="keyword">double</span> error = dx * dx + dy * dy;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (error &lt; current_smallest_error) &#123;</span><br><span class="line">                current_j = j;</span><br><span class="line">                current_smallest_error = error;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        observations[i].ii = current_j;</span><br><span class="line">        observations[i].id = id_j;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> ParticleFilter::updateWeights(<span class="keyword">double</span> sensor_range, <span class="keyword">double</span> std_landmark[],</span><br><span class="line">                                   <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;LandmarkObs&gt; &amp;observations, <span class="keyword">const</span> Map &amp;map_landmarks) &#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Update the weights of each particle using a mult-variate Gaussian distribution. You can read</span></span><br><span class="line">    <span class="comment">//   more about this distribution here: https://en.wikipedia.org/wiki/Multivariate_normal_distribution</span></span><br><span class="line">    <span class="comment">// <span class="doctag">NOTE:</span> The observations are given in the VEHICLE'S coordinate system. Your particles are located</span></span><br><span class="line">    <span class="comment">//   according to the MAP'S coordinate system. You will need to transform between the two systems.</span></span><br><span class="line">    <span class="comment">//   Keep in mind that this transformation requires both rotation AND translation (but no scaling).</span></span><br><span class="line">    <span class="comment">//   The following is a good resource for the theory:</span></span><br><span class="line">    <span class="comment">//   https://www.willamette.edu/~gorr/classes/GeneralGraphics/Transforms/transforms2d.htm</span></span><br><span class="line">    <span class="comment">//   and the following is a good resource for the actual equation to implement (look at equation</span></span><br><span class="line">    <span class="comment">//   3.33</span></span><br><span class="line">    <span class="comment">//   http://planning.cs.uiuc.edu/node99.html</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// iterate particles</span></span><br><span class="line">    weights.clear();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; num_particles; ++i) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// get particle infomation</span></span><br><span class="line">        <span class="keyword">double</span> x_p = particles[i].x;</span><br><span class="line">        <span class="keyword">double</span> y_p = particles[i].y;</span><br><span class="line">        <span class="keyword">double</span> theta = particles[i].theta;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// clear</span></span><br><span class="line">        particles[i].associations.clear();</span><br><span class="line">        particles[i].sense_x.clear();</span><br><span class="line">        particles[i].sense_y.clear();</span><br><span class="line"></span><br><span class="line">        <span class="comment">/*****************************************************</span><br><span class="line">         * Step 1: coordinate system change from VEHICLE'S to MAP'S</span><br><span class="line">         ****************************************************/</span></span><br><span class="line">        <span class="built_in">vector</span>&lt;LandmarkObs&gt; map_observations;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; observations.size(); ++j) &#123;</span><br><span class="line">            <span class="keyword">double</span> x_o = observations[j].x;</span><br><span class="line">            <span class="keyword">double</span> y_o = observations[j].y;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">double</span> x_m, y_m;</span><br><span class="line">            x_m = x_p + <span class="built_in">cos</span>(theta) * x_o - <span class="built_in">sin</span>(theta) * y_o;</span><br><span class="line">            y_m = y_p + <span class="built_in">sin</span>(theta) * x_o + <span class="built_in">cos</span>(theta) * y_o;</span><br><span class="line"></span><br><span class="line">            LandmarkObs observation = &#123;</span><br><span class="line">                    observations[j].id,</span><br><span class="line">                    <span class="number">0</span>,</span><br><span class="line">                    x_m,</span><br><span class="line">                    y_m</span><br><span class="line">            &#125;;</span><br><span class="line"></span><br><span class="line">            map_observations.push_back(observation);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/*****************************************************</span><br><span class="line">         * Step 2: choose landmarks which has the distance with particle less than sensor_range</span><br><span class="line">         ****************************************************/</span></span><br><span class="line">        <span class="built_in">vector</span>&lt;LandmarkObs&gt; effect_landmark_list;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> k=<span class="number">0</span>; k &lt; map_landmarks.landmark_list.size(); ++k) &#123;</span><br><span class="line">            <span class="keyword">float</span> x_l_i = map_landmarks.landmark_list[k].x_f;</span><br><span class="line">            <span class="keyword">float</span> y_l_i = map_landmarks.landmark_list[k].y_f;</span><br><span class="line">            <span class="keyword">int</span> id_l_i = map_landmarks.landmark_list[k].id_i;</span><br><span class="line">            <span class="keyword">double</span> dist = <span class="built_in">sqrt</span>( <span class="built_in">pow</span>(x_p-x_l_i, <span class="number">2</span>) + <span class="built_in">pow</span>(y_p-y_l_i, <span class="number">2</span>) );</span><br><span class="line">            <span class="keyword">if</span> (dist &lt; sensor_range)&#123;</span><br><span class="line">                LandmarkObs curr_landmark = &#123;</span><br><span class="line">                        id_l_i,</span><br><span class="line">                        <span class="number">0</span>,</span><br><span class="line">                        x_l_i,</span><br><span class="line">                        y_l_i</span><br><span class="line">                &#125;;</span><br><span class="line">                effect_landmark_list.push_back(curr_landmark);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="comment">/*****************************************************</span><br><span class="line">         * Step 3: associate landmarks in range to landmarks obeservations</span><br><span class="line">         ****************************************************/</span></span><br><span class="line">        ParticleFilter::dataAssociation(effect_landmark_list, map_observations);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/*****************************************************</span><br><span class="line">         * Step 4: update weight</span><br><span class="line">         ****************************************************/</span></span><br><span class="line">        <span class="keyword">double</span> weight_p = <span class="number">1.0</span>;</span><br><span class="line">        <span class="keyword">if</span> (effect_landmark_list.size()==<span class="number">0</span>)&#123;</span><br><span class="line">            weight_p = <span class="number">0.0</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; map_observations.size(); ++j) &#123;</span><br><span class="line">                <span class="comment">// obeseration im map coordinate</span></span><br><span class="line">                <span class="keyword">double</span> x_m = map_observations[j].x;</span><br><span class="line">                <span class="keyword">double</span> y_m = map_observations[j].y;</span><br><span class="line">                <span class="comment">// landmark im map coordinate</span></span><br><span class="line">                <span class="keyword">double</span> x_l = effect_landmark_list[map_observations[j].ii].x;</span><br><span class="line">                <span class="keyword">double</span> y_l = effect_landmark_list[map_observations[j].ii].y;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">double</span> std_x = std_landmark[<span class="number">0</span>];</span><br><span class="line">                <span class="keyword">double</span> std_y = std_landmark[<span class="number">1</span>];</span><br><span class="line">                <span class="keyword">double</span> p_one_landmark = <span class="number">1</span>/(<span class="number">2</span>*M_PI*std_x*std_y)*<span class="built_in">exp</span>(-( <span class="built_in">pow</span>(x_m-x_l,<span class="number">2</span>)/(<span class="number">2</span>*std_x*std_x) + <span class="built_in">pow</span>(y_m-y_l,<span class="number">2</span>)/(<span class="number">2</span>*std_y*std_y) ));</span><br><span class="line"></span><br><span class="line">                weight_p *= p_one_landmark;</span><br><span class="line"></span><br><span class="line">                particles[i].associations.push_back(map_observations[j].id);</span><br><span class="line"></span><br><span class="line">                <span class="comment">// !!!!! I need help in follow two lines, please help me!!!!!</span></span><br><span class="line">                <span class="comment">// !!!!! I cannot run my program when I uncomment the follow two lines. Why and How can I solve it?</span></span><br><span class="line">                <span class="comment">//particles[i].sense_x.push_back(x_m);</span></span><br><span class="line">                <span class="comment">//particles[i].sense_y.push_back(y_m);</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// update particle</span></span><br><span class="line">        particles[i].weight = weight_p;</span><br><span class="line">        weights.push_back(weight_p);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Resample">Resample</h1><p>Update阶段获得每个粒子的权重后，根据权重重新筛选粒子即可，代码如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> ParticleFilter::resample() &#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Resample particles with replacement with probability proportional to their weight.</span></span><br><span class="line">    <span class="comment">// <span class="doctag">NOTE:</span> You may find std::discrete_distribution helpful here.</span></span><br><span class="line">    <span class="comment">//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution</span></span><br><span class="line">    discrete_distribution&lt;<span class="keyword">int</span>&gt; index (weights.begin(), weights.end());</span><br><span class="line"></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Particle&gt; new_particles;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; num_particles; ++i) &#123;</span><br><span class="line">        new_particles.push_back(particles[index(gen)]);</span><br><span class="line">    &#125;</span><br><span class="line">    particles = new_particles;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="实例">实例</h1><p>相关代码及完整程序可见<a href="https://github.com/YoungGer/Udacity-SelfDrivingCar-NanoDegree/tree/master/CarND-Kidnapped-Vehicle-Project" target="_blank" rel="external">YoungGer的Github</a>。</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/粒子滤波/" rel="tag">#粒子滤波</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/27/无人驾驶定位与贝叶斯滤波/" rel="next" title="无人驾驶定位与贝叶斯滤波">
+                <i class="fa fa-chevron-left"></i> 无人驾驶定位与贝叶斯滤波
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/11/27/粒子滤波简介/"
+           data-title="粒子滤波简介" data-url="http://younggy.com/2017/11/27/粒子滤波简介/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/uploads/touxiang.jpg" alt="Guangyao Yang" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Guangyao Yang</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Guangyao Yang</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">40</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">8</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">68</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/young_gy" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> CSDN
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YoungGer" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-twitter-url" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i> Twitter
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-weibo-url" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-douban-url" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> DouBan
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/ger-young" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> ZhiHu
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#粒子滤波概述"><span class="nav-number">1.</span> <span class="nav-text">粒子滤波概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Motion_Model"><span class="nav-number">2.</span> <span class="nav-text">Motion Model</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#初始化"><span class="nav-number">3.</span> <span class="nav-text">初始化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Prediction"><span class="nav-number">4.</span> <span class="nav-text">Prediction</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Update"><span class="nav-number">5.</span> <span class="nav-text">Update</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#坐标变换"><span class="nav-number">5.1.</span> <span class="nav-text">坐标变换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#选择传感器范围内的标识物"><span class="nav-number">5.2.</span> <span class="nav-text">选择传感器范围内的标识物</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Association"><span class="nav-number">5.3.</span> <span class="nav-text">Association</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Update-1"><span class="nav-number">5.4.</span> <span class="nav-text">Update</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码"><span class="nav-number">5.5.</span> <span class="nav-text">代码</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Resample"><span class="nav-number">6.</span> <span class="nav-text">Resample</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实例"><span class="nav-number">7.</span> <span class="nav-text">实例</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guangyao Yang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"younggy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+
+  
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/MathJax.js"></script>
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/config/TeX-AMS-MML_HTMLorMML.js"></script>
+  
+
+
+  
+  
+
+</body>
+</html>
