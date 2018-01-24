@@ -1,0 +1,915 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="物体检测," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="之前的文章简要介绍了Faster-RCNN等物体检测的算法，本文将从代码角度详细分析介绍Faster-RCNN的实现。本文使用的代码参考了chenyuntc的实现，代码的位置看这里。需要注意的是，本文使用的框架是Pytorch。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FasterRCNN代码解读">
+<meta property="og:url" content="http://younggy.com/2018/01/24/FasterRCNN代码解读/index.html">
+<meta property="og:site_name" content="YoungGy">
+<meta property="og:description" content="之前的文章简要介绍了Faster-RCNN等物体检测的算法，本文将从代码角度详细分析介绍Faster-RCNN的实现。本文使用的代码参考了chenyuntc的实现，代码的位置看这里。需要注意的是，本文使用的框架是Pytorch。">
+<meta property="og:image" content="http://img.blog.csdn.net/20180124222147012?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20180124202137351?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2018-01-24T14:24:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="FasterRCNN代码解读">
+<meta name="twitter:description" content="之前的文章简要介绍了Faster-RCNN等物体检测的算法，本文将从代码角度详细分析介绍Faster-RCNN的实现。本文使用的代码参考了chenyuntc的实现，代码的位置看这里。需要注意的是，本文使用的框架是Pytorch。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post',
+    motion: false
+  };
+</script>
+
+  <title> FasterRCNN代码解读 | YoungGy </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?your-analytics-id";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">YoungGy</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">心有猛虎 细嗅蔷薇</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tools">
+          <a href="/tools" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            工具
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'owv-2W-dWzRWk1KttzWi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                FasterRCNN代码解读
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2018-01-24T22:18:58+08:00" content="2018-01-24">
+              2018-01-24
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/计算机视觉/" itemprop="url" rel="index">
+                    <span itemprop="name">计算机视觉</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2018/01/24/FasterRCNN代码解读/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/01/24/FasterRCNN代码解读/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p><img src="http://img.blog.csdn.net/20180124222147012?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" width="260" alt="图片名称" align="center"></p>
+<p><a href="http://blog.younggy.com/2017/12/25/%E7%89%A9%E4%BD%93%E6%A3%80%E6%B5%8B%E4%B9%8B%E4%BB%8ERCNN%E5%88%B0Faster-RCNN/" target="_blank" rel="external">之前的文章</a>简要介绍了Faster-RCNN等物体检测的算法，本文将从代码角度详细分析介绍Faster-RCNN的实现。本文使用的代码参考了<a href="https://github.com/chenyuntc/simple-faster-rcnn-pytorch" target="_blank" rel="external">chenyuntc的实现</a>，代码的位置<a href="https://github.com/YoungGer/Faster-RCNN-Pytorch" target="_blank" rel="external">看这里</a>。需要注意的是，本文使用的框架是Pytorch。</p>
+<a id="more"></a>
+<h1 id="数据载入">数据载入</h1><p>数据载入部分的代码主要见<code>./data/dataset.py</code>中的类<code>Dataset</code>与<code>TestDataset</code>。</p>
+<p>数据载入部分的逻辑如下：</p>
+<ol>
+<li>从VOC数据集中获得<code>img, bbox, label</code></li>
+<li>将<code>img, bbox</code>进行放缩（放缩的目的是让图片处于合适的大小，这样预先指定锚框才有意义）</li>
+<li>将<code>img</code>进行标准化正则处理</li>
+<li>如果是训练阶段，将<code>img</code>翻转以增加训练数据</li>
+</ol>
+<h1 id="网络结构">网络结构</h1><p>FasterRCNN的网络结构如下图所示：</p>
+<p><img src="http://img.blog.csdn.net/20180124202137351?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWW91bmdfR3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>FasterRCNN结构的代码主要见<code>./model.faster_rcnn.py</code>，其结构包含三大部分：</p>
+<ol>
+<li>预训练的CNN模型 <code>decom_vgg16</code></li>
+<li>rpn网络<code>RegionProposalNetwork</code></li>
+<li>roi及以上网络<code>VGG16RoIHead</code></li>
+</ol>
+<p>下面，将以放缩后大小为<code>[1, 3, 600, 800]</code>的图片为例针对每个部分分别介绍。图像类别共计21类（包含背景）。</p>
+<h2 id="预训练的CNN模型">预训练的CNN模型</h2><p>该部分代码见<code>./model/vgg16.py</code>。</p>
+<p>输入：图片，大小<code>[1, 3, 600, 800]</code><br>输出：特征图<code>features</code>，大小<code>[1, 512, 37, 50]</code></p>
+<hr>
+<p>其逻辑如下：</p>
+<ol>
+<li>载入预先训练好的CNN模型VGG16。</li>
+<li>将模型拆分为两部分<code>extractor</code>, <code>classifier</code>。其中，<code>extractor</code>的参数固定。</li>
+<li>图片通过<code>extractor</code>可以得到特征图<code>features</code>。根据<code>extractor</code>中池化参数可知图像通过<code>extractor</code>缩小了16倍。</li>
+</ol>
+<h2 id="rpn网络">rpn网络</h2><p>该部分代码见<code>./model/rpn.py</code>。</p>
+<p>输入：特征图<code>features</code>，大小<code>[1, 512, 37, 50]</code><br>输出：</p>
+<ul>
+<li><code>rpn_locs</code>：rpn对位置的修正，大小<code>[1, 16650, 4]</code></li>
+<li><code>rpn_scores</code> ：rpn判断区域前景背景，大小<code>[1, 16650, 2]</code></li>
+<li><code>rois</code>：rpn筛选出的roi的位置，大小<code>[300， 4]</code></li>
+<li><code>roi_indices</code>：rpn筛选出的roi对应的图片索引，大小<code>[300]</code></li>
+<li><code>anchor</code>：原图像的锚点，大小<code>[16650, 4]</code></li>
+</ul>
+<p>其中，16650是放缩后的图像所产生的所有锚点（37<em>50</em>9），每个锚点都对应了一个rp。通过 <code>rpn_scores</code>以及nms可以得到筛选后的大小为300的roi。</p>
+<hr>
+<p>其逻辑如下：</p>
+<ol>
+<li>对特征图<code>features</code>以基准长度为16、选择合适的<code>ratios</code>和<code>scales</code>取基准锚点<code>anchor_base</code>。（选择长度为16的原因是图片大小为600<em>800左右，基准长度16对应的原图区域是256</em>256，考虑放缩后的大小有128<em>128，512</em>512比较合适）</li>
+<li>根据<code>anchor_base</code>在原图上获得<code>anchors</code>。</li>
+<li>对特征图<code>features</code>采用卷积得到<code>rpn_locs</code>和<code>rpn_scores</code></li>
+<li>根据<code>anchors</code>和<code>rpn_locs</code>获得修正后的<code>rp</code></li>
+<li>对<code>rp</code>进一步修正获得<code>rois</code>和<code>roi_indices</code>，修正包括超出边界的部分截断、移除太小的、nms。</li>
+</ol>
+<h2 id="roi及以上网络">roi及以上网络</h2><p>该部分代码见<code>./model/roi_module.py</code>。</p>
+<p>输入：</p>
+<ul>
+<li><code>features</code>：特征图，大小<code>[1, 512, 37, 50]</code></li>
+<li><code>rois</code>：rpn筛选出的roi的位置，大小<code>[300， 4]</code></li>
+<li><code>roi_indices</code>：rpn筛选出的roi对应的图片索引，大小<code>[300]</code></li>
+</ul>
+<p>输出：</p>
+<ul>
+<li><code>roi_cls_locs</code>：<code>roi</code>位置的修正，大小<code>[300， 84]</code></li>
+<li><code>roi_scores</code>：<code>roi</code>各类的分数，大小<code>[300， 21]</code></li>
+</ul>
+<hr>
+<p>其逻辑如下：</p>
+<ol>
+<li>通过<code>RoIPooling2D</code>将大小不同的<code>roi</code>变成大小一致，得到pooling后的特征，大小为<code>[300, 512, 7, 7]</code></li>
+<li>接入预训练的CNN模型引入的<code>classifier</code></li>
+<li>分别接入全连接得到<code>roi_cls_locs</code>、<code>roi_scores</code></li>
+</ol>
+<h1 id="训练">训练</h1><p>训练部分的代码主要见<code>./trainer/trainer.py</code>中的<code>FasterRCNNTrainer</code>中的<code>train_step</code>函数。</p>
+<p>训练部分的核心是loss如何求取。</p>
+<p>loss求取前网络的步骤如下：</p>
+<ol>
+<li><strong>预训练CNN特征提取</strong>：输入<code>img</code>到<code>extractor</code>获得<code>features</code></li>
+<li><strong>rpn网络得到roi</strong>：输入<code>features</code>到<code>rpn</code>获得<code>rpn_locs</code>, <code>rpn_scores</code>, <code>rois</code>, <code>roi_indices</code>, <code>anchor</code></li>
+<li><strong>抽样roi</strong>：输入<code>rois</code>，<code>bbox</code>，<code>label</code>到<code>ProposalTargetCreator</code>获得<code>sample_roi</code>, <code>gt_roi_loc</code>, <code>gt_roi_label</code>。该步骤的含义是得到正负例比例和位置合适的<code>roi</code>。</li>
+<li><strong>head网络得到roi的位置修正与分数</strong>：输入<code>features</code>,<code>sample_roi</code>,<code>sample_roi_index</code>得到<code>roi_cls_loc</code>, <code>roi_score</code></li>
+</ol>
+<p>各个loss求取的方式如下：</p>
+<ol>
+<li><code>rpn_loc_loss</code>：已知<code>rpn_loc</code>，需要先根据<code>anchor</code>和<code>bbox</code>得到真实的<code>gt_rpn_loc</code>和<code>gt_rpn_label</code>。该处loss的计算只考虑前景，所以根据<code>rpn_loc</code>,<code>gt_rpn_loc</code>,<code>gt_rpn_label</code>计算L1-LOSS即可。</li>
+<li><code>rpn_cls_loss</code>：根据<code>rpn_score</code>和<code>gt_rpn_label</code>计算二分类的交叉熵即可。</li>
+<li><code>roi_loc_loss</code>：已知<code>roi_loc</code>，在sample roi的过程中已获得<code>gt_roi_loc</code>, <code>gt_roi_label</code>。根据<code>roi_loc</code>,<code>gt_roi_loc</code>,<code>gt_roi_label</code>计算L1-LOSS即可。</li>
+<li><code>roi_cls_loss</code>：根据<code>roi_score</code>和<code>gt_roi_label</code>计算多分类的交叉熵即可。</li>
+</ol>
+<p>整体的loss为以上各loss相加求和。</p>
+<h1 id="测试">测试</h1><p>训练部分的代码主要见<code>./model/faster_rcnn.py</code>中的<code>FasterRCNNTrainer</code>中的<code>predict</code>函数。</p>
+<p>其步骤如下：</p>
+<ol>
+<li><strong>图片预处理</strong></li>
+<li><strong>预训练CNN特征提取</strong>：输入<code>img</code>到<code>extractor</code>获得<code>features</code></li>
+<li><strong>rpn网络得到roi</strong>：输入<code>features</code>到<code>rpn</code>获得<code>rpn_locs</code>, <code>rpn_scores</code>, <code>rois</code>, <code>roi_indices</code>, <code>anchor</code></li>
+<li><strong>head网络得到roi的位置修正与分数</strong>：输入<code>features</code>,<code>rois</code>,<code>roi_indices</code>得到<code>roi_cls_loc</code>, <code>roi_score</code></li>
+<li><strong>得到图片预测的bbox</strong>：输入<code>roi_cls_loc</code>、<code>roi_score</code>、<code>rois</code>，采用nms等方法得到预测的<code>bbox</code>。</li>
+</ol>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/物体检测/" rel="tag">#物体检测</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/25/物体检测之从RCNN到Faster-RCNN/" rel="next" title="物体检测之从RCNN到Faster RCNN">
+                <i class="fa fa-chevron-left"></i> 物体检测之从RCNN到Faster RCNN
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2018/01/24/FasterRCNN代码解读/"
+           data-title="FasterRCNN代码解读" data-url="http://younggy.com/2018/01/24/FasterRCNN代码解读/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/uploads/touxiang.jpg" alt="Guangyao Yang" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Guangyao Yang</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Guangyao Yang</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">69</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/young_gy" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> CSDN
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YoungGer" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-twitter-url" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i> Twitter
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-weibo-url" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="your-douban-url" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> DouBan
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/ger-young" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> ZhiHu
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#数据载入"><span class="nav-number">1.</span> <span class="nav-text">数据载入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#网络结构"><span class="nav-number">2.</span> <span class="nav-text">网络结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#预训练的CNN模型"><span class="nav-number">2.1.</span> <span class="nav-text">预训练的CNN模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rpn网络"><span class="nav-number">2.2.</span> <span class="nav-text">rpn网络</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#roi及以上网络"><span class="nav-number">2.3.</span> <span class="nav-text">roi及以上网络</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#训练"><span class="nav-number">3.</span> <span class="nav-text">训练</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#测试"><span class="nav-number">4.</span> <span class="nav-text">测试</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guangyao Yang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"younggy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+
+  
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/MathJax.js"></script>
+    <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/config/TeX-AMS-MML_HTMLorMML.js"></script>
+  
+
+
+  
+  
+
+</body>
+</html>
